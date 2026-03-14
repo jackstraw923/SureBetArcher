@@ -1,0 +1,32 @@
+# ── SureBetPro .gitignore ─────────────────────────────────────────────────────
+
+# Daily logs — stay local, never commit
+logs/
+
+# Data files — contain proprietary reference data
+*.xlsx
+*.xls
+
+# Tools reports — generated output, not source
+tools/reports/
+
+# R session artifacts
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# Environment / secrets — API keys must never be committed
+.Renviron
+.env
+*.env
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*~
