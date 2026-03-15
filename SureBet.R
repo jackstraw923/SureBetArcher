@@ -54,6 +54,27 @@
 #   - Once API found: rebuild challenger pipeline with automatic bracket fetch,
 #     re-enable sim_tournament() for Challengers, and retire manual xlsx workflow.
 #
+# TODO (SOCCER — next week): Per-team draw rate weighting in model_draw_prob
+#   Current approach: model_draw_prob = league_draw_rate (flat constant per league)
+#   Better approach: weight by each team's individual draw tendency, exactly as in
+#   Big5Odds spreadsheet H(W%) formula:
+#     draw_alloc = league_draw_rate × (home_P(D%) / (home_P(D%) + away_P(D%)))
+#   where P(D%) = team's actual draws / games_played this season
+#   This is already calculated in your manual spreadsheet and verified correct.
+#   Implementation:
+#     1. FotMob standings already return home_draws / home_games_played and
+#        away_draws / away_games_played — these are in soccer_standings_all
+#     2. Carry home_draw_rate and away_draw_rate through soccer_games join
+#     3. In calc_soccer_value_bets(), replace:
+#          model_draw_prob = draw_rate
+#        with:
+#          team_draw_alloc = draw_rate * (home_draw_rate / (home_draw_rate + away_draw_rate))
+#          model_draw_prob = team_draw_alloc
+#     4. Also update DC engine draw_adv to use team-weighted draw prob
+#   Expected impact: games with high-draw teams (e.g. two 30%+ draw teams) will
+#   show higher model_draw_prob, improving DC recommendation precision.
+#   Reference: Big5Odds col H(W%) formula verified 2026-03-14.
+#
 # TODO (NFL / NCAAF season — before first spread bet): Key number push probabilities
 #   - Current spread model treats margins as continuous → assigns zero probability
 #     to exact integer landings. Reasonable for NBA/NCAAB (high-scoring, diffuse).
@@ -128,6 +149,7 @@ library(hoopR)
 library(fastRhockey)
 library(rvest)
 library(zoo)
+library(furrr)   # parallel map_dfr for odds fetch speedup
 
 setwd("C:/Users/jacks/OneDrive/Documents/SureBet")
 SUREBET_DIR <- "C:/Users/jacks/OneDrive/Documents/SureBet"  # master path anchor
@@ -149,6 +171,13 @@ SUREBET_DIR <- "C:/Users/jacks/OneDrive/Documents/SureBet"  # master path anchor
 # ============================================================
 # THE ODDS API - FETCH ALL SPORTS
 # ============================================================
+# ── FETCH CONTROL ─────────────────────────────────────────────────────────────
+# Set FETCH_ODDS <- FALSE to skip the API fetch and reuse cached multi_odds.
+# Use this when debugging downstream code to avoid burning API quota.
+# Requires multi_odds to already exist in the R session from a prior run.
+# Set back to TRUE for any production run or when odds data needs refreshing.
+FETCH_ODDS <- TRUE
+# ──────────────────────────────────────────────────────────────────────────────
 books  <- c("fanduel", "draftkings", "espnbet", "hardrockbet", "fanatics", "bet365")
 
 # Auto-detect ALL active tennis keys — never edit again
@@ -163,18 +192,31 @@ sports <- c("basketball_nba", "basketball_ncaab", "icehockey_nhl",
 # TODO (March 27): Add "baseball_mlb" here and remove the
 # MLB supplemental fetch block (MLB_SPORT_KEY preseason workaround)
 
-
-multi_odds <- map_dfr(
-  sports,
-  ~ suppressWarnings(
-    toa_sports_odds(
-      sport_key = .x,
-      regions   = "us,us2",
-      markets   = "h2h,spreads,totals"
-    ) %>%
-      mutate(sport_key = .x)
+if (FETCH_ODDS) {
+  # Parallel fetch — 4-6x faster than serial map_dfr.
+  # furrr::future_map_dfr runs each sport key in a separate R worker.
+  # possibly() returns an empty tibble on any error/timeout — no crash.
+  # Workers = 4 is safe for TOA rate limits; bump to 6 if quota allows.
+  plan(multisession, workers = min(4L, length(sports)))
+  safe_fetch <- possibly(
+    ~ suppressWarnings(
+        toa_sports_odds(
+          sport_key = .x,
+          regions   = "us,us2",
+          markets   = "h2h,spreads,totals"
+        ) %>%
+          mutate(sport_key = .x)
+      ),
+    otherwise = tibble()
   )
-)
+  multi_odds <- future_map_dfr(sports, safe_fetch, .progress = TRUE)
+  plan(sequential)   # release workers immediately after fetch
+  cat(sprintf("\u2705 Odds fetched: %d rows across %d sports\n",
+              nrow(multi_odds), length(sports)))
+} else {
+  if (!exists("multi_odds")) stop("FETCH_ODDS=FALSE but multi_odds not found. Run once with FETCH_ODDS=TRUE first.")
+  cat(sprintf("ℹ️  FETCH_ODDS=FALSE — reusing cached multi_odds (%d rows)\n", nrow(multi_odds)))
+}
 
 # ============================================================
 # Start runs at this point to avoid unnecessary calls
@@ -239,7 +281,9 @@ name_crosswalk <- tribble(
   "Michigan St Spartans",             "Michigan State Spartans",
   "Missouri St Bears",                "Missouri State Bears",
   "Sam Houston St Bearkats",          "Sam Houston Bearkats",
-  "Cal Baptist Lancers",              "California Baptist Lancers"
+  "Cal Baptist Lancers",              "California Baptist Lancers",
+  # NCAAB additions (from 2026-03-14 diagnostic)
+  "Wichita St Shockers",              "Wichita State Shockers"
 )
 
 fix_team_names <- function(df, crosswalk) {
@@ -1442,6 +1486,7 @@ calc_soccer_value_bets <- function(soccer_games_df) {
         bet_team = home_team_norm, bet_ml = home_ml,
         home_novigprob, away_novigprob,
         home_pyth = model_home_prob, away_pyth = model_away_prob,
+        model_draw_prob, draw_rate,
         home_ev, away_ev, home_edge, away_edge,
         home_value, away_value = FALSE,
         bet_ev = home_ev,        # <-- standardized bet EV
@@ -1473,6 +1518,7 @@ calc_soccer_value_bets <- function(soccer_games_df) {
         bet_team = "Draw", bet_ml = draw_ml,
         home_novigprob, away_novigprob,
         home_pyth = model_home_prob, away_pyth = model_away_prob,
+        model_draw_prob, draw_rate,
         home_ev, away_ev, home_edge, away_edge,
         home_value = FALSE, away_value = FALSE,
         bet_ev = draw_ev,        # <-- standardized bet EV
@@ -1504,6 +1550,7 @@ calc_soccer_value_bets <- function(soccer_games_df) {
         bet_team = away_team_norm, bet_ml = away_ml,
         home_novigprob, away_novigprob,
         home_pyth = model_home_prob, away_pyth = model_away_prob,
+        model_draw_prob, draw_rate,
         home_ev, away_ev, home_edge, away_edge,
         home_value = FALSE, away_value = TRUE,
         bet_ev = away_ev,        # <-- standardized bet EV
@@ -1549,6 +1596,102 @@ print(value_soccer %>%
 # Confirm all bets have positive bet_ev (should return 0 rows)
 value_soccer %>% filter(bet_ev <= 0.05) %>% 
   select(sport, game_date, home_team, away_team, value_side, bet_ev)
+
+# ── Soccer Double Chance Decision Engine ──────────────────────────────────────
+# Double chance covers two of three 1X2 outcomes:
+#   1X = Home win OR Draw  |  X2 = Draw OR Away win  |  12 = Home OR Away
+#
+# TOA double_chance market requires per-event endpoint (not bulk fetch) —
+# not practical for our pipeline. We calculate DC fair value from our 1X2
+# model probabilities instead, which is the correct approach.
+#
+# Decision framework mirrors Big5Odds spreadsheet (DrawAdv / TmAdv columns):
+#   draw_adv = model_draw_prob - league_draw_rate  (is draw elevated vs. avg?)
+#   DC_ML_EV_OVERRIDE_THRESHOLD = 0.15  (take ML only if ML_EV > DC_EV by >15%)
+#
+# Rules:
+#   1. draw_value + home/away_value → DC (team+draw) unless ML EV clearly dominates
+#   2. draw_value + draw_adv > 0 → always recommend Draw or DC+Draw
+#   3. single-side ML value only → straight ML
+
+DC_ML_EV_OVERRIDE_THRESHOLD <- 0.15   # Take ML if ML_EV exceeds DC_EV by this margin
+
+soccer_dc_recommendations <- value_soccer %>%
+  group_by(sport, game_date, home_team, away_team) %>%
+  summarise(
+    home_value  = any(value_side == "home_value"),
+    away_value  = any(value_side == "away_value"),
+    draw_value  = any(value_side == "draw_value"),
+    home_ev     = suppressWarnings(max(bet_ev[value_side == "home_value"],  na.rm = TRUE)),
+    away_ev     = suppressWarnings(max(bet_ev[value_side == "away_value"],  na.rm = TRUE)),
+    draw_ev     = suppressWarnings(max(bet_ev[value_side == "draw_value"],  na.rm = TRUE)),
+    model_home  = first(home_pyth),
+    model_away  = first(away_pyth),
+    model_draw  = first(model_draw_prob),
+    draw_rate   = first(draw_rate),
+    best_book   = first(bookmaker_key),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    home_ev = ifelse(is.infinite(home_ev) | is.nan(home_ev), NA_real_, home_ev),
+    away_ev = ifelse(is.infinite(away_ev) | is.nan(away_ev), NA_real_, away_ev),
+    draw_ev = ifelse(is.infinite(draw_ev) | is.nan(draw_ev), NA_real_, draw_ev),
+
+    # DrawAdv: is this game's model draw prob above the league average?
+    draw_adv          = coalesce(model_draw, draw_rate) - coalesce(draw_rate, 0),
+
+    # DC fair win probabilities (sum of two 1X2 model probs)
+    dc_home_draw_prob = coalesce(model_home, 0) + coalesce(model_draw, coalesce(draw_rate, 0)),
+    dc_away_draw_prob = coalesce(model_away, 0) + coalesce(model_draw, coalesce(draw_rate, 0)),
+
+    dc_recommendation = case_when(
+      # Rule 1a: home + draw value → DC home+draw (unless ML dominates)
+      home_value & draw_value & !is.na(home_ev) & !is.na(draw_ev) &
+        (home_ev - dc_home_draw_prob) <= DC_ML_EV_OVERRIDE_THRESHOLD
+        ~ paste0(home_team, " or Draw (DC)"),
+
+      # Rule 1b: away + draw value → DC away+draw (unless ML dominates)
+      away_value & draw_value & !is.na(away_ev) & !is.na(draw_ev) &
+        (away_ev - dc_away_draw_prob) <= DC_ML_EV_OVERRIDE_THRESHOLD
+        ~ paste0(away_team, " or Draw (DC)"),
+
+      # Rule 1c: ML EV clearly dominates — take straight home ML
+      home_value & draw_value & !is.na(home_ev) & !is.na(draw_ev) &
+        (home_ev - dc_home_draw_prob) > DC_ML_EV_OVERRIDE_THRESHOLD
+        ~ paste0(home_team, " ML (EV dominates DC)"),
+
+      # Rule 1d: ML EV clearly dominates — take straight away ML
+      away_value & draw_value & !is.na(away_ev) & !is.na(draw_ev) &
+        (away_ev - dc_away_draw_prob) > DC_ML_EV_OVERRIDE_THRESHOLD
+        ~ paste0(away_team, " ML (EV dominates DC)"),
+
+      # Rule 2: draw value + draw rate above league avg → Draw or DC+Draw
+      draw_value & !is.na(draw_adv) & draw_adv > 0
+        ~ "Draw (rate above league avg)",
+
+      # Rule 3: draw value only, draw rate at/below avg → straight Draw
+      draw_value & !home_value & !away_value
+        ~ "Draw",
+
+      # Rule 4: single ML value, no draw conflict → straight ML
+      home_value & !draw_value ~ paste0(home_team, " ML"),
+      away_value & !draw_value ~ paste0(away_team, " ML"),
+
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(dc_recommendation)) %>%
+  select(sport, game_date, home_team, away_team,
+         home_value, draw_value, away_value,
+         draw_adv, dc_recommendation,
+         home_ev, draw_ev, away_ev)
+
+if (nrow(soccer_dc_recommendations) > 0) {
+  cat("\n--- Soccer Double Chance / Bet Type Recommendations ---\n")
+  cat(nrow(soccer_dc_recommendations), "games with actionable DC guidance\n\n")
+  print(soccer_dc_recommendations, n = Inf)
+  cat("────────────────────────────────────────────────────────────\n\n")
+}
 
 # ============================================================
 # SACKMANN TOURNAMENT SIMULATOR — single-elimination bracket
@@ -1727,7 +1870,7 @@ cat(sprintf("ATP Elo loaded: %d players | WTA Elo loaded: %d players\n",
             nrow(atp_elo_clean), nrow(wta_elo_clean)))
 
 # ── 3. Tennis h2h odds — best book per matchup ───────────────────────────────
-tennis_h2h <- multi_odds %>%
+tennis_h2h <- multi_odds_filtered %>%
   filter(str_detect(sport_key, "tennis"), market_key == "h2h") %>%
   mutate(game_date = as.Date(substr(commence_time, 1, 10))) %>%
   group_by(game_date, sport_key, home_team, away_team) %>%
@@ -2364,6 +2507,24 @@ odds_mlb <- multi_odds_filtered %>%
 
 cat("MLB odds found:", nrow(odds_mlb), "\n")
 print(odds_mlb %>% distinct(home_team, away_team) %>% head(5))
+
+# ── Preseason guard: ensure odds_mlb always has expected schema ───────────────
+# TOA returns no MLB preseason odds before ~March 26. The filtered tibble
+# comes back with 0 rows AND 0 columns, crashing downstream mutate/pivot.
+# Scaffold guarantees the pipeline runs cleanly (0 value bets) until March 27.
+if (nrow(odds_mlb) == 0 || !("home_team" %in% names(odds_mlb))) {
+  cat("i  MLB odds empty - inserting schema scaffold (preseason, expected pre-March 27)\n")
+  odds_mlb <- tibble(
+    game_date      = as.Date(character()),
+    home_team      = character(),
+    away_team      = character(),
+    bookmaker_key  = character(),
+    market_key     = character(),
+    outcomes_name  = character(),
+    outcomes_price = double(),
+    outcomes_point = double()
+  )
+}
 
 # ── MLB crosswalk diagnostic (run once; add mismatches to name_crosswalk) ────
 mlb_toa_teams <- bind_rows(
@@ -4536,8 +4697,36 @@ cat("Current paper bankroll: $", round(current_bankroll, 2), "\n")
 cat("Daily risk cap (10%):   $", round(current_bankroll * 0.10, 2), "\n")
 
 # ---- Score yesterday's bets in dollar terms ----
+# ── Helper: load daily_picks and extract correct post-cap kelly + risk ─────────
+# daily_picks_YYYY-MM-DD.csv is the single source of truth for what was
+# actually staked. Sport logs carry pre-cap scaled_kelly values which overstate
+# risk. This helper returns a joinable tibble keyed on bet identity.
+load_daily_picks_kelly <- function(picks_path) {
+  if (is.null(picks_path) || !file.exists(picks_path)) return(NULL)
+  read_csv(picks_path,
+           col_types = cols(
+             Home       = col_character(),
+             Away       = col_character(),
+             Pick       = col_character(),
+             Odds       = col_double(),
+             Kelly      = col_double(),
+             `Risk $`   = col_double(),
+             .default   = col_guess()
+           ),
+           show_col_types = FALSE) %>%
+    transmute(
+      home_team    = Home,
+      away_team    = Away,
+      bet_team     = Pick,
+      bet_ml       = Odds,
+      capped_kelly = Kelly,
+      risk_dollar  = `Risk $`
+    )
+}
+
 settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
-                             log_date_override = NULL,
+                             log_date_override          = NULL,
+                             daily_picks_path           = NULL,
                              soccer_pnl_by_date_arg     = NULL,
                              tennis_pnl_by_date_arg     = NULL,
                              challenger_pnl_by_date_arg = NULL) {
@@ -4593,6 +4782,29 @@ settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
       dollar_stake = scaled_kelly * bankroll_at_open,
       dollar_pnl   = pnl * bankroll_at_open
     )
+
+  # ── Patch scaled_kelly + dollar amounts from daily_picks (post-cap) ─────────
+  # Sport logs carry pre-cap scaled_kelly which overstates stakes ~3x.
+  # Join on bet identity to replace with the actual capped values.
+  picks_kelly <- load_daily_picks_kelly(daily_picks_path)
+
+  if (!is.null(picks_kelly)) {
+    all_settled <- all_settled %>%
+      left_join(
+        picks_kelly %>% select(home_team, away_team, bet_team, capped_kelly, risk_dollar),
+        by = c("home_team", "away_team", "bet_team")
+      ) %>%
+      mutate(
+        scaled_kelly = coalesce(capped_kelly, scaled_kelly),
+        dollar_stake = coalesce(risk_dollar,  dollar_stake),
+        dollar_pnl   = case_when(
+          result == "W" ~ (bet_ml - 1) * scaled_kelly * bankroll_at_open,
+          result == "L" ~ -scaled_kelly * bankroll_at_open,
+          TRUE          ~ dollar_pnl
+        )
+      ) %>%
+      select(-capped_kelly, -risk_dollar)
+  }
   
   # ── Bug #2 guard: log_date may have multiple values if log spans multiple days.
   # Always take the first value and warn so the caller knows to use log_date_override.
@@ -4667,7 +4879,11 @@ settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
   tibble(
     date = resolved_date,
     starting_bankroll  = bankroll_at_open,
-    total_risked       = sum(all_settled$dollar_stake, na.rm = TRUE),
+    total_risked       = if (!is.null(picks_kelly)) {
+                           sum(picks_kelly$risk_dollar, na.rm = TRUE)
+                         } else {
+                           sum(all_settled$dollar_stake, na.rm = TRUE)
+                         },
     settled_pnl_kelly  = sum(all_settled$pnl,        na.rm = TRUE) + extra_pnl_kelly,
     settled_pnl_dollar = sum(all_settled$dollar_pnl, na.rm = TRUE) + extra_pnl_dollar,
     ending_bankroll    = round(bankroll_at_open +
@@ -4782,6 +4998,8 @@ for (i in seq_along(backfill_dates)) {
     bf_row <- settle_paper_day(bf_ml_path, bf_bankroll,
                                st_log_path                = bf_st_path,
                                log_date_override          = bf_date,
+                               daily_picks_path           = file.path(getwd(), "logs",
+                                                            paste0("daily_picks_", bf_date, ".csv")),
                                soccer_pnl_by_date_arg     = soccer_pnl_by_date,
                                tennis_pnl_by_date_arg     = tennis_pnl_by_date,
                                challenger_pnl_by_date_arg = challenger_pnl_by_date)
@@ -4813,6 +5031,8 @@ if (!yesterday %in% paper_log$date) {
     yesterday_row <- settle_paper_day(log_path, yesterday_bankroll,
                                       st_log_path                = spread_total_log_path,
                                       log_date_override          = yesterday,
+                                      daily_picks_path           = file.path(getwd(), "logs",
+                                                                   paste0("daily_picks_", yesterday, ".csv")),
                                       soccer_pnl_by_date_arg     = soccer_pnl_by_date,
                                       tennis_pnl_by_date_arg     = tennis_pnl_by_date,
                                       challenger_pnl_by_date_arg = challenger_pnl_by_date)
@@ -4885,4 +5105,129 @@ if (file.exists("tools/vig_monitor.R")) {
   message("ℹ️  tools/vig_monitor.R not found — skipping. ",
           "Place tools/ folder in: ", getwd())
 }
+
+# TOA quota tracker: log today's requests and print usage vs. tier limit.
+# n_requests = number of sport keys fetched (one API request per key).
+if (file.exists("tools/toa_quota_monitor.R")) {
+  source("tools/toa_quota_monitor.R")
+  if (FETCH_ODDS) {
+    toa_log_request(
+      call_type  = "odds_fetch",
+      n_requests = length(sports),
+      sports     = sports,
+      notes      = "daily run"
+    )
+  }
+  toa_quota_report()
+  toa_poll_budget(n_sports = length(sports))
+} else {
+  message("ℹ️  tools/toa_quota_monitor.R not found — skipping quota tracking.")
+}
+
+# ============================================================
+# JSON EXPORTS — ArcVest dashboard data contracts
+# ============================================================
+# Writes three JSON files to docs/data/ for the static HTML dashboard.
+# docs/ is committed to GitHub; GitHub Pages serves arcvest.io from it.
+# The dashboard reads these files directly — no server required.
+# Only runs if jsonlite is available (already loaded via library block above).
+
+json_dir <- file.path(getwd(), "docs", "data")
+if (!dir.exists(json_dir)) dir.create(json_dir, recursive = TRUE)
+
+# ── 1. daily_picks.json — today's capped picks ───────────────────────────────
+tryCatch({
+  write(toJSON(final_picks_clean, auto_unbox = TRUE, na = "null", digits = 4),
+        file.path(json_dir, "daily_picks.json"))
+  cat(sprintf("✅ JSON: daily_picks.json written (%d picks)\n",
+              nrow(final_picks_clean)))
+}, error = function(e) message("⚠️  daily_picks.json write failed: ", e$message))
+
+# ── 2. paper_log.json — full paper trading history ───────────────────────────
+tryCatch({
+  paper_export <- paper_log %>%
+    mutate(date = format(date, "%Y-%m-%d"))
+  write(toJSON(paper_export, auto_unbox = TRUE, na = "null", digits = 4),
+        file.path(json_dir, "paper_log.json"))
+  cat(sprintf("✅ JSON: paper_log.json written (%d days)\n", nrow(paper_log)))
+}, error = function(e) message("⚠️  paper_log.json write failed: ", e$message))
+
+# ── 3. summary.json — dashboard KPIs and record by sport ─────────────────────
+tryCatch({
+  # Build W/L/ROI record by sport from all settled bet logs
+  all_settled_bets <- tryCatch({
+    ml_files <- list.files(file.path(getwd(), "logs"),
+                           pattern = "^bet_log_.*\\.csv$", full.names = TRUE)
+    st_files <- list.files(file.path(getwd(), "logs"),
+                           pattern = "^spread_total_log_.*\\.csv$", full.names = TRUE)
+    bind_rows(
+      map_dfr(ml_files, ~ read_csv(.x, col_types = cols(.default = col_guess()),
+                                   show_col_types = FALSE)),
+      map_dfr(st_files, ~ read_csv(.x, col_types = cols(.default = col_guess()),
+                                   show_col_types = FALSE))
+    ) %>% filter(result %in% c("W", "L"))
+  }, error = function(e) tibble())
+
+  record_by_sport <- if (nrow(all_settled_bets) > 0) {
+    recs <- all_settled_bets %>%
+      group_by(sport) %>%
+      summarise(
+        wins   = sum(result == "W"),
+        losses = sum(result == "L"),
+        roi    = round(sum(pnl, na.rm = TRUE) /
+                       pmax(sum(scaled_kelly, na.rm = TRUE), 0.0001), 4),
+        .groups = "drop"
+      ) %>%
+      arrange(desc(wins + losses))
+    setNames(
+      lapply(seq_len(nrow(recs)), function(i)
+        list(wins = recs$wins[i], losses = recs$losses[i], roi = recs$roi[i])),
+      recs$sport
+    )
+  } else list()
+
+  summary_export <- list(
+    starting_bankroll = STARTING_BANKROLL,
+    current_bankroll  = round(current_br, 2),
+    today_risk        = round(sum(final_picks_clean$`Risk $`, na.rm = TRUE), 2),
+    last_run          = format(Sys.time(), "%Y-%m-%d %H:%M"),
+    record_by_sport   = record_by_sport
+  )
+
+  write(toJSON(summary_export, auto_unbox = TRUE, na = "null", digits = 4),
+        file.path(json_dir, "summary.json"))
+  cat(sprintf("✅ JSON: summary.json written (%d sports in record)\n",
+              length(record_by_sport)))
+}, error = function(e) message("⚠️  summary.json write failed: ", e$message))
+
+# ── 4. Inject data inline into arcvest_dashboard.html (local file:// support) ──
+# Browsers block fetch() on file:// URLs so the dashboard cannot load JSON
+# when opened locally. This writes the three datasets as JS variables directly
+# into the HTML. GitHub Pages uses fetch() automatically; local use gets the
+# inline data. Both paths work without any server.
+tryCatch({
+  html_path <- file.path(getwd(), "docs", "index.html")
+  if (!file.exists(html_path)) html_path <- file.path(getwd(), "arcvest_dashboard.html")
+  if (file.exists(html_path)) {
+    html <- readLines(html_path, encoding = "UTF-8", warn = FALSE)
+    picks_json   <- toJSON(final_picks_clean, auto_unbox = TRUE, na = "null", digits = 4)
+    paper_json   <- toJSON(paper_export,       auto_unbox = TRUE, na = "null", digits = 4)
+    summary_json <- toJSON(summary_export,     auto_unbox = TRUE, na = "null", digits = 4)
+    html <- gsub("var INLINE_PICKS   = null;  // injected by R",
+                 paste0("var INLINE_PICKS   = ", picks_json, ";  // injected by R"),
+                 html, fixed = TRUE)
+    html <- gsub("var INLINE_PAPER   = null;  // injected by R",
+                 paste0("var INLINE_PAPER   = ", paper_json, ";  // injected by R"),
+                 html, fixed = TRUE)
+    html <- gsub("var INLINE_SUMMARY = null;  // injected by R",
+                 paste0("var INLINE_SUMMARY = ", summary_json, ";  // injected by R"),
+                 html, fixed = TRUE)
+    writeLines(html, html_path)
+    cat(sprintf("HTML: inline data injected into %s (%d picks)\n",
+                basename(html_path), nrow(final_picks_clean)))
+  } else {
+    cat("HTML: arcvest_dashboard.html not found - skipping\n")
+  }
+}, error = function(e) message("HTML inline injection failed: ", e$message))
+
 

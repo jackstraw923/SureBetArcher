@@ -75,7 +75,7 @@ vig_twoway <- multi_odds_filtered %>%
     sport_grp     = classify_sport(sport_key)
   ) %>%
   filter(!str_detect(sport_grp, "Soccer")) %>%
-  group_by(run_date, game_date, sport_grp, sport_key,
+  group_by(run_date, run_timestamp, game_date, sport_grp, sport_key,
            home_team, away_team, bookmaker_key, bookmaker) %>%
   summarise(
     implied_sum = sum(1 / outcomes_price, na.rm = TRUE),
@@ -98,7 +98,7 @@ vig_soccer <- multi_odds_filtered %>%
     sport_grp     = classify_sport(sport_key)
   ) %>%
   filter(str_detect(sport_grp, "Soccer")) %>%
-  group_by(run_date, game_date, sport_grp, sport_key,
+  group_by(run_date, run_timestamp, game_date, sport_grp, sport_key,
            home_team, away_team, bookmaker_key, bookmaker) %>%
   summarise(
     implied_sum = sum(1 / outcomes_price, na.rm = TRUE),
@@ -201,6 +201,13 @@ if (file.exists(VIG_HISTORY_PATH)) {
                                   .default      = col_guess()
                                 ),
                                 show_col_types = FALSE)
+
+  # Guard: if existing file was written before run_timestamp column existed,
+  # add it so bind_rows and group_by don't fail. Self-healing — only triggers once.
+  if (!"run_timestamp" %in% names(history_existing)) {
+    history_existing <- history_existing %>%
+      mutate(run_timestamp = NA_character_)
+  }
 
   # Remove today's rows if re-running (idempotent)
   history_existing <- history_existing %>%
