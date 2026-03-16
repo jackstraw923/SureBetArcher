@@ -3,37 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArcVest — Live Dashboard</title>
+<title>ArcVest — Quantitative Sports Analytics</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   /* ── Reset & Base ─────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:           #080b12;
-    --bg2:          #0e1220;
-    --bg3:          #141929;
-    --bg-hover:     #111830;
-    --border:       #1a2238;
-    --border-light: #202840;
-    --gold:         #f0b429;
-    --gold-dim:     #8a6420;
-    --teal:         #10b981;
+    --bg-base:      #0a0c10;
+    --bg-surface:   #0f1117;
+    --bg-card:      #141720;
+    --bg-hover:     #1a1f2e;
+    --border:       #1e2333;
+    --border-light: #252d42;
+    --arc-gold:     #c9a84c;
+    --arc-gold-dim: #8a6f2e;
+    --arc-teal:     #2dd4bf;
+    --arc-teal-dim: #134e4a;
+    --green:        #22c55e;
     --red:          #ef4444;
     --yellow:       #eab308;
-    --text:         #eceef4;
-    --muted:        #8e9ab5;
-    --font-head:    'Bebas Neue', sans-serif;
-    --font-body:    'Outfit', sans-serif;
+    --text-primary: #e8eaf0;
+    --text-secondary: #9aa3b2;
+    --text-muted:   #7a8899;
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
     --font-mono:    'DM Mono', monospace;
   }
 
   html { font-size: 14px; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg-base);
+    color: var(--text-primary);
     font-family: var(--font-body);
     font-weight: 300;
     min-height: 100vh;
@@ -42,86 +45,82 @@
 
   /* ── Scrollbar ───────────────────────────────────────────── */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
   ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
 
-  /* ── Nav ─────────────────────────────────────────────────── */
-  nav {
+  /* ── Header ──────────────────────────────────────────────── */
+  .header {
     position: sticky;
     top: 0;
     z-index: 100;
+    background: rgba(10, 12, 16, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2.5rem;
-    height: 56px;
-    background: rgba(8,11,18,0.92);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(26,34,56,0.6);
   }
 
-  .nav-logo {
+  .logo {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    text-decoration: none;
+    gap: 0.75rem;
   }
-  .nav-logo svg { width: 22px; height: 22px; }
-  .nav-logo-name {
-    font-family: var(--font-head);
-    font-size: 1.5rem;
-    letter-spacing: 0.03em;
-    color: var(--text);
-  }
-  .nav-logo-name em { color: var(--gold); font-style: normal; }
 
-  .nav-center {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    position: relative;
   }
-  .nav-center a {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-center a:hover { color: var(--text); }
-  .nav-center a.active { color: var(--gold); }
 
-  .nav-right {
+  .logo-mark svg { width: 100%; height: 100%; }
+
+  .logo-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .logo-name span { color: var(--arc-gold); }
+
+  .header-meta {
     display: flex;
     align-items: center;
     gap: 1.5rem;
   }
-  .nav-stat {
+
+  .header-stat {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
   }
-  .nav-stat-label {
+
+  .header-stat-label {
     font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
+    font-size: 0.65rem;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
-  .nav-stat-value {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text);
-  }
-  .nav-stat-value.positive { color: var(--teal); }
-  .nav-stat-value.negative { color: var(--red); }
 
-  .nav-run {
+  .header-stat-value {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .header-stat-value.positive { color: var(--green); }
+  .header-stat-value.negative { color: var(--red); }
+
+  .last-run {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
     padding: 0.25rem 0.6rem;
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -129,62 +128,59 @@
 
   /* ── Disclaimer ──────────────────────────────────────────── */
   .disclaimer {
-    background: rgba(240,180,41,0.04);
-    border-bottom: 1px solid rgba(240,180,41,0.12);
-    padding: 0.45rem 2.5rem;
+    background: rgba(201, 168, 76, 0.06);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    padding: 0.5rem 2rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
   }
-  .disclaimer-icon { color: var(--gold); font-size: 0.72rem; flex-shrink: 0; }
+
+  .disclaimer-icon {
+    color: var(--arc-gold);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
   .disclaimer-text {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
-    color: var(--gold-dim);
+    font-size: 0.65rem;
+    color: var(--arc-gold-dim);
     letter-spacing: 0.03em;
   }
 
   /* ── Layout ──────────────────────────────────────────────── */
-  .main { padding: 1.5rem 2.5rem 4rem; max-width: 1600px; margin: 0 auto; }
+  .main { padding: 1.5rem 2rem 3rem; max-width: 1600px; margin: 0 auto; }
 
-  /* ── Section label (matches site pattern) ────────────────── */
-  .section-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
+  /* ── Section Headers ─────────────────────────────────────── */
+  .section-header {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-  .section-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 24px;
-    height: 1px;
-    background: var(--gold);
+    justify-content: space-between;
+    margin-bottom: 1rem;
   }
 
   .section-title {
-    font-family: var(--font-head);
-    font-size: 1.1rem;
-    letter-spacing: 0.06em;
-    color: var(--muted);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
+
   .section-title::before {
     content: '';
     display: inline-block;
-    width: 10px;
+    width: 12px;
     height: 2px;
-    background: var(--gold);
+    background: var(--arc-gold);
   }
 
-  /* ── KPI Grid ────────────────────────────────────────────── */
+  /* ── KPI Row ─────────────────────────────────────────────── */
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -195,272 +191,312 @@
     overflow: hidden;
     margin-bottom: 1.5rem;
   }
+
   .kpi-card {
-    background: var(--bg2);
-    padding: 1.1rem 1.25rem;
+    background: var(--bg-card);
+    padding: 1rem 1.25rem;
     transition: background 0.15s;
   }
+
   .kpi-card:hover { background: var(--bg-hover); }
+
   .kpi-label {
     font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
+    font-size: 0.65rem;
+    color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.5rem;
-  }
-  .kpi-value {
-    font-family: var(--font-head);
-    font-size: 1.8rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    line-height: 1;
-  }
-  .kpi-value.positive { color: var(--teal); }
-  .kpi-value.negative { color: var(--red); }
-  .kpi-value.gold     { color: var(--gold); }
-  .kpi-sub {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    margin-top: 0.35rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
   }
 
-  /* ── Two-column ──────────────────────────────────────────── */
+  .kpi-value {
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .kpi-value.positive { color: var(--green); }
+  .kpi-value.negative { color: var(--red); }
+  .kpi-value.gold { color: var(--arc-gold); }
+
+  .kpi-sub {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  /* ── Two-column layout ───────────────────────────────────── */
   .two-col {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1fr 340px;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
   }
 
   /* ── Card ────────────────────────────────────────────────── */
   .card {
-    background: var(--bg2);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
   }
+
   .card-header {
-    padding: 0.85rem 1.25rem;
+    padding: 0.9rem 1.25rem;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
+
   .card-body { padding: 1.25rem; }
 
   /* ── Chart ───────────────────────────────────────────────── */
-  .chart-container { position: relative; height: 220px; }
+  .chart-container {
+    position: relative;
+    height: 220px;
+  }
 
-  /* ── Sport Bars ──────────────────────────────────────────── */
-  .sport-bars { display: flex; flex-direction: column; gap: 0.65rem; }
+  /* ── Sport Allocation ────────────────────────────────────── */
+  .sport-bars { display: flex; flex-direction: column; gap: 0.6rem; }
+
   .sport-bar-row {
     display: grid;
-    grid-template-columns: 72px 1fr 52px;
+    grid-template-columns: 70px 1fr 50px;
     align-items: center;
     gap: 0.75rem;
   }
+
   .sport-label {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--muted);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
     text-align: right;
   }
+
   .sport-bar-track {
-    height: 5px;
+    height: 6px;
     background: var(--border);
     border-radius: 3px;
     overflow: hidden;
   }
+
   .sport-bar-fill {
     height: 100%;
     border-radius: 3px;
-    background: var(--gold);
+    background: var(--arc-gold);
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   }
+
   .sport-pct {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--muted);
+    font-size: 0.7rem;
+    color: var(--text-muted);
     text-align: right;
   }
 
   /* ── Picks Table ─────────────────────────────────────────── */
   .picks-section { margin-bottom: 1.5rem; }
+
   .table-wrapper { overflow-x: auto; }
+
   table {
     width: 100%;
     border-collapse: collapse;
     font-family: var(--font-mono);
-    font-size: 0.73rem;
+    font-size: 0.75rem;
   }
-  thead tr { border-bottom: 1px solid var(--border-light); }
+
+  thead tr {
+    border-bottom: 1px solid var(--border-light);
+  }
+
   th {
     padding: 0.6rem 0.75rem;
     text-align: left;
-    color: var(--muted);
+    color: var(--text-muted);
     font-weight: 400;
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     white-space: nowrap;
   }
+
   tbody tr {
     border-bottom: 1px solid var(--border);
     transition: background 0.1s;
+    cursor: default;
   }
+
   tbody tr:hover { background: var(--bg-hover); }
   tbody tr:last-child { border-bottom: none; }
+
   td {
     padding: 0.65rem 0.75rem;
-    color: var(--muted);
+    color: var(--text-secondary);
     white-space: nowrap;
   }
-  td.primary { color: var(--text); font-weight: 500; }
-  td.gold    { color: var(--gold); }
-  td.muted   { color: var(--muted); }
 
-  /* ── Sport Badges ────────────────────────────────────────── */
+  td.primary { color: var(--text-primary); font-weight: 500; }
+  td.gold { color: var(--arc-gold); }
+  td.green { color: var(--green); }
+  td.red { color: var(--red); }
+  td.muted { color: var(--text-muted); }
+
+  /* Sport badge */
   .badge {
     display: inline-block;
     padding: 0.15rem 0.45rem;
     border-radius: 3px;
-    font-size: 0.58rem;
+    font-size: 0.6rem;
     font-weight: 500;
-    font-family: var(--font-mono);
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
+
   .badge-nba    { background: rgba(29,185,84,0.12);  color: #1db954; }
   .badge-ncaab  { background: rgba(59,130,246,0.12); color: #60a5fa; }
-  .badge-ncaaw  { background: rgba(244,114,182,0.12);color: #f472b6; }
   .badge-nhl    { background: rgba(139,92,246,0.12); color: #a78bfa; }
   .badge-mlb    { background: rgba(234,179,8,0.12);  color: #fbbf24; }
-  .badge-soccer { background: rgba(16,185,129,0.12); color: #10b981; }
+  .badge-soccer { background: rgba(20,184,166,0.12); color: #2dd4bf; }
   .badge-tennis { background: rgba(249,115,22,0.12); color: #fb923c; }
   .badge-cha    { background: rgba(236,72,153,0.12); color: #f472b6; }
 
-  /* ── EV Bar ──────────────────────────────────────────────── */
-  .ev-bar { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .ev-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-light); }
-  .ev-pip.lit { background: var(--gold); }
+  /* EV meter */
+  .ev-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
 
-  /* ── Filter Bar ──────────────────────────────────────────── */
+  .ev-pip {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--border-light);
+  }
+  .ev-pip.lit { background: var(--arc-gold); }
+
+  /* Filter bar */
   .filter-bar {
     display: flex;
     gap: 0.5rem;
-    padding: 0.7rem 1.25rem;
+    padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
   }
+
   .filter-btn {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
-    padding: 0.28rem 0.65rem;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.7rem;
     border: 1px solid var(--border-light);
     border-radius: 4px;
     background: transparent;
-    color: var(--muted);
+    color: var(--text-muted);
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     transition: all 0.15s;
   }
+
   .filter-btn:hover,
   .filter-btn.active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(240,180,41,0.06);
+    border-color: var(--arc-gold);
+    color: var(--arc-gold);
+    background: rgba(201,168,76,0.06);
   }
 
-  /* ── Record Grid ─────────────────────────────────────────── */
+  /* ── W/L Record by Sport ─────────────────────────────────── */
   .record-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 1px;
     background: var(--border);
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
   }
+
   .record-card {
-    background: var(--bg2);
+    background: var(--bg-card);
     padding: 0.9rem 1rem;
-    transition: background 0.15s;
   }
-  .record-card:hover { background: var(--bg-hover); }
+
   .record-sport {
     font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
+    font-size: 0.65rem;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.4rem;
   }
+
   .record-wl {
-    font-family: var(--font-head);
-    font-size: 1.2rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
   }
+
   .record-pct {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
+    font-size: 0.7rem;
+    color: var(--text-muted);
     margin-top: 0.2rem;
   }
+
   .record-roi {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     margin-top: 0.3rem;
   }
-  .record-roi.positive { color: var(--teal); }
-  .record-roi.negative { color: var(--red); }
 
-  /* ── Section header row ──────────────────────────────────── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    margin-top: 0.5rem;
-  }
-
-  /* ── States ──────────────────────────────────────────────── */
+  /* ── Loading state ───────────────────────────────────────── */
   .loading {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 120px;
-    color: var(--muted);
+    color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     gap: 0.5rem;
   }
+
   .spinner {
-    width: 14px; height: 14px;
+    width: 16px;
+    height: 16px;
     border: 2px solid var(--border-light);
-    border-top-color: var(--gold);
+    border-top-color: var(--arc-gold);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
+
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ── Empty state ─────────────────────────────────────────── */
   .empty {
     padding: 2rem;
     text-align: center;
-    color: var(--muted);
+    color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
   }
 
-  /* ── Fade-in ─────────────────────────────────────────────── */
+  /* ── Fade-in animation ───────────────────────────────────── */
   .fade-in {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
     animation: fadeIn 0.4s ease forwards;
   }
-  @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   .fade-in:nth-child(1) { animation-delay: 0.05s; }
   .fade-in:nth-child(2) { animation-delay: 0.10s; }
   .fade-in:nth-child(3) { animation-delay: 0.15s; }
@@ -472,53 +508,52 @@
   @media (max-width: 1100px) {
     .two-col { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-    .nav-center { display: none; }
   }
+
   @media (max-width: 600px) {
     .main { padding: 1rem; }
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    nav { padding: 0 1rem; }
-    .nav-right { gap: 0.75rem; }
+    .header { padding: 0 1rem; }
+    .header-meta { gap: 0.75rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- ── Nav ─────────────────────────────────────────────────── -->
-<nav>
-  <a class="nav-logo" href="/">
-    <svg viewBox="0 0 26 26" fill="none">
-      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
-      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
-      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
-    </svg>
-    <span class="nav-logo-name">Arc<em>Vest</em></span>
-  </a>
-
-  <div class="nav-center">
-    <a href="/">Home</a>
-    <a href="/dashboard.html" class="active">Dashboard</a>
-    <a href="/bracket.html">March Madness</a>
-    <a href="/library.html">Learn</a>
-    <a href="/pricing.html">Pricing</a>
+<!-- ── Header ──────────────────────────────────────────────── -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Arc/arrow trajectory -->
+        <path d="M4 24 Q8 8 28 6" stroke="#c9a84c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Arrow tip -->
+        <path d="M22 4 L28 6 L26 12" stroke="#c9a84c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Target dot -->
+        <circle cx="28" cy="6" r="2" fill="#c9a84c"/>
+        <!-- Base circle -->
+        <circle cx="16" cy="16" r="14" stroke="#1e2333" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="logo-name">Arc<span>Vest</span></div>
   </div>
 
-  <div class="nav-right">
-    <div class="nav-stat">
-      <span class="nav-stat-label">Bankroll</span>
-      <span class="nav-stat-value" id="header-bankroll">—</span>
+  <div class="header-meta">
+    <div class="header-stat">
+      <span class="header-stat-label">Bankroll</span>
+      <span class="header-stat-value" id="header-bankroll">—</span>
     </div>
-    <div class="nav-stat">
-      <span class="nav-stat-label">Cum. ROI</span>
-      <span class="nav-stat-value" id="header-roi">—</span>
+    <div class="header-stat">
+      <span class="header-stat-label">Cum. ROI</span>
+      <span class="header-stat-value" id="header-roi">—</span>
     </div>
-    <div class="nav-stat">
-      <span class="nav-stat-label">Record</span>
-      <span class="nav-stat-value" id="header-record">—</span>
+    <div class="header-stat">
+      <span class="header-stat-label">Record</span>
+      <span class="header-stat-value" id="header-record">—</span>
     </div>
-    <div class="nav-run" id="last-run">Loading...</div>
+    <div class="last-run" id="last-run">Loading...</div>
   </div>
-</nav>
+</header>
 
 <!-- ── Disclaimer ─────────────────────────────────────────── -->
 <div class="disclaimer">
@@ -546,7 +581,7 @@
     <div class="kpi-card fade-in">
       <div class="kpi-label">Cumulative ROI</div>
       <div class="kpi-value" id="kpi-roi">—</div>
-      <div class="kpi-sub" id="kpi-roi-sub">Since inception</div>
+      <div class="kpi-sub" id="kpi-roi-sub">North star: +5%/mo</div>
     </div>
     <div class="kpi-card fade-in">
       <div class="kpi-label">Overall Record</div>
@@ -556,7 +591,7 @@
     <div class="kpi-card fade-in">
       <div class="kpi-label">Days Tracked</div>
       <div class="kpi-value gold" id="kpi-days">—</div>
-      <div class="kpi-sub">Live tracking</div>
+      <div class="kpi-sub">Paper trading</div>
     </div>
     <div class="kpi-card fade-in">
       <div class="kpi-label">Today's Risk</div>
@@ -715,7 +750,6 @@ function sportBadge(sport) {
   if (s.includes('MLB'))    return `<span class="badge badge-mlb">MLB</span>`;
   if (s.includes('SOCCER')) return `<span class="badge badge-soccer">⚽ ${s.replace('SOCCER-','')}</span>`;
   if (s.includes('CHA'))    return `<span class="badge badge-cha">CHA</span>`;
-  if (s.includes('NCAAW')) return `<span class="badge badge-ncaaw">NCAAW</span>`;
   if (s.includes('ATP') || s.includes('WTA')) return `<span class="badge badge-tennis">🎾</span>`;
   return `<span class="badge">${sport}</span>`;
 }
@@ -840,7 +874,7 @@ function renderChart() {
           backgroundColor: '#141720',
           borderColor: '#1e2333',
           borderWidth: 1,
-          titleColor: '#9aaabf',
+          titleColor: '#8892a4',
           bodyColor: '#e8eaf0',
           titleFont: { family: 'DM Mono', size: 11 },
           bodyFont: { family: 'DM Mono', size: 12 },
@@ -851,13 +885,13 @@ function renderChart() {
       },
       scales: {
         x: {
-          grid: { color: '#252e45' },
-          ticks: { color: '#9aaabf', font: { family: 'DM Mono', size: 10 } }
+          grid: { color: '#1e2333' },
+          ticks: { color: '#7a8899', font: { family: 'DM Mono', size: 10 } }
         },
         y: {
-          grid: { color: '#252e45' },
+          grid: { color: '#1e2333' },
           ticks: {
-            color: '#8e9ab5',
+            color: '#4a5568',
             font: { family: 'DM Mono', size: 10 },
             callback: v => `$${v.toLocaleString()}`
           }
@@ -1050,17 +1084,5 @@ init().then(() => {
   renderPicks(allPicks);
 });
 </script>
-<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2rem;">
-  <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">ArcVest</div>
-  <div style="display:flex;gap:1.5rem;">
-    <a href="/" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Home</a>
-    <a href="/bracket.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">March Madness</a>
-    <a href="/pricing.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Pricing</a>
-    <a href="/library.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Learn</a>
-  </div>
-  <div style="width:100%;font-size:0.62rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;">
-    For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io
-  </div>
-</footer>
 </body>
 </html>
