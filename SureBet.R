@@ -5579,7 +5579,7 @@ tryCatch({
 # into the HTML. GitHub Pages uses fetch() automatically; local use gets the
 # inline data. Both paths work without any server.
 tryCatch({
-  html_path <- file.path(getwd(), "docs", "index.html")
+  html_path <- file.path(getwd(), "docs", "dashboard.html")
   if (!file.exists(html_path)) html_path <- file.path(getwd(), "arcvest_dashboard.html")
   if (file.exists(html_path)) {
     html <- readLines(html_path, encoding = "UTF-8", warn = FALSE)
