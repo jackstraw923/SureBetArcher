@@ -176,7 +176,10 @@ SUREBET_DIR <- "C:/Users/jacks/OneDrive/Documents/SureBet"  # master path anchor
 # Use this when debugging downstream code to avoid burning API quota.
 # Requires multi_odds to already exist in the R session from a prior run.
 # Set back to TRUE for any production run or when odds data needs refreshing.
-FETCH_ODDS <- TRUE
+# ── Interactive prompt — answer Y/N in the console when the script starts ──────
+fetch_response <- readline(prompt = "Fetch fresh odds from API? (Y/N): ")
+FETCH_ODDS <- toupper(trimws(fetch_response)) %in% c("Y", "YES", "1", "TRUE")
+cat(sprintf("FETCH_ODDS set to: %s\n", FETCH_ODDS))
 # ──────────────────────────────────────────────────────────────────────────────
 books  <- c("fanduel", "draftkings", "espnbet", "hardrockbet", "fanatics", "bet365")
 
@@ -184,11 +187,19 @@ books  <- c("fanduel", "draftkings", "espnbet", "hardrockbet", "fanatics", "bet3
 tennis_keys <- toa_sports(all_sports = TRUE) %>%
   filter(str_detect(key, "tennis"), active == TRUE) %>%
   pull(key)
+# Auto-detect NCAAW -- TOA carries it during tournament, absent otherwise
+ncaaw_keys <- toa_sports(all_sports = TRUE) %>%
+  filter(str_detect(key, "basketball_wncaab"), active == TRUE) %>%
+  pull(key)
+if (length(ncaaw_keys) > 0) cat(sprintf("NCAAW odds available: %s\n", paste(ncaaw_keys, collapse=", "))) else cat("NCAAW odds: not available from TOA this run\n")
+
+
 sports <- c("basketball_nba", "basketball_ncaab", "icehockey_nhl",
             "soccer_epl", "soccer_germany_bundesliga", "soccer_italy_serie_a",
             "soccer_france_ligue_one", "soccer_spain_la_liga", "soccer_usa_mls",
             "soccer_uefa_champs_league", "soccer_uefa_europa_league",
-            tennis_keys)   # ← auto-populated every run
+            tennis_keys,   # auto-populated every run
+            ncaaw_keys)    # present during tournament, empty otherwise
 # TODO (March 27): Add "baseball_mlb" here and remove the
 # MLB supplemental fetch block (MLB_SPORT_KEY preseason workaround)
 
@@ -209,7 +220,8 @@ if (FETCH_ODDS) {
       ),
     otherwise = tibble()
   )
-  multi_odds <- future_map_dfr(sports, safe_fetch, .progress = TRUE)
+  multi_odds <- future_map_dfr(sports, safe_fetch, .progress = TRUE,
+                               .options = furrr_options(seed = TRUE))
   plan(sequential)   # release workers immediately after fetch
   cat(sprintf("\u2705 Odds fetched: %d rows across %d sports\n",
               nrow(multi_odds), length(sports)))
@@ -283,7 +295,12 @@ name_crosswalk <- tribble(
   "Sam Houston St Bearkats",          "Sam Houston Bearkats",
   "Cal Baptist Lancers",              "California Baptist Lancers",
   # NCAAB additions (from 2026-03-14 diagnostic)
-  "Wichita St Shockers",              "Wichita State Shockers"
+  "Wichita St Shockers",              "Wichita State Shockers",
+  # NCAAB additions (from 2026-03-16 diagnostic)
+  "North Dakota St Bison",            "North Dakota State Bison",
+  "Tennessee St Tigers",              "Tennessee State Tigers",
+  "Wright St Raiders",                "Wright State Raiders",
+  "LIU Sharks",                       "Long Island University Sharks"
 )
 
 fix_team_names <- function(df, crosswalk) {
@@ -774,7 +791,7 @@ odds_nba_wide <- h2h %>%
 
 nba_game_start <- odds_nba %>%
   distinct(game_date, home_team, away_team,
-           game_start = as.POSIXct(commence_time, tz = "UTC")) %>%
+           game_start = ymd_hms(as.character(commence_time), tz = "UTC")) %>%
   group_by(game_date, home_team, away_team) %>%
   slice(1) %>%
   ungroup()
@@ -890,7 +907,9 @@ ncaab_schedule <- map_dfr(
 # AFTER — add commence_time to the select
 ncaab_odds <- multi_odds_filtered %>%
   filter(sport_key == "basketball_ncaab") %>%
-  mutate(game_date = as.Date(commence_time)) %>%
+  mutate(game_date = as.Date(
+    format(with_tz(ymd_hms(commence_time), "America/New_York"), "%Y-%m-%d")
+  )) %>%
   select(game_date, commence_time, home_team, away_team,
          bookmaker_key, market_key,
          outcomes_name, outcomes_price, outcomes_point)
@@ -938,7 +957,7 @@ odds_ncaab_wide <- h2h_ncaab %>%
 
 ncaab_game_start <- ncaab_odds %>%
   distinct(game_date, home_team, away_team,
-           game_start = as.POSIXct(commence_time, tz = "UTC")) %>%
+           game_start = ymd_hms(as.character(commence_time), tz = "UTC")) %>%
   group_by(game_date, home_team, away_team) %>%
   slice(1) %>%
   ungroup()
@@ -1084,7 +1103,7 @@ odds_nhl_wide <- h2h_nhl %>%
 
 nhl_game_start <- odds_nhl %>%
   distinct(game_date, home_team, away_team,
-           game_start = as.POSIXct(commence_time, tz = "UTC")) %>%
+           game_start = ymd_hms(as.character(commence_time), tz = "UTC")) %>%
   group_by(game_date, home_team, away_team) %>%
   slice(1) %>%
   ungroup()
@@ -1872,14 +1891,16 @@ cat(sprintf("ATP Elo loaded: %d players | WTA Elo loaded: %d players\n",
 # ── 3. Tennis h2h odds — best book per matchup ───────────────────────────────
 tennis_h2h <- multi_odds_filtered %>%
   filter(str_detect(sport_key, "tennis"), market_key == "h2h") %>%
-  mutate(game_date = as.Date(substr(commence_time, 1, 10))) %>%
+  mutate(game_date = as.Date(
+    format(with_tz(ymd_hms(commence_time), "America/New_York"), "%Y-%m-%d")
+  )) %>%
   group_by(game_date, sport_key, home_team, away_team) %>%
   summarise(
     books_home   = list(bookmaker_key[outcomes_name == home_team]),
     books_away   = list(bookmaker_key[outcomes_name == away_team]),
     odds_home    = list(outcomes_price[outcomes_name == home_team]),
     odds_away    = list(outcomes_price[outcomes_name == away_team]),
-    game_start   = as.POSIXct(first(commence_time), tz = "UTC"),   # earliest tip
+    game_start   = ymd_hms(as.character(first(commence_time)), tz = "UTC"),   # earliest tip
     .groups      = "drop"
   ) %>%
   filter(lengths(odds_home) > 0, lengths(odds_away) > 0)
@@ -2499,10 +2520,11 @@ cat("MLB odds appended:", nrow(odds_mlb_supp), "rows\n")
 # ── 2) Spring Training odds (baseball_mlb_preseason)
 odds_mlb <- multi_odds_filtered %>%
   filter(sport_key == MLB_SPORT_KEY) %>%
-  distinct(game_date = as.Date(substr(commence_time, 1, 10)),
-           home_team, away_team, bookmaker_key,
-           market_key, outcomes_name, .keep_all = TRUE) %>%
-  mutate(game_date = as.Date(substr(commence_time, 1, 10)))
+  mutate(game_date = as.Date(
+    format(with_tz(ymd_hms(commence_time), "America/New_York"), "%Y-%m-%d")
+  )) %>%
+  distinct(game_date, home_team, away_team, bookmaker_key,
+           market_key, outcomes_name, .keep_all = TRUE)
 
 
 cat("MLB odds found:", nrow(odds_mlb), "\n")
@@ -2670,79 +2692,97 @@ calc_mlb_totals <- function(games_df, sport_label = "MLB",
   ) %>% arrange(desc(bet_ev))
 }
 
-# ── 4) Value bets (h2h + totals) — inline EV, no calc_value_bets() ───────────
-value_mlb <- mlb_games %>%
-  filter(!is.na(home_ml), !is.na(away_ml)) %>%
-  mutate(
-    sport        = "MLB",
-    home_ev      = (home_ml - 1) * home_h2h_prob - (1 - home_h2h_prob),
-    away_ev      = (away_ml - 1) * (1 - home_h2h_prob) - home_h2h_prob,
-    home_kelly_q = pmax(((home_ml - 1) * home_h2h_prob -
-                           (1 - home_h2h_prob)) / (home_ml - 1), 0) / 4,
-    away_kelly_q = pmax(((away_ml - 1) * (1 - home_h2h_prob) -
-                           home_h2h_prob) / (away_ml - 1), 0) / 4
-  ) %>%
-  filter(home_ev > EV_GATE | away_ev > EV_GATE) %>%
-  mutate(
-    value_side = case_when(
-      home_ev > EV_GATE & away_ev > EV_GATE ~ "both",
-      home_ev > EV_GATE                     ~ "home",
-      away_ev > EV_GATE                     ~ "away",
-      TRUE                                  ~ NA_character_
-    ),
-    raw_kelly = case_when(
-      value_side == "home" ~ home_kelly_q,
-      value_side == "away" ~ away_kelly_q,
-      value_side == "both" ~ pmax(home_kelly_q, away_kelly_q),
-      TRUE                 ~ 0
-    ),
-    bet_team = case_when(
-      value_side == "home" ~ home_team,
-      value_side == "away" ~ away_team,
-      value_side == "both" ~ paste(home_team, "+", away_team),
-      TRUE                 ~ NA_character_
-    ),
-    bet_ml = case_when(
-      value_side == "home" ~ home_ml,
-      value_side == "away" ~ away_ml,
-      TRUE                 ~ NA_real_
-    ),
-    bet_ev = case_when(
-      value_side == "home" ~ home_ev,
-      value_side == "away" ~ away_ev,
-      TRUE                 ~ pmax(home_ev, away_ev)
-    ),
-    implied_prob  = 1 / bet_ml,
-    open_time     = Sys.time(),
-    position_id   = make_position_id(sport, game_date, home_team,
-                                     away_team, value_side, bookmaker_key),
-    status        = "IDENTIFIED",
-    placed_time   = as.POSIXct(NA),
-    game_start    = as.POSIXct(NA),   # MLB odds lack commence_time in preseason block
-    settle_time   = as.POSIXct(NA),
-    stake         = NA_real_,
-    result        = NA_character_,
-    cashout_value = NA_real_,
-    hedge_time    = as.POSIXct(NA),
-    hedge_book    = NA_character_,
-    hedge_ml      = NA_real_,
-    hedge_stake   = NA_real_,
-    hedge_result  = NA_real_,
-    clv_at_action = NA_real_,
-    pnl           = NA_real_
-  ) %>%
-  arrange(desc(bet_ev)) %>%
-  group_by(game_date, home_team, away_team, value_side) %>%
-  slice_max(bet_ev, n = 1, with_ties = FALSE) %>%
-  ungroup()
+# ── 4) Value bets (h2h + totals) — suppressed during preseason ───────────────
+MLB_PRESEASON_ACTIVE <- MLB_SPORT_KEY == "baseball_mlb_preseason"
 
+MLB_EMPTY <- tibble(
+  sport = character(), game_date = as.Date(character()),
+  game_start = as.POSIXct(character()), open_time = as.POSIXct(character()),
+  home_team = character(), away_team = character(),
+  bookmaker_key = character(), bookmaker_name = character(),
+  bet_type = character(), bet_team = character(),
+  bet_ml = numeric(), bet_ev = numeric(), bet_line = numeric(),
+  raw_kelly = numeric(), scaled_kelly = numeric()
+)
 
-totals_mlb <- calc_mlb_totals(mlb_games) %>%
-  group_by(game_date, home_team, away_team, bet_type) %>%
-  slice_max(bet_ev, n = 1, with_ties = FALSE) %>%
-  ungroup()
+if (MLB_PRESEASON_ACTIVE || nrow(mlb_games) == 0 ||
+    !("over_outcomes_point" %in% names(mlb_games))) {
+  cat("ℹ️  MLB preseason active — picks suppressed until March 27. No value bets generated.\n")
+  value_mlb  <- MLB_EMPTY
+  totals_mlb <- MLB_EMPTY
+} else {
+  value_mlb <- mlb_games %>%
+    filter(!is.na(home_ml), !is.na(away_ml)) %>%
+    mutate(
+      sport        = "MLB",
+      home_ev      = (home_ml - 1) * home_h2h_prob - (1 - home_h2h_prob),
+      away_ev      = (away_ml - 1) * (1 - home_h2h_prob) - home_h2h_prob,
+      home_kelly_q = pmax(((home_ml - 1) * home_h2h_prob -
+                             (1 - home_h2h_prob)) / (home_ml - 1), 0) / 4,
+      away_kelly_q = pmax(((away_ml - 1) * (1 - home_h2h_prob) -
+                             home_h2h_prob) / (away_ml - 1), 0) / 4
+    ) %>%
+    filter(home_ev > EV_GATE | away_ev > EV_GATE) %>%
+    mutate(
+      value_side = case_when(
+        home_ev > EV_GATE & away_ev > EV_GATE ~ "both",
+        home_ev > EV_GATE                     ~ "home",
+        away_ev > EV_GATE                     ~ "away",
+        TRUE                                  ~ NA_character_
+      ),
+      raw_kelly = case_when(
+        value_side == "home" ~ home_kelly_q,
+        value_side == "away" ~ away_kelly_q,
+        value_side == "both" ~ pmax(home_kelly_q, away_kelly_q),
+        TRUE                 ~ 0
+      ),
+      bet_team = case_when(
+        value_side == "home" ~ home_team,
+        value_side == "away" ~ away_team,
+        value_side == "both" ~ paste(home_team, "+", away_team),
+        TRUE                 ~ NA_character_
+      ),
+      bet_ml = case_when(
+        value_side == "home" ~ home_ml,
+        value_side == "away" ~ away_ml,
+        TRUE                 ~ NA_real_
+      ),
+      bet_ev = case_when(
+        value_side == "home" ~ home_ev,
+        value_side == "away" ~ away_ev,
+        TRUE                 ~ pmax(home_ev, away_ev)
+      ),
+      implied_prob  = 1 / bet_ml,
+      open_time     = Sys.time(),
+      position_id   = make_position_id(sport, game_date, home_team,
+                                       away_team, value_side, bookmaker_key),
+      status        = "IDENTIFIED",
+      placed_time   = as.POSIXct(NA),
+      game_start    = as.POSIXct(NA),
+      settle_time   = as.POSIXct(NA),
+      stake         = NA_real_,
+      result        = NA_character_,
+      cashout_value = NA_real_,
+      hedge_time    = as.POSIXct(NA),
+      hedge_book    = NA_character_,
+      hedge_ml      = NA_real_,
+      hedge_stake   = NA_real_,
+      hedge_result  = NA_real_,
+      clv_at_action = NA_real_,
+      pnl           = NA_real_
+    ) %>%
+    arrange(desc(bet_ev)) %>%
+    group_by(game_date, home_team, away_team, value_side) %>%
+    slice_max(bet_ev, n = 1, with_ties = FALSE) %>%
+    ungroup()
 
-cat(sprintf("✅ MLB value bets — ML: %d | Totals: %d\n", nrow(value_mlb), nrow(totals_mlb)))
+  totals_mlb <- calc_mlb_totals(mlb_games) %>%
+    group_by(game_date, home_team, away_team, bet_type) %>%
+    slice_max(bet_ev, n = 1, with_ties = FALSE) %>%
+    ungroup()
+
+  cat(sprintf("✅ MLB value bets — ML: %d | Totals: %d\n", nrow(value_mlb), nrow(totals_mlb)))
+}
 
 # ── PARKING LOT ───────────────────────────────────────────────────────────────
 # # TODO (March 27): Wire MLB into settle_paper_day
@@ -3338,12 +3378,135 @@ spread_total_nfl <- tibble(raw_kelly = numeric())
 value_ncaaf        <- tibble(raw_kelly = numeric())
 spread_total_ncaaf <- tibble(raw_kelly = numeric())
 
+# ============================================================
+# NCAAW — WOMEN'S MARCH MADNESS VALUE BETS
+# ============================================================
+# Reads pre-computed sim results from tools/ncaaw_sim_results.csv.
+# Run march_madness_sim_ncaaw.R separately (once after Selection Sunday,
+# again after each round) to regenerate that file with updated probabilities.
+# Gate: picks suppressed from portfolio until NCAAW_LIVE_DATE.
+
+NCAAW_LIVE_DATE <- as.Date("2026-03-17")
+
+ncaaw_value_bets <- tryCatch({
+  ncaaw_results_path <- file.path("tools", "ncaaw_sim_results.csv")
+  if (!file.exists(ncaaw_results_path)) {
+    cat("INFO: ncaaw_sim_results.csv not found — run march_madness_sim_ncaaw.R first.\n")
+    tibble(raw_kelly = numeric())
+  } else {
+    results_w2026 <- read_csv(ncaaw_results_path, show_col_types = FALSE)
+    cat(sprintf("NCAAW sim results loaded: %d teams\n", nrow(results_w2026)))
+
+    # ── Fetch NCAAW game odds ───────────────────────────────────────────────
+    odds_ncaaw_w <- multi_odds_filtered %>%
+      filter(sport_key == "basketball_wncaab", market_key == "h2h") %>%
+      mutate(game_date = as.Date(
+        format(with_tz(ymd_hms(commence_time), "America/New_York"), "%Y-%m-%d")
+      ))
+
+    cat(sprintf("NCAAW odds: %d rows\n", nrow(odds_ncaaw_w)))
+
+    if (nrow(odds_ncaaw_w) == 0 || !exists("results_w2026")) {
+      cat("INFO: No NCAAW odds or sim results — no value bets.\n")
+      tibble(raw_kelly = numeric())
+    } else {
+      # Best ML per matchup
+      ncaaw_best <- odds_ncaaw_w %>%
+        group_by(game_date, home_team, away_team) %>%
+        summarise(
+          game_start     = ymd_hms(as.character(first(commence_time)), tz = "UTC"),
+          best_home_ml   = { h <- outcomes_price[outcomes_name == home_team[1]]; if (length(h) == 0) NA_real_ else min(h, na.rm = TRUE) },
+          best_away_ml   = { a <- outcomes_price[outcomes_name == away_team[1]]; if (length(a) == 0) NA_real_ else min(a, na.rm = TRUE) },
+          best_home_book = { idx <- which(outcomes_name == home_team[1]); if (length(idx) == 0) NA_character_ else bookmaker_key[idx[which.min(outcomes_price[idx])]] },
+          best_away_book = { idx <- which(outcomes_name == away_team[1]); if (length(idx) == 0) NA_character_ else bookmaker_key[idx[which.min(outcomes_price[idx])]] },
+          .groups = "drop"
+        ) %>%
+        filter(!is.na(best_home_ml), !is.na(best_away_ml),
+               !is.infinite(best_home_ml), !is.infinite(best_away_ml))
+
+      # Sim p_win_r1 = P(win first game) → use as model prob for R1 matchups
+      sim_r1 <- results_w2026 %>%
+        select(player, p_win_r1) %>%
+        rename(model_prob = p_win_r1)
+
+      ncaaw_ev <- ncaaw_best %>%
+        left_join(sim_r1, by = c("home_team" = "player")) %>%
+        rename(home_model = model_prob) %>%
+        left_join(sim_r1, by = c("away_team" = "player")) %>%
+        rename(away_model = model_prob) %>%
+        filter(!is.na(home_model), !is.na(away_model)) %>%
+        mutate(
+          prob_sum   = home_model + away_model,
+          home_prob  = home_model / prob_sum,
+          away_prob  = away_model / prob_sum,
+          overround  = 1/best_home_ml + 1/best_away_ml,
+          home_novig = (1/best_home_ml) / overround,
+          away_novig = (1/best_away_ml) / overround,
+          home_ev    = home_prob * best_home_ml - 1,
+          away_ev    = away_prob * best_away_ml - 1,
+          home_edge  = home_prob - home_novig,
+          away_edge  = away_prob - away_novig
+        )
+
+      bind_rows(
+        ncaaw_ev %>%
+          filter(home_ev > EV_GATE, home_ev <= EV_CAP, home_edge > 0) %>%
+          transmute(
+            sport = "NCAAW", game_date, game_start,
+            home_team, away_team,
+            bookmaker_key  = best_home_book,
+            bookmaker_name = coalesce(BOOK_DISPLAY_NAMES[best_home_book], best_home_book),
+            bet_type = "ML", bet_team = home_team,
+            bet_ml = best_home_ml, bet_ev = home_ev, bet_line = NA_real_,
+            raw_kelly = pmax((best_home_ml-1)*home_prob - (1-home_prob), 0) /
+                          (best_home_ml-1) / 4
+          ),
+        ncaaw_ev %>%
+          filter(away_ev > EV_GATE, away_ev <= EV_CAP, away_edge > 0) %>%
+          transmute(
+            sport = "NCAAW", game_date, game_start,
+            home_team, away_team,
+            bookmaker_key  = best_away_book,
+            bookmaker_name = coalesce(BOOK_DISPLAY_NAMES[best_away_book], best_away_book),
+            bet_type = "ML", bet_team = away_team,
+            bet_ml = best_away_ml, bet_ev = away_ev, bet_line = NA_real_,
+            raw_kelly = pmax((best_away_ml-1)*away_prob - (1-away_prob), 0) /
+                          (best_away_ml-1) / 4
+          )
+      ) %>% filter(!is.na(raw_kelly), raw_kelly > 0) %>% arrange(desc(bet_ev))
+    }
+  }
+}, error = function(e) {
+  message("WARNING: NCAAW pipeline error: ", e$message)
+  tibble(raw_kelly = numeric())
+})
+
+cat(sprintf("NCAAW value bets: %d | Gate %s until %s\n",
+            nrow(ncaaw_value_bets),
+            if (Sys.Date() >= NCAAW_LIVE_DATE) "OPEN" else "CLOSED",
+            NCAAW_LIVE_DATE))
+
+# Log NCAAW bets every day regardless of gate
+if (nrow(ncaaw_value_bets) > 0) {
+  ncaaw_log_path <- file.path("logs", paste0("ncaaw_bet_log_", Sys.Date(), ".csv"))
+  write_csv(ncaaw_value_bets %>% mutate(log_date = Sys.Date(),
+                                         result = NA_character_,
+                                         pnl    = NA_real_),
+            ncaaw_log_path)
+  cat(sprintf("NCAAW bets logged -> %s\n", ncaaw_log_path))
+}
+
+# Gate: only include in kelly pool if live
+ncaaw_kelly_pool <- if (Sys.Date() >= NCAAW_LIVE_DATE && nrow(ncaaw_value_bets) > 0)
+  ncaaw_value_bets$raw_kelly else numeric(0)
+
 # --- COMBINED KELLY SCALING ---
 all_raw_kelly <- c(value_best$raw_kelly, spread_total_best$raw_kelly,
                    value_soccer$raw_kelly,
                    value_mlb$raw_kelly, totals_mlb$raw_kelly,
                    tennis_value_bets$raw_kelly,
                    tennis_picks$raw_kelly,
+                   ncaaw_kelly_pool,                                     # NCAAW (gated)
                    value_wnba$raw_kelly, spread_total_wnba$raw_kelly,    # WNBA placeholder
                    value_nfl$raw_kelly,  spread_total_nfl$raw_kelly,     # NFL placeholder
                    value_ncaaf$raw_kelly, spread_total_ncaaf$raw_kelly)  # NCAAF placeholder
@@ -3357,9 +3520,11 @@ spread_total_best   <- spread_total_best   %>% mutate(scaled_kelly = raw_kelly *
 value_soccer        <- value_soccer        %>% mutate(scaled_kelly = raw_kelly * sf_combined)
 value_mlb           <- value_mlb           %>% mutate(scaled_kelly = raw_kelly * sf_combined)
 totals_mlb          <- totals_mlb          %>% mutate(scaled_kelly = raw_kelly * sf_combined)
-tennis_value_bets   <- tennis_value_bets   %>% mutate(scaled_kelly = raw_kelly * sf_combined)  # Tennis added
+tennis_value_bets   <- tennis_value_bets   %>% mutate(scaled_kelly = raw_kelly * sf_combined)
 tennis_picks        <- if (nrow(tennis_picks) > 0)
-  tennis_picks %>% mutate(scaled_kelly = raw_kelly * sf_combined) else tennis_picks  # Challenger added
+  tennis_picks %>% mutate(scaled_kelly = raw_kelly * sf_combined) else tennis_picks
+if (nrow(ncaaw_value_bets) > 0)
+  ncaaw_value_bets <- ncaaw_value_bets %>% mutate(scaled_kelly = raw_kelly * sf_combined)
 
 # ── Unified picks dataframe — one row per bet across all sports ───────────────
 # Common columns only; used by cap_daily_bets() and daily_picks log.
@@ -3451,7 +3616,8 @@ all_picks_df <- bind_rows(
            bookmaker_key  = if ("bookmaker_key" %in% names(.)) bookmaker_key
                             else NA_character_,
            bookmaker_name = coalesce(BOOK_DISPLAY_NAMES[bookmaker_key], bookmaker_key),
-           game_start    = as.POSIXct(NA)) %>%
+           game_start    = if ("game_start" %in% names(.)) game_start
+                           else as.POSIXct(NA)) %>%
     select(sport, game_date, game_start, home_team, away_team,
            bet_type, bet_team, bet_ml, bet_ev, raw_kelly, scaled_kelly,
            bet_line, bookmaker_key, bookmaker_name),
@@ -3471,6 +3637,14 @@ all_picks_df <- bind_rows(
                 bet_line,
                 bookmaker_key  = if ("book"             %in% names(.)) book             else NA_character_,
                 bookmaker_name = if ("bookmaker_display" %in% names(.)) bookmaker_display else NA_character_)
+  else tibble(),
+
+  # NCAAW (gated -- excluded from portfolio until NCAAW_LIVE_DATE)
+  if (Sys.Date() >= NCAAW_LIVE_DATE && nrow(ncaaw_value_bets) > 0)
+    ncaaw_value_bets %>%
+      select(sport, game_date, game_start, home_team, away_team,
+             bet_type, bet_team, bet_ml, bet_ev, raw_kelly, scaled_kelly,
+             bet_line, bookmaker_key, bookmaker_name)
   else tibble()
 
 ) %>%
@@ -3525,6 +3699,115 @@ cap_daily_bets <- function(picks_df, bankroll = 1000, cap_pct = 0.10,
 
 final_picks <- cap_daily_bets(all_picks_df, bankroll = current_bankroll)
 
+
+# ── ESPN tip time enrichment ──────────────────────────────────────────────────
+# TOA returns T00:00:00Z (midnight UTC) as a sentinel for unconfirmed tip times.
+# ESPN scoreboard has real confirmed times. We fetch ESPN and patch any sentinel
+# rows in final_picks before writing daily_picks.csv.
+#
+# NAME CROSSWALK: ESPN displayName ≠ TOA name in many cases. The table below
+# maps ESPN's name to whatever TOA produces after fix_team_names(). Add rows
+# as new mismatches appear in the console output.
+espn_to_toa <- tribble(
+  ~espn_name,                             ~toa_name,
+  # NCAAB — common mismatches
+  "Connecticut Huskies",                  "UConn Huskies",
+  "Saint Mary's (CA) Gaels",              "St Mary's Gaels",
+  "Saint Mary's Gaels",                   "St Mary's Gaels",
+  "VCU Rams",                             "VCU Rams",
+  "UTSA Roadrunners",                     "UT San Antonio Roadrunners",
+  "Louisiana Ragin' Cajuns",              "Louisiana Ragin' Cajuns",
+  "Louisiana Lafayette Ragin' Cajuns",    "Louisiana Ragin' Cajuns",
+  "UAB Blazers",                          "UAB Blazers",
+  "UMBC Retrievers",                      "UMBC Retrievers",
+  "USC Trojans",                          "USC Trojans",
+  "Loyola Chicago Ramblers",              "Loyola (IL) Ramblers",
+  "Loyola (IL) Ramblers",                 "Loyola (IL) Ramblers",
+  "Illinois Fighting Illini",             "Illinois Fighting Illini",
+  "Miami Hurricanes",                     "Miami (FL) Hurricanes",
+  "Miami (OH) RedHawks",                  "Miami (OH) RedHawks",
+  "Pitt Panthers",                        "Pittsburgh Panthers",
+  "Mississippi Rebels",                   "Ole Miss Rebels",
+  "Central Florida Knights",              "UCF Knights",
+  "Massachusetts Minutemen",              "UMass Minutemen",
+  "North Carolina-Wilmington Seahawks",   "UNC Wilmington Seahawks",
+  "Texas-San Antonio Roadrunners",        "UT San Antonio Roadrunners",
+  "Arkansas-Little Rock Trojans",         "Little Rock Trojans",
+  "Nebraska-Omaha Mavericks",             "Omaha Mavericks",
+  # NBA — usually clean; LA Clippers is the known mismatch
+  "Los Angeles Clippers",                 "LA Clippers",
+  # NHL — full city+nickname typically matches TOA; add here if mismatch found
+)
+
+fetch_espn_tip_times <- function(date_str) {
+  # Returns tibble(home_team, away_team, tip_utc) with ESPN names already
+  # translated to TOA names via espn_to_toa crosswalk.
+  endpoints <- list(
+    NBA   = paste0("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=", date_str),
+    NCAAB = paste0("https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&limit=200&dates=", date_str),
+    NHL   = paste0("https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=", date_str)
+  )
+  raw_times <- map_dfr(names(endpoints), function(sport) {
+    tryCatch({
+      raw    <- fromJSON(endpoints[[sport]], simplifyVector = FALSE)
+      events <- raw$events
+      if (length(events) == 0) return(tibble())
+      map_dfr(events, function(e) {
+        comp  <- e$competitions[[1]]
+        teams <- comp$competitors
+        home  <- Filter(function(t) t$homeAway == "home", teams)[[1]]
+        away  <- Filter(function(t) t$homeAway == "away", teams)[[1]]
+        tibble(
+          sport_grp = sport,
+          home_team = home$team$displayName,
+          away_team = away$team$displayName,
+          tip_utc   = as.POSIXct(e$date, format = "%Y-%m-%dT%H:%M%OSZ", tz = "UTC")
+        )
+      })
+    }, error = function(e) tibble())
+  })
+  # Apply ESPN → TOA name translation
+  raw_times %>%
+    mutate(
+      home_team = coalesce(espn_to_toa$toa_name[match(home_team, espn_to_toa$espn_name)], home_team),
+      away_team = coalesce(espn_to_toa$toa_name[match(away_team, espn_to_toa$espn_name)], away_team)
+    )
+}
+
+espn_times <- tryCatch(
+  fetch_espn_tip_times(format(Sys.Date(), "%Y%m%d")),
+  error = function(e) { message("⚠️  ESPN tip time fetch failed: ", e$message); tibble() }
+)
+
+if (nrow(espn_times) > 0) {
+  cat(sprintf("✅ ESPN tip times fetched: %d games\n", nrow(espn_times)))
+
+  # Join ESPN times and patch sentinel rows only — leave real TOA times untouched
+  final_picks <- final_picks %>%
+    left_join(
+      espn_times %>% select(home_team, away_team, tip_utc),
+      by = c("home_team", "away_team")
+    ) %>%
+    mutate(
+      game_start = case_when(
+        !is.na(tip_utc) &
+          (is.na(game_start) |
+           format(with_tz(game_start, "UTC"), "%H:%M:%S") == "00:00:00") ~ tip_utc,
+        TRUE ~ game_start
+      )
+    ) %>%
+    select(-tip_utc)
+
+  n_patched <- final_picks %>%
+    filter(sport %in% c("NBA", "NCAAB", "NHL"),
+           !is.na(game_start),
+           format(with_tz(game_start, "UTC"), "%H:%M:%S") != "00:00:00") %>%
+    nrow()
+  cat(sprintf("   Times confirmed for %d NBA/NCAAB/NHL picks\n", n_patched))
+} else {
+  cat("ℹ️  ESPN tip times unavailable — sentinel rows will show TBD.\n")
+}
+
 daily_picks_path <- file.path("logs",
                               paste0("daily_picks_", Sys.Date(), ".csv"))
 
@@ -3534,18 +3817,12 @@ daily_picks_path <- file.path("logs",
 # Most US books display soccer with away team listed first — opposite of this sheet.
 final_picks_clean <- final_picks %>%
   mutate(
-    # Game time — convert UTC game_start to ET for display.
-    # NOTE: Challenger times are stored as local time (no tz) — with_tz()
-    #   misinterprets them. Parked for fix: Challenger needs tz="America/New_York"
-    #   on construction, or a sport-aware tz branch here.
-    # NOTE: TOA returns midnight UTC for NCAAB/NBA tournament games without
-    #   confirmed tip times. These correctly display as 08:00 PM ET but are
-    #   not meaningful. Parked for fix: detect midnight-UTC sentinel and show
-    #   "TBD" instead; also explore ESPN API as a fallback for confirmed times.
-    `Time (ET)` = if_else(
-      !is.na(game_start),
-      format(with_tz(game_start, "America/New_York"), "%I:%M %p"),
-      "TBD"
+    `Time (ET)` = case_when(
+      is.na(game_start) ~ "TBD",
+      # TOA midnight UTC sentinel = unconfirmed tip time → show TBD
+      # NOTE: format(x, tz=) is ignored in R — must use with_tz() first
+      format(with_tz(game_start, "UTC"), "%H:%M:%S") == "00:00:00" ~ "TBD",
+      TRUE ~ format(with_tz(game_start, "America/New_York"), "%I:%M %p")
     ),
     # Normalise Bet Type labels
     `Bet Type` = case_when(
@@ -3592,19 +3869,22 @@ cat(sprintf("✅ Daily picks written: %d bets → %s\n",
             nrow(final_picks_clean), daily_picks_path))
 
 mlb_log_path <- file.path("logs", paste0("mlb_bet_log_", Sys.Date(), ".csv"))
-mlb_bet_log_new <- bind_rows(
-  value_mlb  %>% mutate(bet_type = "ML",  bet_line = NA_real_),
-  totals_mlb
-) %>%
-  mutate(log_date = Sys.Date(),
-         result   = NA_character_,
-         pnl      = NA_real_) %>%
-  filter(!is.na(bet_ml)) %>%
-  select(sport, log_date, game_date, open_time, home_team, away_team, bookmaker_key,
-         bet_type, bet_team, bet_ml, bet_line, raw_kelly, scaled_kelly, result, pnl)
-
-write_csv(mlb_bet_log_new, mlb_log_path)
-cat("✅ MLB bets logged:", nrow(mlb_bet_log_new), "\n")
+if (!MLB_PRESEASON_ACTIVE && nrow(value_mlb) + nrow(totals_mlb) > 0) {
+  mlb_bet_log_new <- bind_rows(
+    value_mlb  %>% mutate(bet_type = "ML",  bet_line = NA_real_),
+    totals_mlb
+  ) %>%
+    mutate(log_date = Sys.Date(),
+           result   = NA_character_,
+           pnl      = NA_real_) %>%
+    filter(!is.na(bet_ml)) %>%
+    select(sport, log_date, game_date, open_time, home_team, away_team, bookmaker_key,
+           bet_type, bet_team, bet_ml, bet_line, raw_kelly, scaled_kelly, result, pnl)
+  write_csv(mlb_bet_log_new, mlb_log_path)
+  cat("✅ MLB bets logged:", nrow(mlb_bet_log_new), "\n")
+} else {
+  cat("ℹ️  MLB log skipped — preseason suppression active.\n")
+}
 
 # ── Write logs — only bets that survived cap_daily_bets() ────────────────────
 # final_picks has the capped set (slim columns). Rejoin to full-column source
@@ -4101,13 +4381,25 @@ print(soccer_results_yesterday %>%
                home_score, away_score, match_result))
 
 # Soccer PnL contribution for paper trading (by game_date)
-soccer_pnl_by_date <- if (nrow(soccer_settled_today) > 0) {
-  soccer_settled_today %>%
+# ── Read from FULL log files (not just newly-settled rows) ───────────────────
+# This ensures prior-run settlements are included when paper log is rebuilt.
+soccer_all_settled <- map_dfr(soccer_log_files, function(lp) {
+  if (!file.exists(lp)) return(tibble())
+  tryCatch(
+    read_csv(lp, col_types = cols(result = col_character(), pnl = col_double(),
+             game_date = col_date(), .default = col_guess()), show_col_types = FALSE) %>%
+      filter(result %in% c("W", "L")),
+    error = function(e) tibble()
+  )
+})
+
+soccer_pnl_by_date <- if (nrow(soccer_all_settled) > 0) {
+  soccer_all_settled %>%
     filter(!is.na(result)) %>%
     group_by(game_date) %>%
     summarise(
-      soccer_pnl   = sum(pnl, na.rm = TRUE),
-      soccer_wins  = sum(result == "W"),
+      soccer_pnl    = sum(pnl, na.rm = TRUE),
+      soccer_wins   = sum(result == "W"),
       soccer_losses = sum(result == "L"),
       .groups = "drop"
     )
@@ -4307,8 +4599,22 @@ cat("Files scanned:", length(tennis_log_files), "\n")
 cat("Newly settled:", nrow(tennis_settled_today), "bets\n")
 
 # ── Tennis PnL for paper trading (by game_date) ───────────────────────────────
-tennis_pnl_by_date <- if (nrow(tennis_settled_today) > 0) {
-  tennis_settled_today %>%
+# ── Read from FULL tennis log files (not just newly-settled rows) ────────────
+tennis_log_files_all <- list.files(file.path(getwd(), "logs"),
+                                   pattern = "^tennis_bet_log_.*\\.csv$",
+                                   full.names = TRUE)
+tennis_all_settled <- map_dfr(tennis_log_files_all, function(lp) {
+  if (!file.exists(lp)) return(tibble())
+  tryCatch(
+    read_csv(lp, col_types = cols(result = col_character(), pnl = col_double(),
+             game_date = col_date(), .default = col_guess()), show_col_types = FALSE) %>%
+      filter(result %in% c("W", "L")),
+    error = function(e) tibble()
+  )
+})
+
+tennis_pnl_by_date <- if (nrow(tennis_all_settled) > 0) {
+  tennis_all_settled %>%
     filter(!is.na(result)) %>%
     group_by(game_date) %>%
     summarise(
@@ -4520,8 +4826,22 @@ cat("Files scanned:", length(challenger_log_files), "\n")
 cat("Newly settled:", nrow(challenger_settled_today), "bets\n")
 
 # ── Challenger PnL for paper trading (by game_date) ───────────────────────────
-challenger_pnl_by_date <- if (nrow(challenger_settled_today) > 0) {
-  challenger_settled_today %>%
+# ── Read from FULL challenger log files (not just newly-settled rows) ────────
+challenger_log_files_all <- list.files(file.path(getwd(), "logs"),
+                                       pattern = "^challenger_bet_log_.*\\.csv$",
+                                       full.names = TRUE)
+challenger_all_settled <- map_dfr(challenger_log_files_all, function(lp) {
+  if (!file.exists(lp)) return(tibble())
+  tryCatch(
+    read_csv(lp, col_types = cols(result = col_character(), pnl = col_double(),
+             game_date = col_date(), .default = col_guess()), show_col_types = FALSE) %>%
+      filter(result %in% c("W", "L")),
+    error = function(e) tibble()
+  )
+})
+
+challenger_pnl_by_date <- if (nrow(challenger_all_settled) > 0) {
+  challenger_all_settled %>%
     filter(!is.na(result)) %>%
     group_by(game_date) %>%
     summarise(
@@ -4708,6 +5028,7 @@ load_daily_picks_kelly <- function(picks_path) {
              Home       = col_character(),
              Away       = col_character(),
              Pick       = col_character(),
+             `Bet Type` = col_character(),
              Odds       = col_double(),
              Kelly      = col_double(),
              `Risk $`   = col_double(),
@@ -4717,8 +5038,15 @@ load_daily_picks_kelly <- function(picks_path) {
     transmute(
       home_team    = Home,
       away_team    = Away,
-      bet_team     = Pick,
-      bet_ml       = Odds,
+      bet_type_cap = case_when(
+        `Bet Type` == "ML"     ~ "ML",
+        `Bet Type` == "Spread" ~ "SPREAD",
+        `Bet Type` == "Total"  ~ "TOTAL",
+        TRUE                   ~ `Bet Type`
+      ),
+      pick_raw     = Pick,
+      bet_line_cap = as.numeric(str_extract(Pick, "[+-]?[0-9]+\\.?[0-9]*$")),
+      bet_odds     = Odds,
       capped_kelly = Kelly,
       risk_dollar  = `Risk $`
     )
@@ -4752,7 +5080,6 @@ settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
   # Load spread/total settled bets if path provided
   st_settled <- tibble(result = character(), pnl = double(), scaled_kelly = double())
   if (!is.null(st_log_path) && file.exists(st_log_path)) {
-    # AFTER
     st_log <- read_csv(st_log_path,
                        col_types = cols(
                          result    = col_character(),
@@ -4764,12 +5091,18 @@ settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
     
     st_settled <- st_log %>%
       filter(!is.na(result), result %in% c("W", "L")) %>%
-      select(result, pnl, scaled_kelly)
+      select(any_of(c("home_team", "away_team", "bet_team",
+                      "bet_type", "bet_line", "bet_odds",
+                      "result", "pnl", "scaled_kelly")))
   }
   
   all_settled <- bind_rows(
-    ml_settled %>% select(result, pnl, scaled_kelly),
-    st_settled
+    ml_settled %>%
+      select(any_of(c("home_team", "away_team", "bet_team", "bet_ml",
+                      "value_side", "result", "pnl", "scaled_kelly"))) %>%
+      mutate(bet_type = NA_character_, bet_line = NA_real_, bet_odds = NA_real_),
+    st_settled %>%
+      mutate(bet_ml = NA_real_, value_side = NA_character_)
   )
   
   if (nrow(all_settled) == 0) {
@@ -4779,31 +5112,47 @@ settle_paper_day <- function(ml_log_path, bankroll_at_open, st_log_path = NULL,
   
   all_settled <- all_settled %>%
     mutate(
+      bet_ml_eff   = coalesce(bet_ml, bet_odds),
       dollar_stake = scaled_kelly * bankroll_at_open,
       dollar_pnl   = pnl * bankroll_at_open
     )
 
   # ── Patch scaled_kelly + dollar amounts from daily_picks (post-cap) ─────────
-  # Sport logs carry pre-cap scaled_kelly which overstates stakes ~3x.
-  # Join on bet identity to replace with the actual capped values.
   picks_kelly <- load_daily_picks_kelly(daily_picks_path)
 
   if (!is.null(picks_kelly)) {
-    all_settled <- all_settled %>%
+    picks_ml <- picks_kelly %>% filter(bet_type_cap == "ML")
+    picks_st <- picks_kelly %>% filter(bet_type_cap %in% c("SPREAD", "TOTAL"))
+
+    ml_rows <- all_settled %>% filter(!is.na(value_side) | is.na(bet_type))
+    st_rows <- all_settled %>% filter(!is.na(bet_type) & bet_type %in% c("SPREAD", "OVER", "UNDER"))
+
+    ml_joined <- ml_rows %>%
       left_join(
-        picks_kelly %>% select(home_team, away_team, bet_team, capped_kelly, risk_dollar),
-        by = c("home_team", "away_team", "bet_team")
-      ) %>%
+        picks_ml %>% select(home_team, away_team, pick_raw, capped_kelly, risk_dollar),
+        by = c("home_team", "away_team", "bet_team" = "pick_raw")
+      )
+
+    st_joined <- st_rows %>%
+      left_join(
+        picks_st %>% select(home_team, away_team, bet_line_cap, capped_kelly, risk_dollar),
+        by = c("home_team", "away_team", "bet_line" = "bet_line_cap")
+      )
+
+    all_settled <- bind_rows(ml_joined, st_joined) %>%
+      filter(!is.na(capped_kelly)) %>%
       mutate(
-        scaled_kelly = coalesce(capped_kelly, scaled_kelly),
-        dollar_stake = coalesce(risk_dollar,  dollar_stake),
+        scaled_kelly = capped_kelly,
+        dollar_stake = risk_dollar,
         dollar_pnl   = case_when(
-          result == "W" ~ (bet_ml - 1) * scaled_kelly * bankroll_at_open,
-          result == "L" ~ -scaled_kelly * bankroll_at_open,
+          result == "W" ~ (bet_ml_eff - 1) * capped_kelly * bankroll_at_open,
+          result == "L" ~ -capped_kelly * bankroll_at_open,
           TRUE          ~ dollar_pnl
         )
       ) %>%
-      select(-capped_kelly, -risk_dollar)
+      select(-capped_kelly, -risk_dollar, -bet_ml_eff, -bet_ml, -bet_odds, -value_side, -bet_type)
+  } else {
+    all_settled <- all_settled %>% select(-bet_ml_eff, -bet_ml, -bet_odds, -value_side, -bet_type)
   }
   
   # ── Bug #2 guard: log_date may have multiple values if log spans multiple days.
@@ -4967,6 +5316,10 @@ settle_soccer_log <- function(log_path, results_df) {
 # ---- Backfill any missing historical days (Bug #14 fix) ----
 # Derived dynamically from bet_log_*.csv files in the logs/ directory.
 # No longer needs hand-editing when a new day is added.
+# Set FORCE_RESETTLE_DATES to re-process specific dates (e.g. fix bad 3/13 row).
+# Example: FORCE_RESETTLE_DATES <- as.Date(c("2026-03-13", "2026-03-14"))
+# Set to as.Date(character()) to disable.
+FORCE_RESETTLE_DATES <- as.Date(character())  # empty = normal mode
 log_files_on_disk <- list.files(
   file.path(getwd(), "logs"),
   pattern    = "^bet_log_\\d{4}-\\d{2}-\\d{2}\\.csv$",
@@ -4985,14 +5338,15 @@ cat(sprintf("Backfill candidates: %d dates (%s to %s)\n",
 for (i in seq_along(backfill_dates)) {
   bf_date <- backfill_dates[i]   # index into the vector — preserves Date class
   
-  if (!bf_date %in% paper_log$date) {
+  if (!bf_date %in% paper_log$date || bf_date %in% FORCE_RESETTLE_DATES) {
     bf_ml_path <- file.path(getwd(), "logs", paste0("bet_log_", bf_date, ".csv"))
     bf_st_path <- file.path(getwd(), "logs", paste0("spread_total_log_", bf_date, ".csv"))
     
-    bf_bankroll <- if (nrow(paper_log) == 0) {
+    prior_rows <- paper_log %>% filter(date < bf_date) %>% arrange(date)
+    bf_bankroll <- if (nrow(prior_rows) == 0) {
       STARTING_BANKROLL
     } else {
-      tail(paper_log$ending_bankroll, 1)
+      tail(prior_rows$ending_bankroll, 1)
     }
     
     bf_row <- settle_paper_day(bf_ml_path, bf_bankroll,
@@ -5005,8 +5359,12 @@ for (i in seq_along(backfill_dates)) {
                                challenger_pnl_by_date_arg = challenger_pnl_by_date)
     
     if (!is.null(bf_row)) {
-      paper_log <- bind_rows(paper_log, bf_row) %>% arrange(date)
-      cat("Backfilled:", format(bf_date), "\n")
+      paper_log <- paper_log %>%
+        filter(date != bf_date) %>%   # remove old row if force-resettling
+        bind_rows(bf_row) %>%
+        arrange(date)
+      cat(if (bf_date %in% FORCE_RESETTLE_DATES) "Re-settled:" else "Backfilled:",
+          format(bf_date), "\n")
     } else {
       cat("No data for:", format(bf_date), "\n")
     }
@@ -5015,6 +5373,21 @@ for (i in seq_along(backfill_dates)) {
   }
 }
 
+
+# ---- Cascade: recompute starting_bankroll chain after any resettlement ------
+if (length(FORCE_RESETTLE_DATES) > 0 && nrow(paper_log) > 1) {
+  paper_log <- paper_log %>% arrange(date)
+  for (j in 2:nrow(paper_log)) {
+    correct_start <- paper_log$ending_bankroll[j - 1]
+    if (!isTRUE(all.equal(paper_log$starting_bankroll[j], correct_start))) {
+      orig_pnl <- paper_log$settled_pnl_dollar[j]
+      paper_log$starting_bankroll[j] <- correct_start
+      paper_log$ending_bankroll[j]   <- round(correct_start + orig_pnl, 2)
+      paper_log$daily_roi[j]         <- orig_pnl / correct_start
+    }
+  }
+  cat("✅ Bankroll cascade updated after resettlement.\n")
+}
 
 # ---- Add/update yesterday (only if not already backfilled above) ----
 if (!yesterday %in% paper_log$date) {
