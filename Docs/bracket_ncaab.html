@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — NCAAB March Madness 2026</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #0a0d14;
@@ -21,7 +21,7 @@
       --midwest:    #ef4444;
       --font-head:  'Bebas Neue', sans-serif;
       --font-mono:  'DM Mono', monospace;
-      --font-body:  'Inter', sans-serif;
+      --font-body:  'Outfit', sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -321,6 +321,15 @@
 <body>
 
 <!-- Nav -->
+<style>
+nav a { color: #7a8399 !important; text-decoration: none !important; }
+nav a:visited { color: #7a8399 !important; }
+nav a:hover { color: #eceef4 !important; }
+nav a.nav-gold { color: #f0b429 !important; }
+nav a.nav-gold:visited { color: #f0b429 !important; }
+nav a.nav-cta { color: #f0b429 !important; border: 1px solid #f0b429 !important; border-radius: 4px; padding: 0.5rem 1.2rem; }
+nav a.nav-cta:hover { background: #f0b429 !important; color: #080b12 !important; }
+</style>
 <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(10,13,20,0.92);backdrop-filter:blur(16px);border-bottom:1px solid #1e2740;">
   <a href="/" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
     <svg viewBox="0 0 26 26" fill="none" style="width:24px;height:24px;"><circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/><path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/><circle cx="13" cy="13" r="2.5" fill="#0a0d14"/></svg>
@@ -328,7 +337,7 @@
   </a>
   <div style="display:flex;align-items:center;gap:2rem;">
     <a href="/dashboard.html" style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8399;text-decoration:none;">Dashboard</a>
-    <a href="/tournaments.html" style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#f0b429;text-decoration:none;">Tournaments</a>
+    <a href="/tournaments.html" class="nav-gold" style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#f0b429;text-decoration:none;">Tournaments</a>
     <a href="/library.html" style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8399;text-decoration:none;">Learn</a>
     <a href="/pricing.html" style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8399;text-decoration:none;">Pricing</a>
   </div>
@@ -338,7 +347,7 @@
 <!-- Hero -->
 <div class="hero" style="padding-top:5.5rem;">
   <h1>2026 March Madness<br><span>Model Probabilities</span></h1>
-  <p>Pythagorean win% model · 50,000 simulations · Updated after bracket release</p>
+  <p>Pythagorean win% model · 50,000 simulations · Updated daily</p>
   <div class="disclaimer">
     ⚠ For informational and entertainment purposes only. Not financial or betting advice.
     Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal.
