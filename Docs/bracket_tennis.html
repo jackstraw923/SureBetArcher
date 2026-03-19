@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Miami Open 2026 Bracket</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b12; --bg2:#0e1220; --bg3:#141929;
+      --border:#1a2238; --gold:#f0b429; --gold2:#e07b00;
+      --text:#eceef4; --muted:#6b7794; --green:#10b981;
+      --blue:#3b82f6; --teal:#06b6d4;
+      --font-head:'Bebas Neue',sans-serif;
+      --font-mono:'DM Mono',monospace;
+      --font-body:'Outfit',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);}
+
+    /* ── Nav ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(8,11,18,0.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(26,34,56,0.6);}
+    .nav-logo{display:flex;align-items:center;gap:0.6rem;text-decoration:none;}
+    .nav-logo svg{width:24px;height:24px;}
+    .nav-logo span{font-family:var(--font-head);font-size:1.6rem;color:var(--text);letter-spacing:0.03em;}
+    .nav-logo span em{color:var(--gold);font-style:normal;}
+    .nav-links{display:flex;align-items:center;gap:2rem;}
+    .nav-links a{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--gold);}
+    .nav-cta{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.5rem 1.2rem;border:1px solid var(--gold);color:var(--gold);text-decoration:none;border-radius:4px;transition:all 0.2s;}
+    .nav-cta:hover{background:var(--gold);color:var(--bg);}
+
+    /* ── Hero ── */
+    .hero{background:linear-gradient(135deg,#0a0f1e 0%,#0d1528 50%,#080b12 100%);border-bottom:1px solid var(--border);padding:7rem 2.5rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'MIAMI OPEN';position:absolute;font-family:var(--font-head);font-size:10rem;color:rgba(240,180,41,0.03);top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;}
+    .hero-eyebrow{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;}
+    .hero h1{font-family:var(--font-head);font-size:clamp(2.5rem,5vw,4rem);letter-spacing:0.05em;color:var(--text);position:relative;}
+    .hero h1 span{color:var(--gold);}
+    .hero-sub{color:var(--muted);font-size:0.82rem;font-family:var(--font-mono);margin-top:0.5rem;position:relative;}
+    .disclaimer{background:rgba(240,180,41,0.05);border:1px solid rgba(240,180,41,0.15);border-radius:4px;padding:0.5rem 1rem;font-size:0.7rem;color:var(--muted);margin:1.2rem auto 0;max-width:680px;position:relative;}
+
+    /* ── Tour tabs ── */
+    .tour-tabs{max-width:1400px;margin:2rem auto 0;padding:0 2.5rem;display:flex;gap:0.75rem;}
+    .tour-tab{font-family:var(--font-head);font-size:1.1rem;letter-spacing:0.08em;padding:0.6rem 2rem;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+    .tour-tab:hover{color:var(--text);border-color:var(--muted);}
+    .tour-tab.active.atp{color:var(--bg);background:var(--blue);border-color:var(--blue);}
+    .tour-tab.active.wta{color:var(--bg);background:var(--teal);border-color:var(--teal);}
+
+    /* ── Championship grid ── */
+    .champ-section{padding:2rem 2.5rem;max-width:1400px;margin:0 auto;}
+    .section-title{font-family:var(--font-head);font-size:1.3rem;letter-spacing:0.08em;color:var(--muted);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.75rem;}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+    .section-title .tour-dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+    .dot-atp{background:var(--blue);}
+    .dot-wta{background:var(--teal);}
+
+    .champ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;}
+    .champ-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:0.9rem 1rem;position:relative;overflow:hidden;transition:border-color 0.2s;}
+    .champ-card:hover{border-color:rgba(240,180,41,0.3);}
+    .champ-card .tour-bar{position:absolute;left:0;top:0;bottom:0;width:3px;}
+    .tour-bar.atp{background:var(--blue);}
+    .tour-bar.wta{background:var(--teal);}
+    .champ-card .c-seed{font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);margin-bottom:0.2rem;}
+    .champ-card .c-name{font-size:0.82rem;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:0.4rem;}
+    .champ-card .c-elo{font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);margin-bottom:0.5rem;}
+    .champ-card .prob-row{display:flex;align-items:center;gap:0.5rem;}
+    .champ-card .prob-bar-bg{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+    .champ-card .prob-bar-fill{height:100%;border-radius:2px;transition:width 0.6s ease;}
+    .fill-atp{background:var(--blue);}
+    .fill-wta{background:var(--teal);}
+    .champ-card .prob-pct{font-family:var(--font-mono);font-size:0.72rem;min-width:38px;text-align:right;}
+    .pct-atp{color:var(--blue);}
+    .pct-wta{color:var(--teal);}
+
+    /* ── Model note ── */
+    .model-note{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:4px;padding:1rem 1.2rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+    .model-note strong{color:var(--text);}
+
+    /* ── Full table ── */
+    .bracket-section{padding:0 2.5rem 3rem;max-width:1400px;margin:0 auto;}
+
+    .bracket-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+    .bracket-table th{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:0.5rem 0.75rem;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+    .bracket-table th.right{text-align:right;}
+    .bracket-table td{padding:0.42rem 0.75rem;border-bottom:1px solid rgba(26,34,56,0.4);vertical-align:middle;}
+    .bracket-table tr:hover td{background:var(--bg2);}
+
+    .seed-pill{display:inline-block;font-family:var(--font-mono);font-size:0.62rem;padding:0.1rem 0.35rem;border-radius:3px;background:var(--bg3);color:var(--muted);min-width:22px;text-align:center;}
+    .seed-pill.s1{background:rgba(240,180,41,0.2);color:var(--gold);}
+    .seed-pill.s2{background:rgba(240,180,41,0.1);color:#d4a020;}
+    .seed-pill.s3,.seed-pill.s4{background:rgba(240,180,41,0.07);color:#b08a18;}
+
+    .elo-bar{display:inline-block;height:5px;background:var(--gold);border-radius:3px;vertical-align:middle;opacity:0.6;}
+
+    .prob-cell{font-family:var(--font-mono);font-size:0.72rem;text-align:right;white-space:nowrap;}
+    .ph{color:var(--gold);}
+    .pm{color:#9ca3af;}
+    .pl{color:#374151;}
+
+    .next-badge{display:inline-block;font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.4rem;border-radius:3px;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);}
+
+    /* ── Sort controls ── */
+    .sort-bar{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+    .sort-label{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .sort-btn{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.06em;padding:0.3rem 0.75rem;border-radius:3px;border:1px solid var(--border);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+    .sort-btn:hover{color:var(--text);border-color:var(--muted);}
+    .sort-btn.active{color:var(--bg);background:var(--gold);border-color:var(--gold);}
+
+    /* ── Footer ── */
+    footer{background:var(--bg2);border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+    .footer-links{display:flex;gap:1.5rem;}
+    .footer-links a{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+    .footer-links a:hover{color:var(--text);}
+    .footer-disc{width:100%;font-size:0.65rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;}
+
+    .hidden{display:none;}
+
+    @media(max-width:768px){
+      .nav-links{display:none;}
+      nav{padding:1rem 1.5rem;}
+      .champ-grid{grid-template-columns:repeat(2,1fr);}
+      .bracket-table th:nth-child(n+6),.bracket-table td:nth-child(n+6){display:none;}
+      .champ-section,.bracket-section{padding-left:1rem;padding-right:1rem;}
+      .tour-tabs{padding:0 1rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/><path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/><circle cx="13" cy="13" r="2.5" fill="#080b12"/></svg>
+    <span>Arc<em>Vest</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/tournaments.html" class="active">Tournaments</a>
+    <a href="/library.html">Learn</a>
+    <a href="/pricing.html">Pricing</a>
+  </div>
+  <a class="nav-cta" href="/pricing.html">Start Free</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">ArcVest Model Probabilities · Updated Daily</div>
+  <h1>Miami Open <span>2026</span></h1>
+  <div class="hero-sub">Sackmann Elo · 50,000 Monte Carlo simulations · Hard Court · Mar 18–29</div>
+  <div class="disclaimer">⚠ For informational and entertainment purposes only. Not financial or betting advice. Must be 21+ and in a jurisdiction where sports betting is legal.</div>
+</div>
+
+<div class="tour-tabs">
+  <button class="tour-tab active atp" onclick="switchTour('atp')">ATP — Men's Singles</button>
+  <button class="tour-tab wta" onclick="switchTour('wta')">WTA — Women's Singles</button>
+</div>
+
+<!-- ATP PANEL -->
+<div id="panel-atp">
+  <div class="champ-section">
+    <div class="section-title"><span class="tour-dot dot-atp"></span>Championship Probabilities — Top 12</div>
+    <div class="model-note">
+      <strong>ATP Miami Open sim:</strong> 50,000 Monte Carlo simulations of the 96-player draw, padded to 128 bracket positions. Player strength measured by TennisAbstract hard-court Elo (e=1.1 Sackmann exponent). Unseeded/qualifier Elo imputed at 25th-percentile field strength. Probabilities update each morning as eliminated players are removed from the draw.
+    </div>
+    <div class="champ-grid" id="atp-champ-grid"></div>
+  </div>
+  <div class="bracket-section">
+    <div class="section-title"><span class="tour-dot dot-atp"></span>Full Draw — Round Probabilities</div>
+    <div class="sort-bar">
+      <span class="sort-label">Sort by:</span>
+      <button class="sort-btn active" onclick="sortTable('atp','win')">Championship %</button>
+      <button class="sort-btn" onclick="sortTable('atp','draw')">Draw Position</button>
+      <button class="sort-btn" onclick="sortTable('atp','elo')">Elo Rating</button>
+      <button class="sort-btn" onclick="sortTable('atp','next')">Next Match %</button>
+    </div>
+    <table class="bracket-table">
+      <thead><tr>
+        <th>Seed</th>
+        <th>Player</th>
+        <th>Elo</th>
+        <th class="right">Next match</th>
+        <th class="right">Semifinal</th>
+        <th class="right">Final</th>
+        <th class="right">Champion</th>
+      </tr></thead>
+      <tbody id="atp-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- WTA PANEL -->
+<div id="panel-wta" class="hidden">
+  <div class="champ-section">
+    <div class="section-title"><span class="tour-dot dot-wta"></span>Championship Probabilities — Top 12</div>
+    <div class="model-note">
+      <strong>WTA Miami Open sim:</strong> 50,000 Monte Carlo simulations of the 96-player draw, padded to 128 bracket positions. Player strength measured by TennisAbstract hard-court Elo (e=1.1 Sackmann exponent). Unseeded/qualifier Elo imputed at 25th-percentile field strength. Probabilities update each morning as eliminated players are removed from the draw.
+    </div>
+    <div class="champ-grid" id="wta-champ-grid"></div>
+  </div>
+  <div class="bracket-section">
+    <div class="section-title"><span class="tour-dot dot-wta"></span>Full Draw — Round Probabilities</div>
+    <div class="sort-bar">
+      <span class="sort-label">Sort by:</span>
+      <button class="sort-btn active" onclick="sortTable('wta','win')">Championship %</button>
+      <button class="sort-btn" onclick="sortTable('wta','draw')">Draw Position</button>
+      <button class="sort-btn" onclick="sortTable('wta','elo')">Elo Rating</button>
+      <button class="sort-btn" onclick="sortTable('wta','next')">Next Match %</button>
+    </div>
+    <table class="bracket-table">
+      <thead><tr>
+        <th>Seed</th>
+        <th>Player</th>
+        <th>Elo</th>
+        <th class="right">Next match</th>
+        <th class="right">Semifinal</th>
+        <th class="right">Final</th>
+        <th class="right">Champion</th>
+      </tr></thead>
+      <tbody id="wta-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">ArcVest</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/tournaments.html">← Tournaments</a>
+    <a href="/library.html">Learn</a>
+    <a href="/pricing.html">Pricing</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+// ── Sim data — injected by SureBet2.R each daily run ──────────────────────────
+// Format per player: {draw_pos, seed, player, pct_win, pct_final, pct_semi, pct_next, elo}
+const SIM_DATA = {
+  atp: [
+    {draw_pos:96, seed:2, player:"Jannik Sinner", pct_win:18.1, pct_final:32.5, pct_semi:32.5, pct_next:100.0, elo:2238},
+    {draw_pos:1,  seed:1, player:"Carlos Alcaraz", pct_win:1.8, pct_final:3.2, pct_semi:5.6, pct_next:100.0, elo:2217},
+    {draw_pos:72, seed:3, player:"Alexander Zverev", pct_win:2.6, pct_final:4.7, pct_semi:4.7, pct_next:100.0, elo:2017},
+    {draw_pos:84, seed:12, player:"Jakub Mensik", pct_win:2.2, pct_final:4.2, pct_semi:4.2, pct_next:100.0, elo:1905},
+    {draw_pos:66, seed:20, player:"Learner Tien", pct_win:2.0, pct_final:3.9, pct_semi:3.9, pct_next:100.0, elo:1934},
+    {draw_pos:85, seed:15, player:"Andrey Rublev", pct_win:1.9, pct_final:3.7, pct_semi:3.7, pct_next:100.0, elo:1853},
+    {draw_pos:93, seed:null, player:"Tomas Machac", pct_win:1.9, pct_final:3.7, pct_semi:3.7, pct_next:100.0, elo:1832},
+    {draw_pos:73, seed:7, player:"Felix Auger-Aliassime", pct_win:2.3, pct_final:4.5, pct_semi:4.5, pct_next:100.0, elo:1960},
+    {draw_pos:60, seed:9, player:"Daniil Medvedev", pct_win:1.5, pct_final:2.9, pct_semi:2.9, pct_next:100.0, elo:1900},
+    {draw_pos:49, seed:8, player:"Ben Shelton", pct_win:1.4, pct_final:2.8, pct_semi:2.8, pct_next:100.0, elo:1882},
+    {draw_pos:37, seed:10, player:"Alexander Bublik", pct_win:1.3, pct_final:2.6, pct_semi:2.6, pct_next:100.0, elo:1834},
+    {draw_pos:48, seed:5, player:"Alex De Minaur", pct_win:1.5, pct_final:3.0, pct_semi:3.0, pct_next:100.0, elo:1864}
+  ],
+  wta: [
+    {draw_pos:96, seed:2, player:"Iga Swiatek", pct_win:8.6, pct_final:16.1, pct_semi:16.1, pct_next:100.0, elo:2056},
+    {draw_pos:1,  seed:1, player:"Aryna Sabalenka", pct_win:1.8, pct_final:3.3, pct_semi:5.8, pct_next:100.0, elo:2204},
+    {draw_pos:72, seed:4, player:"Coco Gauff", pct_win:2.3, pct_final:4.2, pct_semi:4.3, pct_next:100.0, elo:2017},
+    {draw_pos:84, seed:10, player:"Victoria Mboko", pct_win:2.3, pct_final:4.4, pct_semi:4.4, pct_next:100.0, elo:2037},
+    {draw_pos:85, seed:13, player:"Karolina Muchova", pct_win:2.2, pct_final:4.1, pct_semi:4.1, pct_next:100.0, elo:2012},
+    {draw_pos:73, seed:8, player:"Mirra Andreeva", pct_win:2.0, pct_final:3.7, pct_semi:3.7, pct_next:100.0, elo:1941},
+    {draw_pos:79, seed:22, player:"Anna Kalinskaya", pct_win:2.0, pct_final:3.8, pct_semi:3.8, pct_next:100.0, elo:1881},
+    {draw_pos:66, seed:21, player:"Elise Mertens", pct_win:1.9, pct_final:3.6, pct_semi:3.6, pct_next:100.0, elo:1861},
+    {draw_pos:48, seed:5, player:"Jessica Pegula", pct_win:1.5, pct_final:2.9, pct_semi:2.9, pct_next:100.0, elo:1890},
+    {draw_pos:49, seed:6, player:"Amanda Anisimova", pct_win:1.4, pct_final:2.8, pct_semi:2.8, pct_next:100.0, elo:1875},
+    {draw_pos:25, seed:3, player:"Elena Rybakina", pct_win:1.5, pct_final:3.0, pct_semi:3.0, pct_next:100.0, elo:2005},
+    {draw_pos:60, seed:12, player:"Belinda Bencic", pct_win:1.4, pct_final:2.7, pct_semi:2.7, pct_next:100.0, elo:1860}
+  ]
+};
+
+// ── State ───────────────────────────────────────────────────────────────────
+let activeTour = 'atp';
+let sortKey = { atp: 'win', wta: 'win' };
+
+// ── Tour switch ──────────────────────────────────────────────────────────────
+function switchTour(tour) {
+  activeTour = tour;
+  document.querySelectorAll('.tour-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tour-tab.${tour}`).classList.add('active');
+  document.getElementById('panel-atp').classList.toggle('hidden', tour !== 'atp');
+  document.getElementById('panel-wta').classList.toggle('hidden', tour !== 'wta');
+  // Handle hash navigation
+  history.replaceState(null, '', '#' + tour);
+}
+
+// ── Sort ─────────────────────────────────────────────────────────────────────
+function sortTable(tour, key) {
+  sortKey[tour] = key;
+  document.querySelectorAll(`#panel-${tour} .sort-btn`).forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTable(tour);
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function pct(v) { return v == null ? '—' : v.toFixed(1) + '%'; }
+function probClass(v) {
+  if (v == null) return 'pl';
+  if (v >= 10) return 'ph';
+  if (v >= 3)  return 'pm';
+  return 'pl';
+}
+function seedPillClass(s) {
+  if (s === 1) return 's1';
+  if (s === 2) return 's2';
+  if (s === 3 || s === 4) return 's3';
+  return '';
+}
+
+// ── Championship grid ────────────────────────────────────────────────────────
+function buildChampGrid(tour) {
+  const players = [...SIM_DATA[tour]].sort((a,b) => b.pct_win - a.pct_win).slice(0,12);
+  const maxProb = players[0]?.pct_win || 1;
+  const cls = tour === 'atp' ? 'atp' : 'wta';
+  const fillCls = tour === 'atp' ? 'fill-atp' : 'fill-wta';
+  const pctCls  = tour === 'atp' ? 'pct-atp'  : 'pct-wta';
+
+  return players.map(p => {
+    const fill = Math.round((p.pct_win / maxProb) * 100);
+    const seedLabel = p.seed ? `#${p.seed} seed` : 'unseeded';
+    return `<div class="champ-card">
+      <div class="tour-bar ${cls}"></div>
+      <div class="c-seed">${seedLabel}</div>
+      <div class="c-name">${p.player}</div>
+      <div class="c-elo">Elo ${Math.round(p.elo)}</div>
+      <div class="prob-row">
+        <div class="prob-bar-bg"><div class="prob-bar-fill ${fillCls}" style="width:${fill}%"></div></div>
+        <span class="prob-pct ${pctCls}">${pct(p.pct_win)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Full table ────────────────────────────────────────────────────────────────
+function renderTable(tour) {
+  const key = sortKey[tour];
+  const sorted = [...SIM_DATA[tour]].filter(p => !p.player.startsWith('Bye_'));
+
+  if (key === 'win')  sorted.sort((a,b) => b.pct_win  - a.pct_win);
+  if (key === 'draw') sorted.sort((a,b) => a.draw_pos  - b.draw_pos);
+  if (key === 'elo')  sorted.sort((a,b) => b.elo       - a.elo);
+  if (key === 'next') sorted.sort((a,b) => b.pct_next  - a.pct_next);
+
+  const maxElo = Math.max(...sorted.map(p => p.elo));
+
+  document.getElementById(`${tour}-tbody`).innerHTML = sorted.map(p => {
+    const sc = seedPillClass(p.seed);
+    const seedStr = p.seed ? `<span class="seed-pill ${sc}">${p.seed}</span>` : `<span class="seed-pill">—</span>`;
+    const eloWidth = Math.round((p.elo / maxElo) * 80);
+    const nextBadge = p.pct_next >= 70 ? `<span class="next-badge">${pct(p.pct_next)}</span>` : `<span class="${probClass(p.pct_next)} prob-cell">${pct(p.pct_next)}</span>`;
+    return `<tr>
+      <td>${seedStr}</td>
+      <td><strong>${p.player}</strong></td>
+      <td><span class="elo-bar" style="width:${eloWidth}px"></span> <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--muted);margin-left:4px">${Math.round(p.elo)}</span></td>
+      <td class="right">${nextBadge}</td>
+      <td class="prob-cell right ${probClass(p.pct_semi)}">${pct(p.pct_semi)}</td>
+      <td class="prob-cell right ${probClass(p.pct_final)}">${pct(p.pct_final)}</td>
+      <td class="prob-cell right ${probClass(p.pct_win)}">${pct(p.pct_win)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('atp-champ-grid').innerHTML = buildChampGrid('atp');
+  document.getElementById('wta-champ-grid').innerHTML = buildChampGrid('wta');
+  renderTable('atp');
+  renderTable('wta');
+
+  // Handle hash navigation (#atp or #wta)
+  const hash = window.location.hash.replace('#','');
+  if (hash === 'wta') switchTour('wta');
+}
+
+init();
+</script>
+</body>
+</html>
