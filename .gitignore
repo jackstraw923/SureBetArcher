@@ -10,6 +10,9 @@ logs/
 # Tools reports — generated output, not source
 tools/reports/
 
+# Sim output CSVs — generated daily, not source
+tools/*.csv
+
 # R session artifacts
 .Rhistory
 .RData

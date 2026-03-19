@@ -1,2 +1,0 @@
-sport,sport_tournament,game_date,home_player,away_player,bet_team,bet_ml,model_prob,bet_ev,scaled_kelly,position_id,status,action_flag,elo_prob,prob_diff,alignment
-TENNIS-CHALLENGER,CHA - Phoenix,2026-03-12,(Alt)Billy Harris (GBR),(WC)Darwin Blanch (USA),(Alt)Billy Harris (GBR),2.15,0.575,0.14078947368421052,0.05,CHALL_2026-03-12_(Alt)Billy Harris (GBR),IDENTIFIED,(Alt)Billy Harris (GBR),0.5714631174083814,0.003536882591618551,✅ Elite
