@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — Quantitative Sports Investing</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #080b12;
@@ -40,14 +40,192 @@
       border-bottom: 1px solid rgba(26,34,56,0.6);
     }
     .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-logo svg { width: 26px; height: 26px; }
-    .nav-logo span {
-      font-family: var(--font-head);
-      font-size: 1.6rem;
-      color: var(--text);
-      letter-spacing: 0.03em;
+    .nav-logo .wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: #e8eaf0;
+      line-height: 1;
     }
-    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
+
+    /* ── Email modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(8,11,18,0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #0e1220;
+      border: 1px solid #1a2238;
+      border-radius: 12px;
+      padding: 2.5rem;
+      max-width: 440px;
+      width: 90%;
+      position: relative;
+      animation: fadeUp 0.3s ease both;
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1.2rem;
+      background: none; border: none; color: #6b7794;
+      font-size: 1.2rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: #eceef4; }
+    .modal-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 0.75rem;
+    }
+    .modal-title {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #e8eaf0;
+      margin-bottom: 0.5rem;
+    }
+    .modal-sub {
+      font-size: 0.875rem;
+      color: #6b7794;
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.75rem;
+    }
+    .modal-form { display: flex; flex-direction: column; gap: 0.75rem; }
+    .modal-input {
+      background: #141929;
+      border: 1px solid #1a2238;
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      color: #eceef4;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: #c9a84c; }
+    .modal-input::placeholder { color: #6b7794; }
+    .modal-submit {
+      background: #c9a84c;
+      color: #080b12;
+      border: none;
+      border-radius: 6px;
+      padding: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .modal-submit:hover { background: #d4b55e; transform: translateY(-1px); }
+    .modal-note {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      color: #6b7794;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .modal-success {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .modal-success-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .modal-success-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: #e8eaf0;
+      margin-bottom: 0.5rem;
+    }
+    .modal-success-sub { font-size: 0.85rem; color: #6b7794; line-height: 1.6; }
+
+    /* ── Email band ── */
+    .email-band {
+      background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(45,212,191,0.04) 100%);
+      border-top: 1px solid rgba(201,168,76,0.15);
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      padding: 3rem 2.5rem;
+      text-align: center;
+    }
+    .email-band-inner { max-width: 540px; margin: 0 auto; }
+    .email-band-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin-bottom: 0.75rem;
+    }
+    .email-band-title {
+      font-family: var(--font-head);
+      font-size: 2.5rem;
+      letter-spacing: 0.05em;
+      color: #e8eaf0;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .email-band-sub {
+      font-size: 0.875rem;
+      color: #6b7794;
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .email-band-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .email-band-input {
+      flex: 1;
+      background: #0e1220;
+      border: 1px solid #1a2238;
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      color: #eceef4;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .email-band-input:focus { border-color: #c9a84c; }
+    .email-band-input::placeholder { color: #6b7794; }
+    .email-band-btn {
+      background: #c9a84c;
+      color: #080b12;
+      border: none;
+      border-radius: 6px;
+      padding: 0.8rem 1.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .email-band-btn:hover { background: #d4b55e; }
+    .email-band-note {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      color: #6b7794;
+      margin-top: 0.75rem;
+    }
     .nav-links { display: flex; align-items: center; gap: 2rem; }
     .nav-links a {
       font-family: var(--font-mono);
@@ -106,7 +284,95 @@
       pointer-events: none;
     }
 
-    .hero-content { position: relative; max-width: 900px; }
+    .hero-inner {
+      position: relative;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .hero-content { position: relative; }
+    .hero-chart-panel {
+      position: relative;
+      background: rgba(14,18,32,0.7);
+      border: 1px solid rgba(26,34,56,0.8);
+      border-radius: 12px;
+      padding: 1.75rem;
+      backdrop-filter: blur(8px);
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+    .hero-chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .hero-chart-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .hero-chart-label::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #c9a84c;
+    }
+    .hero-chart-bankroll {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      color: #c9a84c;
+      letter-spacing: 0.03em;
+    }
+    .hero-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 140px;
+      margin-bottom: 1rem;
+    }
+    .hero-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      min-height: 4px;
+      transition: opacity 0.2s;
+    }
+    .hero-bar:hover { opacity: 0.75; }
+    .hero-chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(26,34,56,0.8);
+      padding-top: 1rem;
+    }
+    .hero-chart-stat { text-align: center; }
+    .hero-chart-stat-val {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .hero-chart-stat-val.pos { color: #10b981; }
+    .hero-chart-stat-val.neg { color: #ef4444; }
+    .hero-chart-stat-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-chart-panel { display: none; }
+    }
 
     .hero-eyebrow {
       font-family: var(--font-mono);
@@ -535,12 +801,7 @@
 <!-- Nav -->
 <nav>
   <a class="nav-logo" href="/">
-    <svg viewBox="0 0 26 26" fill="none">
-      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
-      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
-      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
-    </svg>
-    <span>Arc<em>Vest</em></span>
+    <div class="wordmark">Arc<em>Vest</em></div>
   </a>
   <div class="nav-links">
     <a href="/dashboard.html">Dashboard</a>
@@ -548,50 +809,114 @@
     <a href="/library.html">Learn</a>
     <a href="/pricing.html">Pricing</a>
   </div>
-  <a class="nav-cta" href="/pricing.html">Start Free</a>
+  <a class="nav-cta" href="#" onclick="openModal(); return false;">Get Daily Picks</a>
 </nav>
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-content">
-    <div class="hero-eyebrow">Quantitative Sports Investing</div>
-    <h1 class="hero-h1">
-      Find The<br>
-      <span class="accent">Edge.</span><br>
-      <span class="dim">Daily.</span>
-    </h1>
-    <p class="hero-sub">
-      ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering,
-      and fractional Kelly sizing to generate daily sports investment picks.
-      No gut feel. No touts. Pure math.
-    </p>
-    <div class="hero-actions">
-      <a class="btn-primary" href="/pricing.html">Start Free Trial</a>
-      <a class="btn-ghost" href="/dashboard.html">View Live Dashboard</a>
+  <div class="hero-inner">
+
+    <!-- Left: copy + stats -->
+    <div class="hero-content">
+      <div class="hero-eyebrow">Quantitative Sports Investing</div>
+      <h1 class="hero-h1">
+        Find The<br>
+        <span class="accent">Edge.</span><br>
+        <span class="dim">Daily.</span>
+      </h1>
+      <p class="hero-sub">
+        ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering,
+        and fractional Kelly sizing to generate daily sports investment picks.
+        No gut feel. No touts. Pure math.
+      </p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#" onclick="openModal(); return false;">Get Daily Picks — Free</a>
+        <a class="btn-ghost" href="/dashboard.html">View Live Dashboard</a>
+      </div>
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-item">
+          <div class="stat-value" id="stat-sports">10+</div>
+          <div class="stat-label">Sports covered</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-picks">—</div>
+          <div class="stat-label">Picks today</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-ev">5%+</div>
+          <div class="stat-label">Min EV gate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="stat-model">50k</div>
+          <div class="stat-label">Daily simulations</div>
+        </div>
+      </div>
     </div>
 
-    <div class="stats-bar" id="stats-bar">
-      <div class="stat-item">
-        <div class="stat-value" id="stat-sports">10+</div>
-        <div class="stat-label">Sports covered</div>
+    <!-- Right: live P&L bar chart -->
+    <div class="hero-chart-panel">
+      <div class="hero-chart-header">
+        <div class="hero-chart-label">Daily P&amp;L — Track Record</div>
+        <div class="hero-chart-bankroll" id="hero-bankroll">—</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-picks">—</div>
-        <div class="stat-label">Picks today</div>
+      <div class="hero-bars" id="hero-bars">
+        <!-- injected by JS -->
       </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-ev">5%+</div>
-        <div class="stat-label">Min EV gate</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="stat-model">50k</div>
-        <div class="stat-label">Daily simulations</div>
+      <div class="hero-chart-footer">
+        <div class="hero-chart-stat">
+          <div class="hero-chart-stat-val" id="hero-record">—</div>
+          <div class="hero-chart-stat-lbl">Record</div>
+        </div>
+        <div class="hero-chart-stat">
+          <div class="hero-chart-stat-val pos" id="hero-roi">—</div>
+          <div class="hero-chart-stat-lbl">ROI</div>
+        </div>
+        <div class="hero-chart-stat">
+          <div class="hero-chart-stat-val" id="hero-days">—</div>
+          <div class="hero-chart-stat-lbl">Days tracked</div>
+        </div>
       </div>
     </div>
+
   </div>
 </section>
 
-<!-- Live picks teaser -->
+<!-- Email capture band -->
+<section class="email-band">
+  <div class="email-band-inner">
+    <div class="email-band-label">Free Beta Access</div>
+    <div class="email-band-title">Get ArcVest picks in your inbox</div>
+    <p class="email-band-sub">Daily model output delivered every morning. Free while we're in beta. Be among the first to track the edge with us.</p>
+    <div class="email-band-form">
+      <input class="email-band-input" type="email" placeholder="your@email.com" id="band-email" />
+      <button class="email-band-btn" onclick="submitBandEmail()">Subscribe</button>
+    </div>
+    <div class="email-band-note">Free during beta · No credit card · Unsubscribe anytime</div>
+  </div>
+</section>
+
+<!-- Email modal -->
+<div class="modal-overlay" id="email-modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-form-view">
+      <div class="modal-eyebrow">Free Beta Access</div>
+      <div class="modal-title">Get Daily Picks Free</div>
+      <p class="modal-sub">Model output delivered every morning. Full EV, matchup, and book data. Free while we're in beta.</p>
+      <div class="modal-form">
+        <input class="modal-input" type="text" placeholder="First name" id="modal-name" />
+        <input class="modal-input" type="email" placeholder="Email address" id="modal-email" />
+        <button class="modal-submit" onclick="submitModalEmail()">Send Me Daily Picks</button>
+      </div>
+      <div class="modal-note">Free during beta · No credit card · Unsubscribe anytime</div>
+    </div>
+    <div class="modal-success" id="modal-success-view">
+      <div class="modal-success-icon">✓</div>
+      <div class="modal-success-text">You're in.</div>
+      <p class="modal-success-sub">First picks land in your inbox tomorrow morning. Welcome to the edge.</p>
+    </div>
+  </div>
+</div>
 <section class="picks-section">
   <div class="section-label">Today's Picks — Free Preview</div>
   <h2 class="section-title">What the Model Found Today</h2>
@@ -606,7 +931,7 @@
 <section class="how-section">
   <div class="how-inner">
     <div class="section-label">The Engine</div>
-    <h2 class="section-title">How SureBet Archer Works</h2>
+    <h2 class="section-title">How ArcVest Works</h2>
     <div class="how-grid">
       <div class="how-step">
         <div class="how-num">01</div>
@@ -661,26 +986,33 @@
 <!-- CTA -->
 <section class="cta-section">
   <div class="cta-inner">
-    <h2 class="cta-title">Start Finding<br><span>Real Edge</span></h2>
+    <h2 class="cta-title">Find The<br><span>Real Edge</span></h2>
     <p class="cta-sub">
-      14-day free trial. No credit card required.
-      See today's picks, track the model, decide if it's worth it.
+      Daily picks from institutional-grade models. Full audit trail.
+      No gut feel. No touts. Get the picks in your inbox while we're in beta — free.
     </p>
-    <a class="btn-primary" href="/pricing.html" style="font-size:0.85rem; padding: 1rem 2.5rem;">
-      Start Free — No CC Required
+    <a class="btn-primary" href="#" onclick="openModal(); return false;" style="font-size:0.85rem; padding: 1rem 2.5rem;">
+      Get Daily Picks — Free
     </a>
-    <div class="cta-note">Free forever · Pro $29/mo · Cancel anytime</div>
+    <div class="cta-note">Free during beta · No credit card · Unsubscribe anytime</div>
   </div>
 </section>
 
 <!-- Footer -->
 <footer>
-  <div class="footer-logo">ArcVest</div>
+  <div class="footer-logo">Arc<span style="color:#c9a84c">Vest</span></div>
   <div class="footer-links">
     <a href="/dashboard.html">Dashboard</a>
     <a href="/tournaments.html">Tournaments</a>
     <a href="/pricing.html">Pricing</a>
     <a href="/library.html">Learn</a>
+  </div>
+  <div style="display:flex; gap:0.5rem; align-items:center;">
+    <input class="email-band-input" type="email" placeholder="Get picks in your inbox" id="footer-email"
+      style="padding:0.55rem 0.9rem; font-size:0.78rem; width:220px;" />
+    <button class="email-band-btn" onclick="submitFooterEmail()" style="padding:0.55rem 1rem; font-size:0.68rem;">
+      Subscribe
+    </button>
   </div>
   <div class="footer-disclaimer">
     For informational and entertainment purposes only. Not financial or betting advice.
@@ -716,7 +1048,35 @@ async function init() {
     loadJSON('data/summary.json'),
   ]);
 
-  // Stats bar
+  // Hero chart + stats
+  if (paper && paper.length) {
+    const last = paper[paper.length - 1];
+    const br = last.ending_bankroll;
+    const wins = paper.reduce((s,r) => s+(r.wins||0), 0);
+    const losses = paper.reduce((s,r) => s+(r.losses||0), 0);
+    const totalRisked = paper.reduce((s,r) => s+(r.total_risked||0), 0);
+    const totalPnl = br - 1000;
+    const roi = totalRisked > 0 ? (totalPnl / totalRisked * 100) : 0;
+
+    document.getElementById('hero-bankroll').textContent =
+      '$' + br.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('hero-record').textContent = `${wins}W — ${losses}L`;
+    document.getElementById('hero-roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+    document.getElementById('hero-roi').className = 'hero-chart-stat-val ' + (roi >= 0 ? 'pos' : 'neg');
+    document.getElementById('hero-days').textContent = paper.length + ' days';
+
+    const heroBars = document.getElementById('hero-bars');
+    const maxAbs = Math.max(...paper.map(r => Math.abs(r.daily_roi||0)));
+    heroBars.innerHTML = paper.map(r => {
+      const pnl = r.daily_roi || 0;
+      const h = maxAbs > 0 ? Math.max(4, Math.round((Math.abs(pnl)/maxAbs) * 120)) : 4;
+      const color = pnl >= 0 ? '#10b981' : '#ef4444';
+      return `<div class="hero-bar" style="height:${h}px;background:${color};opacity:0.75"
+               title="${(pnl*100).toFixed(2)}% daily ROI"></div>`;
+    }).join('');
+  }
+
+  // Stats bar picks count
   if (picks) {
     document.getElementById('stat-picks').textContent = picks.length;
   }
@@ -774,6 +1134,52 @@ async function init() {
         </div>`;
     }).join('');
   }
+}
+
+function openModal() {
+  document.getElementById('email-modal').classList.add('open');
+  setTimeout(() => document.getElementById('modal-name').focus(), 100);
+}
+function closeModal() {
+  document.getElementById('email-modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function showSuccess(modalView, successView) {
+  document.getElementById(modalView).style.display = 'none';
+  const s = document.getElementById(successView);
+  s.style.display = 'block';
+  setTimeout(closeModal, 3000);
+}
+
+function submitModalEmail() {
+  const email = document.getElementById('modal-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('modal-email').focus();
+    return;
+  }
+  // TODO: Replace with Mailchimp API call once account is set up
+  console.log('Modal signup:', document.getElementById('modal-name').value, email);
+  showSuccess('modal-form-view', 'modal-success-view');
+}
+
+function submitBandEmail() {
+  const email = document.getElementById('band-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('band-email').focus();
+    return;
+  }
+  console.log('Band signup:', email);
+  document.getElementById('band-email').value = '';
+  document.getElementById('band-email').placeholder = '✓ You\'re in — check your inbox tomorrow';
+}
+
+function submitFooterEmail() {
+  const email = document.getElementById('footer-email').value.trim();
+  if (!email || !email.includes('@')) return;
+  console.log('Footer signup:', email);
+  document.getElementById('footer-email').value = '';
+  document.getElementById('footer-email').placeholder = '✓ Subscribed';
 }
 
 init();
