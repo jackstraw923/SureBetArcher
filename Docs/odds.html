@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Odds</title>
+  <meta name="description" content="ArcVest Odds — daily market intelligence. Best available lines across 6 books, no-vig probabilities, and model EV for every game. Coming soon.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b12; --bg2:#0e1220; --bg3:#141929;
+      --border:#1a2238; --gold:#f0b429;
+      --text:#eceef4; --muted:#6b7794; --green:#10b981;
+      --font-head:'Bebas Neue',sans-serif;
+      --font-mono:'DM Mono',monospace;
+      --font-body:'Outfit',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column;}
+
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1rem 2.5rem;
+      background:rgba(8,11,18,0.92);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo{display:flex;align-items:center;gap:0.6rem;text-decoration:none;}
+    .nav-logo svg{width:24px;height:24px;}
+    .nav-logo span{font-family:var(--font-head);font-size:1.5rem;color:var(--text);letter-spacing:0.03em;}
+    .nav-logo span em{color:var(--gold);font-style:normal;}
+    .nav-links{display:flex;align-items:center;gap:2rem;}
+    .nav-links a{
+      font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;
+    }
+    .nav-links a:hover{color:var(--text);}
+    .nav-links a.active{color:var(--gold);}
+    .nav-cta{
+      font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;
+      text-transform:uppercase;padding:0.5rem 1.2rem;
+      border:1px solid var(--gold);color:var(--gold);
+      text-decoration:none;border-radius:4px;transition:all 0.2s;
+    }
+    .nav-cta:hover{background:var(--gold);color:var(--bg);}
+    .nav-hamburger{
+      display:none;flex-direction:column;gap:5px;
+      cursor:pointer;padding:4px;background:none;border:none;
+    }
+    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--muted);border-radius:2px;}
+    .nav-mobile-menu{
+      display:none;position:fixed;top:57px;left:0;right:0;
+      background:rgba(8,11,18,0.97);border-bottom:1px solid var(--border);
+      backdrop-filter:blur(16px);padding:1.5rem 2.5rem;
+      flex-direction:column;gap:1.2rem;z-index:99;
+    }
+    .nav-mobile-menu.open{display:flex;}
+    .nav-mobile-menu a{
+      font-family:var(--font-mono);font-size:0.8rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--muted);text-decoration:none;
+      padding:0.4rem 0;border-bottom:1px solid rgba(26,34,56,0.4);
+    }
+
+    /* ── Main ── */
+    .main{
+      flex:1;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      padding:6rem 2.5rem 4rem;
+      position:relative;overflow:hidden;
+    }
+    .main::before{
+      content:'';position:absolute;
+      width:600px;height:600px;
+      background:radial-gradient(circle,rgba(240,180,41,0.06) 0%,transparent 70%);
+      top:50%;left:50%;transform:translate(-50%,-50%);
+      pointer-events:none;
+    }
+    /* Grid background */
+    .main::after{
+      content:'';position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(240,180,41,0.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(240,180,41,0.03) 1px,transparent 1px);
+      background-size:60px 60px;
+      mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);
+      pointer-events:none;
+    }
+
+    .content{position:relative;max-width:700px;width:100%;text-align:center;}
+
+    .eyebrow{
+      font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;
+      text-transform:uppercase;color:var(--gold);margin-bottom:1rem;
+      display:flex;align-items:center;justify-content:center;gap:0.6rem;
+    }
+    .eyebrow::before,.eyebrow::after{content:'';display:block;width:24px;height:1px;background:var(--gold);}
+
+    h1{
+      font-family:var(--font-head);font-size:clamp(3rem,6vw,5.5rem);
+      letter-spacing:0.02em;color:var(--text);line-height:0.95;
+      margin-bottom:1.5rem;
+    }
+    h1 span{color:var(--gold);}
+
+    .sub{
+      font-size:1rem;color:var(--muted);font-weight:300;
+      line-height:1.8;margin-bottom:3rem;max-width:560px;margin-left:auto;margin-right:auto;
+    }
+
+    /* ── Preview wireframe ── */
+    .wireframe{
+      background:var(--bg2);border:1px solid var(--border);
+      border-radius:10px;padding:1.5rem;margin-bottom:2.5rem;
+      text-align:left;
+      border-top:2px solid rgba(240,180,41,0.3);
+    }
+    .wireframe-header{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;
+      gap:0.75rem;
+      padding-bottom:0.75rem;
+      border-bottom:1px solid var(--border);
+      margin-bottom:0.75rem;
+    }
+    .wf-col-head{
+      font-family:var(--font-mono);font-size:0.58rem;
+      letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
+    }
+    .wireframe-row{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;
+      gap:0.75rem;padding:0.6rem 0;
+      border-bottom:1px solid rgba(26,34,56,0.4);
+      align-items:center;
+    }
+    .wireframe-row:last-child{border-bottom:none;}
+    .wf-matchup{font-size:0.8rem;color:var(--text);font-weight:500;}
+    .wf-matchup span{color:var(--muted);font-weight:300;font-size:0.72rem;display:block;margin-top:0.1rem;}
+    .wf-book{
+      font-family:var(--font-mono);font-size:0.72rem;color:var(--gold);
+    }
+    .wf-odds{font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);}
+    .wf-prob{font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);}
+    .wf-ev{
+      font-family:var(--font-mono);font-size:0.72rem;color:var(--green);
+      display:flex;align-items:center;gap:0.3rem;
+    }
+    .wf-ev::before{content:'▲';font-size:0.55rem;}
+    .wf-ev.neutral{color:var(--muted);}
+    .wf-ev.neutral::before{content:'·';}
+    .wf-gate{
+      font-family:var(--font-mono);font-size:0.58rem;
+      padding:0.15rem 0.4rem;border-radius:3px;
+      background:rgba(16,185,129,0.1);color:var(--green);
+      display:inline-block;
+    }
+    .wf-gate.none{background:transparent;color:var(--border);}
+    .wireframe-label{
+      font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--muted);
+      text-align:center;margin-top:0.75rem;padding-top:0.75rem;
+      border-top:1px solid var(--border);
+    }
+
+    /* ── What's coming bullets ── */
+    .coming-list{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+      gap:1rem;margin-bottom:2.5rem;text-align:left;
+    }
+    .coming-item{
+      background:var(--bg2);border:1px solid var(--border);
+      border-radius:8px;padding:1rem 1.2rem;
+    }
+    .coming-item-head{
+      font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--gold);margin-bottom:0.4rem;
+    }
+    .coming-item-body{
+      font-size:0.78rem;color:var(--muted);font-weight:300;line-height:1.5;
+    }
+
+    /* ── Waitlist CTA ── */
+    .cta-row{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.5rem;}
+    .btn-primary{
+      font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.08em;
+      text-transform:uppercase;padding:0.85rem 2rem;
+      background:var(--gold);color:var(--bg);
+      border:none;border-radius:4px;cursor:pointer;
+      text-decoration:none;font-weight:500;transition:all 0.2s;
+    }
+    .btn-primary:hover{background:#f5c842;transform:translateY(-1px);}
+    .btn-ghost{
+      font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.08em;
+      text-transform:uppercase;padding:0.85rem 2rem;
+      background:transparent;color:var(--muted);
+      border:1px solid var(--border);border-radius:4px;
+      text-decoration:none;transition:all 0.2s;
+    }
+    .btn-ghost:hover{border-color:var(--muted);color:var(--text);}
+
+    .build-note{
+      font-family:var(--font-mono);font-size:0.62rem;
+      color:var(--muted);letter-spacing:0.06em;
+    }
+    .build-note a{color:var(--gold);text-decoration:none;}
+    .build-note a:hover{text-decoration:underline;}
+
+    footer{
+      background:var(--bg2);border-top:1px solid var(--border);
+      padding:1.5rem 2.5rem;
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:1rem;
+    }
+    .footer-logo{font-family:var(--font-head);font-size:1.1rem;color:var(--muted);}
+    .footer-links{display:flex;gap:1.5rem;}
+    .footer-links a{
+      font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;
+    }
+    .footer-links a:hover{color:var(--text);}
+    .footer-disc{
+      width:100%;font-size:0.65rem;color:var(--muted);
+      font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;
+    }
+
+    @media(max-width:768px){
+      .nav-links{display:none;}
+      .nav-hamburger{display:flex;}
+      nav{padding:1rem 1.5rem;}
+      .main{padding:5rem 1.5rem 3rem;}
+      .wireframe-header,.wireframe-row{grid-template-columns:2fr 1fr 1fr;}
+      .wf-prob,.wf-gate{display:none;}
+      footer{padding:1.5rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <svg viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
+      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
+      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
+    </svg>
+    <span>Arc<em>Vest</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html" class="active">Odds</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav-cta" href="/#waitlist">Get Daily Trades</a>
+</nav>
+
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/tournaments.html">Tournaments</a>
+  <a href="/edgevault.html">EdgeVault</a>
+  <a href="/odds.html" style="color:var(--gold);">Odds</a>
+  <a href="/#waitlist" style="color:var(--gold);">Get Daily Trades — Free</a>
+</div>
+
+<main class="main">
+  <div class="content">
+
+    <div class="eyebrow">Market Intelligence</div>
+    <h1>The <span>Odds</span><br>Page is Coming.</h1>
+    <p class="sub">
+      ArcVest already monitors best-available lines across 6 books for 13+ sports every morning.
+      Soon we'll publish that data as a daily market intelligence screen — with no-vig probabilities
+      and model EV alongside every game.
+    </p>
+
+    <!-- Wireframe preview -->
+    <div class="wireframe">
+      <div class="wireframe-header">
+        <div class="wf-col-head">Matchup</div>
+        <div class="wf-col-head">Best Book</div>
+        <div class="wf-col-head">Best Line</div>
+        <div class="wf-col-head">No-Vig %</div>
+        <div class="wf-col-head">Model EV</div>
+        <div class="wf-col-head">Gate</div>
+      </div>
+      <div class="wireframe-row">
+        <div class="wf-matchup">Boston Celtics vs NY Knicks<span>NBA · 7:30 PM ET</span></div>
+        <div class="wf-book">FanDuel</div>
+        <div class="wf-odds">−108</div>
+        <div class="wf-prob">52.8%</div>
+        <div class="wf-ev">+11.4%</div>
+        <div><span class="wf-gate">✓ Passes</span></div>
+      </div>
+      <div class="wireframe-row">
+        <div class="wf-matchup">Arsenal vs Chelsea<span>EPL · 3:00 PM ET</span></div>
+        <div class="wf-book">Fanatics</div>
+        <div class="wf-odds">+115</div>
+        <div class="wf-prob">46.2%</div>
+        <div class="wf-ev neutral">+2.1%</div>
+        <div><span class="wf-gate none">Below gate</span></div>
+      </div>
+      <div class="wireframe-row">
+        <div class="wf-matchup">Sinner vs Alcaraz<span>ATP Miami · TBD</span></div>
+        <div class="wf-book">DraftKings</div>
+        <div class="wf-odds">+180</div>
+        <div class="wf-prob">35.7%</div>
+        <div class="wf-ev">+18.2%</div>
+        <div><span class="wf-gate">✓ Passes</span></div>
+      </div>
+      <div class="wireframe-label">Preview only — live data coming soon</div>
+    </div>
+
+    <!-- What's coming -->
+    <div class="coming-list">
+      <div class="coming-item">
+        <div class="coming-item-head">Best Line by Book</div>
+        <div class="coming-item-body">Best available odds across FanDuel, DraftKings, Hard Rock, Fanatics, and ESPN Bet — every game, every market.</div>
+      </div>
+      <div class="coming-item">
+        <div class="coming-item-head">No-Vig Probability</div>
+        <div class="coming-item-body">Juice stripped out. Fair implied probability for each side — the same calculation in the EdgeVault No-Vig Calculator.</div>
+      </div>
+      <div class="coming-item">
+        <div class="coming-item-head">Model EV</div>
+        <div class="coming-item-body">ArcVest Pythagorean model probability vs. market fair line. Every game. Not just the picks that passed the two-gate filter.</div>
+      </div>
+      <div class="coming-item">
+        <div class="coming-item-head">Two-Gate Indicator</div>
+        <div class="coming-item-body">Clear signal when a game clears both the 5% EV gate and the model edge gate. Infrastructure view, not a picks feed.</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn-primary" href="/#waitlist">Join the Waitlist</a>
+      <a class="btn-ghost" href="/scorecard.html">View Scorecard</a>
+    </div>
+
+    <div class="build-note">
+      Building in public · Follow progress at <a href="/">arcvest.io</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">ArcVest</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+</script>
+</body>
+</html>

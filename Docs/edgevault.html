@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — EdgeVault</title>
+  <meta name="description" content="EdgeVault by ArcVest — free tools and educational content for quantitative sports bettors. No-vig calculator, odds converter, hedge calculator, and deep-dive articles.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #080b12;
+      --bg2:       #0e1220;
+      --bg3:       #141929;
+      --border:    #1a2238;
+      --gold:      #f0b429;
+      --text:      #eceef4;
+      --muted:     #6b7794;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Outfit', sans-serif;
+      --nav-w:     260px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ── Top nav ── */
+    .topnav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(8,11,18,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .nav-logo svg { width: 24px; height: 24px; }
+    .nav-logo span { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); letter-spacing: 0.03em; }
+    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+    .nav-cta {
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.5rem 1.2rem;
+      border: 1px solid var(--gold); color: var(--gold);
+      text-decoration: none; border-radius: 4px; transition: all 0.2s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 4px; background: none; border: none;
+    }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; transition: all 0.2s; }
+    .nav-mobile-menu {
+      display: none; position: fixed; top: 57px; left: 0; right: 0;
+      background: rgba(8,11,18,0.97); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px); padding: 1.5rem 2.5rem;
+      flex-direction: column; gap: 1.2rem; z-index: 199;
+    }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a {
+      font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none;
+      padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4);
+    }
+    .nav-mobile-menu a:hover { color: var(--text); }
+
+    /* ── Layout: sidebar + main ── */
+    .layout {
+      display: flex;
+      padding-top: 57px;
+      min-height: 100vh;
+    }
+
+    /* ── Left sidebar ── */
+    .sidebar {
+      width: var(--nav-w);
+      flex-shrink: 0;
+      position: fixed;
+      top: 57px; left: 0; bottom: 0;
+      overflow-y: auto;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 2rem 0 4rem;
+      z-index: 100;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .sidebar-brand {
+      padding: 0 1.5rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .sidebar-brand-name {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1;
+    }
+    .sidebar-brand-name em { color: var(--gold); font-style: normal; }
+    .sidebar-brand-sub {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .sidebar-section {
+      padding: 0 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .sidebar-section-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      margin-top: 1.5rem;
+      padding-left: 0.25rem;
+    }
+    .sidebar-item {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 4px;
+      margin-bottom: 0.15rem;
+      transition: background 0.15s, color 0.15s;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-item:hover { background: rgba(240,180,41,0.06); color: var(--text); }
+    .sidebar-item.active {
+      background: rgba(240,180,41,0.1);
+      color: var(--gold);
+      border-left: 2px solid var(--gold);
+      padding-left: calc(0.75rem - 2px);
+    }
+    .sidebar-item .item-badge {
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.35rem;
+      border-radius: 2px;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: var(--nav-w);
+      flex: 1;
+      padding: 3rem 3rem 5rem;
+      max-width: 900px;
+    }
+
+    /* ── Panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Panel header */
+    .panel-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+    .panel-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.03em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      line-height: 1.05;
+    }
+    .panel-sub {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 300;
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      max-width: 620px;
+    }
+
+    /* ── Tool card ── */
+    .tool-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .tool-card-title {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+    .tool-card-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Tool inputs */
+    .tool-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+    .tool-field { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 140px; }
+    .tool-label {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tool-input {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .tool-input:focus { border-color: var(--gold); }
+    .tool-input::placeholder { color: var(--muted); }
+    .tool-select {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 0.65rem 0.9rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .tool-select:focus { border-color: var(--gold); }
+
+    .tool-btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.5rem;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    .tool-btn:hover { background: #f5c842; }
+
+    .tool-result {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.2rem 1.5rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .tool-result.show { display: block; }
+    .tool-result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(26,34,56,0.5);
+    }
+    .tool-result-row:last-child { border-bottom: none; }
+    .tool-result-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tool-result-val {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .tool-result-val.green { color: var(--green); }
+    .tool-result-val.red   { color: var(--red); }
+    .tool-result-val.white { color: var(--text); }
+
+    .tool-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+    .tool-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.6;
+      font-style: italic;
+      margin-top: 1rem;
+    }
+    .formula-box {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.9rem 1.2rem;
+      margin: 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--gold);
+      line-height: 1.8;
+    }
+
+    /* ── Article styles ── */
+    .article-tag {
+      font-family: var(--font-mono); font-size: 0.62rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.75rem;
+    }
+    .article-meta {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.08em; color: var(--muted); margin-bottom: 1.8rem;
+    }
+    .article-body {
+      font-size: 0.88rem; color: var(--muted);
+      font-weight: 300; line-height: 1.9;
+    }
+    .article-body h3 {
+      font-family: var(--font-head); font-size: 1.3rem;
+      letter-spacing: 0.05em; color: var(--text); margin: 2rem 0 0.75rem;
+    }
+    .article-body p { margin-bottom: 1.2rem; }
+    .article-body strong { color: var(--text); font-weight: 600; }
+    .article-body .formula {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1rem 1.5rem; margin: 1.2rem 0;
+      font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--gold); line-height: 1.8;
+    }
+    .article-body .callout {
+      background: rgba(240,180,41,0.05); border: 1px solid rgba(240,180,41,0.2);
+      border-radius: 6px; padding: 1rem 1.2rem; margin: 1.2rem 0;
+      font-size: 0.82rem; color: var(--muted); line-height: 1.7;
+    }
+    .article-body .callout strong { color: var(--gold); }
+
+    /* ── Coming soon grid ── */
+    .soon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .soon-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.5rem; opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .soon-card:hover { opacity: 0.8; }
+    .soon-badge {
+      font-family: var(--font-mono); font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); border: 1px solid var(--border);
+      display: inline-block; padding: 0.2rem 0.5rem;
+      border-radius: 3px; margin-bottom: 0.75rem;
+    }
+    .soon-title { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+    .soon-desc { font-size: 0.78rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+    .section-divider {
+      font-family: var(--font-head); font-size: 1.3rem;
+      letter-spacing: 0.08em; color: var(--muted);
+      margin: 2.5rem 0 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Coming soon panel ── */
+    .coming-panel {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .coming-panel-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    .coming-panel-title {
+      font-family: var(--font-head);
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    .coming-panel-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-left: var(--nav-w);
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo { font-family: var(--font-head); font-size: 1.1rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-disc {
+      width: 100%; font-size: 0.65rem; color: var(--muted);
+      font-family: var(--font-mono); border-top: 1px solid var(--border);
+      padding-top: 1rem; line-height: 1.5;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 2rem 1.5rem 4rem; max-width: 100%; }
+      footer { margin-left: 0; padding: 1.5rem; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .topnav { padding: 1rem 1.5rem; }
+      /* Mobile sidebar toggle */
+      .sidebar.open { display: block; z-index: 150; }
+      .sidebar-toggle-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--gold);
+        background: rgba(240,180,41,0.08);
+        border: 1px solid rgba(240,180,41,0.2);
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        margin-bottom: 1.5rem;
+      }
+    }
+    @media (min-width: 901px) {
+      .sidebar-toggle-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top nav -->
+<nav class="topnav">
+  <a class="nav-logo" href="/">
+    <svg viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
+      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
+      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
+    </svg>
+    <span>Arc<em>Vest</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/edgevault.html" class="active">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav-cta" href="/#waitlist">Get Daily Trades</a>
+</nav>
+
+<!-- Mobile menu -->
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/tournaments.html">Tournaments</a>
+  <a href="/edgevault.html" style="color:var(--gold);">EdgeVault</a>
+  <a href="/odds.html">Odds</a>
+  <a href="/#waitlist" style="color:var(--gold);">Get Daily Trades — Free</a>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name">Edge<em>Vault</em></div>
+      <div class="sidebar-brand-sub">Tools &amp; Knowledge Base</div>
+    </div>
+
+    <!-- TOOLS section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Tools</div>
+      <button class="sidebar-item active" data-panel="novig">No-Vig Calculator</button>
+      <button class="sidebar-item" data-panel="odds-converter">Odds Converter</button>
+      <button class="sidebar-item" data-panel="hedge">Hedge Calculator</button>
+      <button class="sidebar-item" data-panel="kelly">
+        Kelly Sizer <span class="item-badge">Soon</span>
+      </button>
+    </div>
+
+    <!-- LIBRARY section -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Library</div>
+
+      <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">Articles</div>
+      <button class="sidebar-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
+      <button class="sidebar-item" data-panel="articles">
+        Why Win Rates Lie <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="articles">
+        Line Shopping Is Free Money <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="articles">
+        Closing Line Value (CLV) <span class="item-badge">Soon</span>
+      </button>
+
+      <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">How-To Guides</div>
+      <button class="sidebar-item" data-panel="howto">
+        ArcVest User's Guide <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="howto">
+        How to Read the No-Vig Line <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="howto">
+        How to Convert Odds Formats <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="howto">
+        Build Your First Multi-Sport Slate <span class="item-badge">Soon</span>
+      </button>
+
+      <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">Deep Dives</div>
+      <button class="sidebar-item" data-panel="deepdives">
+        Kelly Criterion for Sports <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="deepdives">
+        Pythagorean Expectation <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="deepdives">
+        Soccer Double Chance <span class="item-badge">Soon</span>
+      </button>
+      <button class="sidebar-item" data-panel="deepdives">
+        Tennis Elo + Bracket Sim <span class="item-badge">Soon</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle-btn" id="sidebar-toggle">
+      ☰ &nbsp;Browse EdgeVault
+    </button>
+
+    <!-- EdgeVault intro (shown above default panel always) -->
+    <div style="margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border);">
+      <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;">EdgeVault · Research &amp; Utility Hub</div>
+      <p style="font-size:0.85rem;color:var(--muted);font-weight:300;line-height:1.7;max-width:580px;">EdgeVault is ArcVest's research and utility hub. Explore the math behind expected value, use the same core tools that disciplined traders use to evaluate lines, and learn how ArcVest approaches position sizing, price, and portfolio management.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Odds Converter
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-odds-converter">
+      <div class="panel-eyebrow">Tools · Odds Converter</div>
+      <h1 class="panel-title">Odds Converter</h1>
+      <p class="panel-sub">Convert between American, Decimal, and Implied Probability instantly. Enter any one format and the others calculate automatically.</p>
+
+      <div class="tool-card">
+        <div class="tool-card-title">American → Decimal → Implied %</div>
+        <div class="tool-card-desc">Enter American odds (e.g. −110, +150) and see the decimal equivalent and true implied probability.</div>
+
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">American Odds</label>
+            <input class="tool-input" id="oc-american" type="number" placeholder="e.g. -110 or +150" />
+          </div>
+          <button class="tool-btn" onclick="convertFromAmerican()">Convert</button>
+        </div>
+        <div class="tool-result" id="oc-result-american">
+          <div class="tool-result-row">
+            <span class="tool-result-label">Decimal Odds</span>
+            <span class="tool-result-val" id="oc-decimal-out">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Implied Probability</span>
+            <span class="tool-result-val" id="oc-implied-out">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">To profit $100 you risk</span>
+            <span class="tool-result-val white" id="oc-risk-out">—</span>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="tool-card-title" style="font-size:1.1rem;margin-bottom:0.4rem;">Decimal → American → Implied %</div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Decimal Odds</label>
+            <input class="tool-input" id="oc-decimal" type="number" step="0.01" placeholder="e.g. 1.91 or 2.50" />
+          </div>
+          <button class="tool-btn" onclick="convertFromDecimal()">Convert</button>
+        </div>
+        <div class="tool-result" id="oc-result-decimal">
+          <div class="tool-result-row">
+            <span class="tool-result-label">American Odds</span>
+            <span class="tool-result-val" id="oc-american-out">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Implied Probability</span>
+            <span class="tool-result-val" id="oc-implied2-out">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Return on $100 stake</span>
+            <span class="tool-result-val white" id="oc-return-out">—</span>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="tool-card-title" style="font-size:1.1rem;margin-bottom:0.4rem;">Implied % → Decimal → American</div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Implied Probability (%)</label>
+            <input class="tool-input" id="oc-prob" type="number" step="0.1" min="1" max="99" placeholder="e.g. 52.4" />
+          </div>
+          <button class="tool-btn" onclick="convertFromProb()">Convert</button>
+        </div>
+        <div class="tool-result" id="oc-result-prob">
+          <div class="tool-result-row">
+            <span class="tool-result-label">Decimal Odds</span>
+            <span class="tool-result-val" id="oc-decimal2-out">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">American Odds</span>
+            <span class="tool-result-val" id="oc-american2-out">—</span>
+          </div>
+        </div>
+
+        <p class="tool-note">Note: Implied probability includes the bookmaker's vig. Use the No-Vig Calculator to find the fair probability with juice removed.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: No-Vig Calculator (default)
+    ═══════════════════════════════════════════ -->
+    <div class="panel active" id="panel-novig">
+      <div class="panel-eyebrow">Tools · No-Vig Calculator</div>
+      <h1 class="panel-title">No-Vig Calculator</h1>
+      <p class="panel-sub">Strip the bookmaker's margin out of a market and see the implied fair probabilities underneath the posted price. This is the exact calculation behind Gate 2 of the ArcVest two-gate filter.</p>
+
+      <div class="tool-card">
+        <div class="tool-card-title">Two-Way Market (ML / Spread)</div>
+        <div class="tool-card-desc">Enter the American odds for both sides. The calculator strips the vig and returns the fair implied probability for each.</div>
+
+        <div class="formula-box">
+          Fair prob (side A) = (1 / decimal_A) / (1/decimal_A + 1/decimal_B)
+        </div>
+
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Side A Odds (American)</label>
+            <input class="tool-input" id="nv-a" type="number" placeholder="e.g. -110" />
+          </div>
+          <div class="tool-field">
+            <label class="tool-label">Side B Odds (American)</label>
+            <input class="tool-input" id="nv-b" type="number" placeholder="e.g. -110" />
+          </div>
+          <button class="tool-btn" onclick="calcNoVig2()">Calculate</button>
+        </div>
+        <div class="tool-result" id="nv-result-2way">
+          <div class="tool-result-row">
+            <span class="tool-result-label">Overround (Vig)</span>
+            <span class="tool-result-val red" id="nv-vig">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Fair Prob — Side A</span>
+            <span class="tool-result-val green" id="nv-fair-a">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Fair Prob — Side B</span>
+            <span class="tool-result-val green" id="nv-fair-b">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Breakeven Win Rate (Side A)</span>
+            <span class="tool-result-val white" id="nv-break-a">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Breakeven Win Rate (Side B)</span>
+            <span class="tool-result-val white" id="nv-break-b">—</span>
+          </div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="tool-card-title" style="font-size:1.1rem;margin-bottom:0.4rem;">Three-Way Market (Soccer 1X2)</div>
+        <div class="tool-card-desc" style="margin-bottom:1rem;">Enter all three outcomes — Home, Draw, Away — for soccer or any three-way market.</div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Home (American)</label>
+            <input class="tool-input" id="nv-h" type="number" placeholder="e.g. +120" />
+          </div>
+          <div class="tool-field">
+            <label class="tool-label">Draw (American)</label>
+            <input class="tool-input" id="nv-d" type="number" placeholder="e.g. +220" />
+          </div>
+          <div class="tool-field">
+            <label class="tool-label">Away (American)</label>
+            <input class="tool-input" id="nv-aw" type="number" placeholder="e.g. +200" />
+          </div>
+          <button class="tool-btn" onclick="calcNoVig3()">Calculate</button>
+        </div>
+        <div class="tool-result" id="nv-result-3way">
+          <div class="tool-result-row">
+            <span class="tool-result-label">Overround (Vig)</span>
+            <span class="tool-result-val red" id="nv3-vig">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Fair Prob — Home</span>
+            <span class="tool-result-val green" id="nv3-home">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Fair Prob — Draw</span>
+            <span class="tool-result-val green" id="nv3-draw">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Fair Prob — Away</span>
+            <span class="tool-result-val green" id="nv3-away">—</span>
+          </div>
+        </div>
+
+        <p class="tool-note">This is the exact formula ArcVest uses on every pick. The second gate of the two-gate filter compares our model probability against this no-vig fair probability — edge only exists when the model disagrees with the fair line.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Hedge Calculator
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-hedge">
+      <div class="panel-eyebrow">Tools · Hedge Calculator</div>
+      <h1 class="panel-title">Hedge Calculator</h1>
+      <p class="panel-sub">Calculate the optimal hedge stake to lock in a guaranteed profit or minimize loss on an existing position.</p>
+
+      <div class="tool-card">
+        <div class="tool-card-title">Lock-In Profit Hedge</div>
+        <div class="tool-card-desc">You have a bet in play that has moved in your favor. Enter your original position and the current opposing odds to find the hedge stake that guarantees a profit regardless of outcome.</div>
+
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Original Stake ($)</label>
+            <input class="tool-input" id="hg-stake" type="number" step="0.01" placeholder="e.g. 50" />
+          </div>
+          <div class="tool-field">
+            <label class="tool-label">Original Odds (American)</label>
+            <input class="tool-input" id="hg-orig-odds" type="number" placeholder="e.g. +150" />
+          </div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label">Hedge Odds (American)</label>
+            <input class="tool-input" id="hg-hedge-odds" type="number" placeholder="e.g. -130" />
+          </div>
+          <div class="tool-field">
+            <label class="tool-label">Target (optional)</label>
+            <select class="tool-select" id="hg-target">
+              <option value="equal">Equal profit both sides</option>
+              <option value="break">Break even on original</option>
+              <option value="half">Lock half original profit</option>
+            </select>
+          </div>
+          <button class="tool-btn" onclick="calcHedge()">Calculate</button>
+        </div>
+        <div class="tool-result" id="hg-result">
+          <div class="tool-result-row">
+            <span class="tool-result-label">Hedge Stake</span>
+            <span class="tool-result-val" id="hg-hedge-stake">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Profit if Original Wins</span>
+            <span class="tool-result-val green" id="hg-profit-orig">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Profit if Hedge Wins</span>
+            <span class="tool-result-val green" id="hg-profit-hedge">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Total Committed</span>
+            <span class="tool-result-val white" id="hg-total-committed">—</span>
+          </div>
+          <div class="tool-result-row">
+            <span class="tool-result-label">Guaranteed Floor</span>
+            <span class="tool-result-val green" id="hg-floor">—</span>
+          </div>
+        </div>
+        <p class="tool-note">Hedging reduces upside in exchange for certainty. Whether to hedge depends on your bankroll position, the odds movement, and your edge conviction. A hedge that eliminates all upside on a +EV original bet may not be optimal long-run.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Article — Two-Gate EV Filter
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-article-twogates">
+      <div class="panel-eyebrow">Library · Articles · Foundations</div>
+      <h1 class="panel-title">The Two-Gate 5% EV Filter</h1>
+      <div class="article-meta">Published 2026-03-15 &nbsp;·&nbsp; 5 min read &nbsp;·&nbsp; ArcVest Engine v1.0</div>
+      <div class="article-body">
+        <p>Every trade on ArcVest passes through two independent filters before it's logged. Most candidates fail. The ones that survive are genuine edges — not just low odds or high-probability favorites.</p>
+
+        <h3>Gate 1: Expected Value ≥ 5%</h3>
+        <p>Expected value (EV) measures how much you expect to profit per dollar risked, on average, if you made the same bet thousands of times.</p>
+        <div class="formula">
+EV = (model_win_probability × decimal_odds) − 1
+
+Example: Model says 60% win probability. Book offers 2.00 odds.
+EV = (0.60 × 2.00) − 1 = 0.20 = 20% EV ✓ Passes Gate 1
+        </div>
+        <p>The model win probability comes from <strong>Pythagorean expectation</strong> — a formula that uses points scored and points allowed to estimate true team strength, independently of the win-loss record.</p>
+        <div class="callout">
+          <strong>Why 5%?</strong> A 5% EV threshold filters out noise while capturing real edge. At high volume, even 5–10% EV trades are profitable over hundreds of positions. Lower thresholds produce too many marginal trades; higher thresholds produce too few.
+        </div>
+
+        <h3>Gate 2: Positive Edge vs. No-Vig Probability</h3>
+        <p>Even a trade with positive EV might just be exploiting overpriced odds — not a genuine model edge. The second gate compares the model probability directly against the <strong>no-vig (fair) implied probability</strong>.</p>
+        <div class="formula">
+No-vig probability = (1/odds_side1) / (1/odds_side1 + 1/odds_side2)
+
+Edge = model_probability − no_vig_probability
+
+A trade must have Edge > 0 to pass Gate 2.
+        </div>
+        <p>This ensures the model actually disagrees with the market's fair probability — not just the vig-inflated line. A trade can have positive EV but negative edge if the book's fair odds are stronger than the model. That trade gets filtered out.</p>
+
+        <h3>Why Both Gates?</h3>
+        <p>EV alone can be gamed by betting huge underdogs — technically positive EV but high variance. Edge alone doesn't account for the actual profit magnitude. Together, they ensure every logged trade is both <strong>mathematically profitable in expectation</strong> and <strong>based on genuine model disagreement with the market</strong>.</p>
+        <div class="callout">
+          <strong>In practice:</strong> On a typical day, several hundred raw candidates enter the pipeline. After the two-gate filter, 40–80 survive. Those are the trades. Every single one cleared both bars independently.
+        </div>
+
+        <h3>What Comes Next: Kelly Sizing</h3>
+        <p>After filtering, each trade receives a <strong>quarter Kelly</strong> stake — a conservative position size derived from the EV and odds. All trades are then scaled uniformly so total daily risk stays within 10% of bankroll. No single position dominates the portfolio. That's the final step before publication.</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Articles (coming soon)
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-articles">
+      <div class="panel-eyebrow">Library · Articles</div>
+      <h1 class="panel-title">Articles</h1>
+      <p class="panel-sub">Accessible, SEO-friendly reads for the disciplined bettor who wants a systematic edge without full quant immersion. 800–1,200 words each.</p>
+      <div class="coming-panel">
+        <div class="coming-panel-icon">📰</div>
+        <div class="coming-panel-title">Articles Coming Soon</div>
+        <p class="coming-panel-sub">The first article — "Why Win Rates Lie" — launches alongside the site. Check back each week for new content.</p>
+      </div>
+      <div class="section-divider">Planned Articles</div>
+      <div class="soon-grid">
+        <div class="soon-card">
+          <div class="soon-badge">Launch Week</div>
+          <div class="soon-title">Why Win Rates Lie: The Case for ROI in Sports Trading</div>
+          <div class="soon-desc">A 55% win rate sounds great until you realize it loses money at −110 odds. How to evaluate model performance the right way.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Week 3</div>
+          <div class="soon-title">Line Shopping Is Free Money: How to Beat the Books Legally</div>
+          <div class="soon-desc">One half-point better odds compounds to 10%+ ROI over a season. The most underused edge available to any bettor.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Week 3</div>
+          <div class="soon-title">Closing Line Value (CLV): The Sharp Bettor's Secret Metric</div>
+          <div class="soon-desc">Beating the closing line is more predictive of long-term profitability than wins. What CLV is and why ArcVest tracks it on every trade.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: How-To Guides (coming soon)
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-howto">
+      <div class="panel-eyebrow">Library · How-To Guides</div>
+      <h1 class="panel-title">How-To Guides</h1>
+      <p class="panel-sub">Step-by-step walkthroughs for getting the most out of ArcVest's tools and methodology. Written for users who know the basics and want a practical process.</p>
+      <div class="coming-panel">
+        <div class="coming-panel-icon">📋</div>
+        <div class="coming-panel-title">Guides Coming Soon</div>
+        <p class="coming-panel-sub">We're building these alongside the product so every guide reflects how ArcVest actually works — not how we planned it to work.</p>
+      </div>
+      <div class="section-divider">Planned Guides</div>
+      <div class="soon-grid">
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon · Priority</div>
+          <div class="soon-title">ArcVest User's Guide</div>
+          <div class="soon-desc">The definitive guide to using ArcVest — Scorecard, Odds page, EdgeVault tools, and how to act on the daily trade slate from start to finish.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon · Week 2</div>
+          <div class="soon-title">How to Read the No-Vig Line</div>
+          <div class="soon-desc">Three steps: sum the inverse odds, normalize to 100%, spot where the model disagrees. Pairs directly with the No-Vig Calculator above.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon · Week 3</div>
+          <div class="soon-title">How to Convert Odds Formats</div>
+          <div class="soon-desc">American → Decimal → Implied probability → EV calculation. The full chain, step by step. Pairs with the Odds Converter tool.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Build Your First Multi-Sport Slate</div>
+          <div class="soon-desc">Filter by EV, cap total risk, diversify across leagues. How to treat daily trades like a portfolio rather than individual bets.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">How to Read the Scorecard</div>
+          <div class="soon-desc">Walk through every stat on the public performance page — what each metric means, what it doesn't, and how to evaluate model health over time.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Setting Your Bankroll Size</div>
+          <div class="soon-desc">How to apply ArcVest's Kelly sizing to your real bankroll, what happens when you deviate, and why the 10% daily cap matters.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Deep Dives (coming soon)
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-deepdives">
+      <div class="panel-eyebrow">Library · Deep Dives</div>
+      <h1 class="panel-title">Deep Dives</h1>
+      <p class="panel-sub">Technical breakdowns of the model — sport by sport, formula by formula. 1,200–2,000 words with full math. For analytics fans who want ArcVest's internals, not just the outputs.</p>
+      <div class="coming-panel">
+        <div class="coming-panel-icon">🔬</div>
+        <div class="coming-panel-title">Deep Dives Coming Soon</div>
+        <p class="coming-panel-sub">The Two-Gate EV Filter is live above. The Kelly Criterion deep dive launches in Week 2.</p>
+      </div>
+      <div class="section-divider">Planned Deep Dives</div>
+      <div class="soon-grid">
+        <div class="soon-card">
+          <div class="soon-badge">Live Now</div>
+          <div class="soon-title">The Two-Gate EV Filter</div>
+          <div class="soon-desc">Gate 1: EV ≥ 5.24%. Gate 2: edge vs. no-vig probability. The complete foundation of every ArcVest trade.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Week 2</div>
+          <div class="soon-title">Kelly Criterion for Sports: Full, Fractional, and Portfolio Caps</div>
+          <div class="soon-desc">f = (bp − q) / b. Why we use quarter-Kelly, what happens at full Kelly, and how the 10% daily cap changes the math.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Pythagorean Expectation Across Sports</div>
+          <div class="soon-desc">PythagenPat for NBA (exp 14.3), PythagenPuck for NHL, BaseRuns for MLB. Why the exponent matters and how surface changes tennis Elo.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Soccer Double Chance Explained</div>
+          <div class="soon-desc">Why 3-way markets need special handling — and how ArcVest decides between straight ML and DC trades using draw probability.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Tennis Elo + Bracket Simulation</div>
+          <div class="soon-desc">How 50,000 simulations of a draw produce stable championship probabilities — and what they reveal about outright market pricing.</div>
+        </div>
+        <div class="soon-card">
+          <div class="soon-badge">Coming Soon</div>
+          <div class="soon-title">Why a 39% Win Rate Can Beat the House</div>
+          <div class="soon-desc">The EV math behind ArcVest. At +150 average odds, 40% is the breakeven. Win rate is the wrong metric. Here's the right one.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Kelly Sizer (coming soon)
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-kelly">
+      <div class="panel-eyebrow">Tools · Kelly Sizer</div>
+      <h1 class="panel-title">Kelly Sizer</h1>
+      <p class="panel-sub">Calculate optimal stake size from your edge and bankroll using the Kelly Criterion — the same formula behind every ArcVest trade recommendation.</p>
+      <div class="coming-panel">
+        <div class="coming-panel-icon">📐</div>
+        <div class="coming-panel-title">Coming Soon</div>
+        <p class="coming-panel-sub">The Kelly Sizer will let you input your model probability, the available odds, and your bankroll to get a recommended stake at full, half, and quarter Kelly. It connects directly to the No-Vig and EV concepts — best understood after those tools.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">ArcVest</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+// ── Nav: hamburger (top nav) ──────────────────────────────
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+
+// ── Sidebar: panel switching ──────────────────────────────
+const sidebarItems = document.querySelectorAll('.sidebar-item[data-panel]');
+const panels       = document.querySelectorAll('.panel');
+
+function showPanel(id) {
+  panels.forEach(p => p.classList.remove('active'));
+  sidebarItems.forEach(i => i.classList.remove('active'));
+  const target = document.getElementById('panel-' + id);
+  if (target) target.classList.add('active');
+  sidebarItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+sidebarItems.forEach(item => {
+  item.addEventListener('click', () => showPanel(item.dataset.panel));
+});
+
+// Mobile sidebar toggle
+document.getElementById('sidebar-toggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// Handle hash on load (e.g. /edgevault.html#odds-converter)
+const hash = window.location.hash.replace('#','');
+if (hash) showPanel(hash);
+
+// ── TOOL: Odds Converter ──────────────────────────────────
+function americanToDecimal(american) {
+  american = parseFloat(american);
+  if (isNaN(american)) return null;
+  return american >= 0 ? (american / 100) + 1 : (100 / Math.abs(american)) + 1;
+}
+function decimalToAmerican(decimal) {
+  decimal = parseFloat(decimal);
+  if (isNaN(decimal) || decimal <= 1) return null;
+  return decimal >= 2 ? '+' + Math.round((decimal - 1) * 100) : Math.round(-100 / (decimal - 1));
+}
+function decimalToImplied(decimal) {
+  return decimal > 0 ? (1 / decimal) * 100 : null;
+}
+function fmt2(n) { return n !== null ? n.toFixed(2) : '—'; }
+function fmtPct(n) { return n !== null ? n.toFixed(2) + '%' : '—'; }
+
+function convertFromAmerican() {
+  const am  = parseFloat(document.getElementById('oc-american').value);
+  if (isNaN(am)) return;
+  const dec = americanToDecimal(am);
+  const imp = decimalToImplied(dec);
+  const risk = am >= 0 ? '— (you win $' + am.toFixed(0) + ' per $100 risked)' : '$' + Math.abs(am).toFixed(2);
+  document.getElementById('oc-decimal-out').textContent  = fmt2(dec);
+  document.getElementById('oc-implied-out').textContent  = fmtPct(imp);
+  document.getElementById('oc-risk-out').textContent     = risk;
+  document.getElementById('oc-result-american').classList.add('show');
+}
+function convertFromDecimal() {
+  const dec = parseFloat(document.getElementById('oc-decimal').value);
+  if (isNaN(dec) || dec <= 1) return;
+  const am   = decimalToAmerican(dec);
+  const imp  = decimalToImplied(dec);
+  const ret  = '$' + ((dec - 1) * 100).toFixed(2);
+  document.getElementById('oc-american-out').textContent = am !== null ? String(am) : '—';
+  document.getElementById('oc-implied2-out').textContent = fmtPct(imp);
+  document.getElementById('oc-return-out').textContent   = ret;
+  document.getElementById('oc-result-decimal').classList.add('show');
+}
+function convertFromProb() {
+  const pct = parseFloat(document.getElementById('oc-prob').value);
+  if (isNaN(pct) || pct <= 0 || pct >= 100) return;
+  const dec = 100 / pct;
+  const am  = decimalToAmerican(dec);
+  document.getElementById('oc-decimal2-out').textContent  = fmt2(dec);
+  document.getElementById('oc-american2-out').textContent = am !== null ? String(am) : '—';
+  document.getElementById('oc-result-prob').classList.add('show');
+}
+
+// Enter key support for odds converter
+['oc-american','oc-decimal','oc-prob'].forEach((id, i) => {
+  const fns = [convertFromAmerican, convertFromDecimal, convertFromProb];
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fns[i](); });
+});
+
+// ── TOOL: No-Vig Calculator ───────────────────────────────
+function calcNoVig2() {
+  const decA = americanToDecimal(document.getElementById('nv-a').value);
+  const decB = americanToDecimal(document.getElementById('nv-b').value);
+  if (!decA || !decB) return;
+  const impA   = 1 / decA;
+  const impB   = 1 / decB;
+  const total  = impA + impB;
+  const vig    = ((total - 1) * 100).toFixed(2) + '%';
+  const fairA  = (impA / total * 100).toFixed(2) + '%';
+  const fairB  = (impB / total * 100).toFixed(2) + '%';
+  const breakA = (impA * 100).toFixed(2) + '%';
+  const breakB = (impB * 100).toFixed(2) + '%';
+  document.getElementById('nv-vig').textContent     = vig;
+  document.getElementById('nv-fair-a').textContent  = fairA;
+  document.getElementById('nv-fair-b').textContent  = fairB;
+  document.getElementById('nv-break-a').textContent = breakA;
+  document.getElementById('nv-break-b').textContent = breakB;
+  document.getElementById('nv-result-2way').classList.add('show');
+}
+function calcNoVig3() {
+  const decH = americanToDecimal(document.getElementById('nv-h').value);
+  const decD = americanToDecimal(document.getElementById('nv-d').value);
+  const decA = americanToDecimal(document.getElementById('nv-aw').value);
+  if (!decH || !decD || !decA) return;
+  const iH    = 1 / decH, iD = 1 / decD, iA = 1 / decA;
+  const total = iH + iD + iA;
+  document.getElementById('nv3-vig').textContent  = ((total - 1) * 100).toFixed(2) + '%';
+  document.getElementById('nv3-home').textContent = (iH / total * 100).toFixed(2) + '%';
+  document.getElementById('nv3-draw').textContent = (iD / total * 100).toFixed(2) + '%';
+  document.getElementById('nv3-away').textContent = (iA / total * 100).toFixed(2) + '%';
+  document.getElementById('nv-result-3way').classList.add('show');
+}
+
+// Enter key support for no-vig
+['nv-a','nv-b'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig2(); });
+});
+['nv-h','nv-d','nv-aw'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig3(); });
+});
+
+// ── TOOL: Hedge Calculator ────────────────────────────────
+function calcHedge() {
+  const stake     = parseFloat(document.getElementById('hg-stake').value);
+  const origOdds  = parseFloat(document.getElementById('hg-orig-odds').value);
+  const hedgeOdds = parseFloat(document.getElementById('hg-hedge-odds').value);
+  const target    = document.getElementById('hg-target').value;
+  if (isNaN(stake) || isNaN(origOdds) || isNaN(hedgeOdds)) return;
+
+  const decOrig  = americanToDecimal(origOdds);
+  const decHedge = americanToDecimal(hedgeOdds);
+  if (!decOrig || !decHedge) return;
+
+  const origPayout = stake * decOrig; // total return if orig wins
+  const origProfit = origPayout - stake;
+
+  let hedgeStake;
+  if (target === 'equal') {
+    // Equal profit both sides: hedgeStake = origPayout / decHedge
+    hedgeStake = origPayout / decHedge;
+  } else if (target === 'break') {
+    // Break even: hedge profit = original stake
+    hedgeStake = stake / (decHedge - 1);
+  } else {
+    // Lock half original profit
+    const halfProfit = origProfit / 2;
+    // profit if orig wins = origProfit - hedgeStake
+    // profit if hedge wins = hedgeStake * (decHedge-1)
+    // target: hedgeStake * (decHedge-1) = halfProfit
+    hedgeStake = halfProfit / (decHedge - 1);
+  }
+
+  const totalCommitted = stake + hedgeStake;
+  const profitIfOrig   = origPayout - totalCommitted;
+  const profitIfHedge  = hedgeStake * decHedge - totalCommitted;
+  const floor          = Math.min(profitIfOrig, profitIfHedge);
+
+  document.getElementById('hg-hedge-stake').textContent    = '$' + hedgeStake.toFixed(2);
+  document.getElementById('hg-profit-orig').textContent    = '$' + profitIfOrig.toFixed(2);
+  document.getElementById('hg-profit-hedge').textContent   = '$' + profitIfHedge.toFixed(2);
+  document.getElementById('hg-total-committed').textContent= '$' + totalCommitted.toFixed(2);
+  document.getElementById('hg-floor').textContent          = '$' + floor.toFixed(2);
+
+  // Color floor green/red
+  const floorEl = document.getElementById('hg-floor');
+  floorEl.className = 'tool-result-val ' + (floor >= 0 ? 'green' : 'red');
+
+  document.getElementById('hg-result').classList.add('show');
+}
+
+['hg-stake','hg-orig-odds','hg-hedge-odds'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcHedge(); });
+});
+</script>
+</body>
+</html>

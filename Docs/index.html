@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — Quantitative Sports Investing</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <meta name="description" content="ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering, and fractional Kelly sizing to find daily sports betting picks with genuine edge. Free during beta.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #080b12;
@@ -40,192 +41,14 @@
       border-bottom: 1px solid rgba(26,34,56,0.6);
     }
     .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-logo .wordmark {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.5rem;
-      letter-spacing: -0.02em;
-      color: #e8eaf0;
-      line-height: 1;
-    }
-    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
-
-    /* ── Email modal ── */
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 999;
-      background: rgba(8,11,18,0.85);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: #0e1220;
-      border: 1px solid #1a2238;
-      border-radius: 12px;
-      padding: 2.5rem;
-      max-width: 440px;
-      width: 90%;
-      position: relative;
-      animation: fadeUp 0.3s ease both;
-    }
-    .modal-close {
-      position: absolute; top: 1rem; right: 1.2rem;
-      background: none; border: none; color: #6b7794;
-      font-size: 1.2rem; cursor: pointer; line-height: 1;
-    }
-    .modal-close:hover { color: #eceef4; }
-    .modal-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #c9a84c;
-      margin-bottom: 0.75rem;
-    }
-    .modal-title {
+    .nav-logo svg { width: 26px; height: 26px; }
+    .nav-logo span {
       font-family: var(--font-head);
-      font-size: 2rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: #e8eaf0;
-      margin-bottom: 0.5rem;
+      font-size: 1.6rem;
+      color: var(--text);
+      letter-spacing: 0.03em;
     }
-    .modal-sub {
-      font-size: 0.875rem;
-      color: #6b7794;
-      font-weight: 300;
-      line-height: 1.6;
-      margin-bottom: 1.75rem;
-    }
-    .modal-form { display: flex; flex-direction: column; gap: 0.75rem; }
-    .modal-input {
-      background: #141929;
-      border: 1px solid #1a2238;
-      border-radius: 6px;
-      padding: 0.85rem 1rem;
-      color: #eceef4;
-      font-family: var(--font-body);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .modal-input:focus { border-color: #c9a84c; }
-    .modal-input::placeholder { color: #6b7794; }
-    .modal-submit {
-      background: #c9a84c;
-      color: #080b12;
-      border: none;
-      border-radius: 6px;
-      padding: 0.9rem;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .modal-submit:hover { background: #d4b55e; transform: translateY(-1px); }
-    .modal-note {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.06em;
-      color: #6b7794;
-      text-align: center;
-      margin-top: 0.5rem;
-    }
-    .modal-success {
-      display: none;
-      text-align: center;
-      padding: 1rem 0;
-    }
-    .modal-success-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-    .modal-success-text {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: #e8eaf0;
-      margin-bottom: 0.5rem;
-    }
-    .modal-success-sub { font-size: 0.85rem; color: #6b7794; line-height: 1.6; }
-
-    /* ── Email band ── */
-    .email-band {
-      background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(45,212,191,0.04) 100%);
-      border-top: 1px solid rgba(201,168,76,0.15);
-      border-bottom: 1px solid rgba(201,168,76,0.15);
-      padding: 3rem 2.5rem;
-      text-align: center;
-    }
-    .email-band-inner { max-width: 540px; margin: 0 auto; }
-    .email-band-label {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #c9a84c;
-      margin-bottom: 0.75rem;
-    }
-    .email-band-title {
-      font-family: var(--font-head);
-      font-size: 2.5rem;
-      letter-spacing: 0.05em;
-      color: #e8eaf0;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-    }
-    .email-band-sub {
-      font-size: 0.875rem;
-      color: #6b7794;
-      font-weight: 300;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    .email-band-form {
-      display: flex;
-      gap: 0.5rem;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-    .email-band-input {
-      flex: 1;
-      background: #0e1220;
-      border: 1px solid #1a2238;
-      border-radius: 6px;
-      padding: 0.8rem 1rem;
-      color: #eceef4;
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .email-band-input:focus { border-color: #c9a84c; }
-    .email-band-input::placeholder { color: #6b7794; }
-    .email-band-btn {
-      background: #c9a84c;
-      color: #080b12;
-      border: none;
-      border-radius: 6px;
-      padding: 0.8rem 1.4rem;
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .email-band-btn:hover { background: #d4b55e; }
-    .email-band-note {
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.06em;
-      color: #6b7794;
-      margin-top: 0.75rem;
-    }
+    .nav-logo span em { color: var(--gold); font-style: normal; }
     .nav-links { display: flex; align-items: center; gap: 2rem; }
     .nav-links a {
       font-family: var(--font-mono);
@@ -250,6 +73,49 @@
       transition: all 0.2s;
     }
     .nav-cta:hover { background: var(--gold); color: var(--bg); }
+
+    /* Mobile nav toggle */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--muted);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      top: 57px; left: 0; right: 0;
+      background: rgba(8,11,18,0.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      padding: 1.5rem 2.5rem;
+      flex-direction: column;
+      gap: 1.2rem;
+      z-index: 99;
+    }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(26,34,56,0.4);
+    }
+    .nav-mobile-menu a:hover { color: var(--text); }
 
     /* ── Hero ── */
     .hero {
@@ -284,95 +150,7 @@
       pointer-events: none;
     }
 
-    .hero-inner {
-      position: relative;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-    .hero-content { position: relative; }
-    .hero-chart-panel {
-      position: relative;
-      background: rgba(14,18,32,0.7);
-      border: 1px solid rgba(26,34,56,0.8);
-      border-radius: 12px;
-      padding: 1.75rem;
-      backdrop-filter: blur(8px);
-      animation: fadeUp 0.6s 0.35s ease both;
-    }
-    .hero-chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.25rem;
-    }
-    .hero-chart-label {
-      font-family: var(--font-mono);
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .hero-chart-label::before {
-      content: '';
-      display: inline-block;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #c9a84c;
-    }
-    .hero-chart-bankroll {
-      font-family: var(--font-head);
-      font-size: 1.5rem;
-      color: #c9a84c;
-      letter-spacing: 0.03em;
-    }
-    .hero-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 5px;
-      height: 140px;
-      margin-bottom: 1rem;
-    }
-    .hero-bar {
-      flex: 1;
-      border-radius: 3px 3px 0 0;
-      min-height: 4px;
-      transition: opacity 0.2s;
-    }
-    .hero-bar:hover { opacity: 0.75; }
-    .hero-chart-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid rgba(26,34,56,0.8);
-      padding-top: 1rem;
-    }
-    .hero-chart-stat { text-align: center; }
-    .hero-chart-stat-val {
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    .hero-chart-stat-val.pos { color: #10b981; }
-    .hero-chart-stat-val.neg { color: #ef4444; }
-    .hero-chart-stat-lbl {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }
-    @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-chart-panel { display: none; }
-    }
+    .hero-content { position: relative; max-width: 640px; }
 
     .hero-eyebrow {
       font-family: var(--font-mono);
@@ -464,7 +242,6 @@
       flex-wrap: wrap;
       animation: fadeUp 0.6s 0.4s ease both;
     }
-    .stat-item {}
     .stat-value {
       font-family: var(--font-head);
       font-size: 2.2rem;
@@ -481,7 +258,94 @@
       margin-top: 0.3rem;
     }
 
-    /* ── Live picks teaser ── */
+    /* ── Email band ── */
+    .email-band {
+      background: linear-gradient(135deg, rgba(240,180,41,0.06), rgba(240,180,41,0.02));
+      border-top: 1px solid rgba(240,180,41,0.15);
+      border-bottom: 1px solid rgba(240,180,41,0.15);
+      padding: 3rem 2.5rem;
+    }
+    .email-band-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .email-band-title {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .email-band-sub {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+    }
+    .email-form {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 480px;
+      margin: 0 auto 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .email-form input[type="email"] {
+      flex: 1;
+      min-width: 220px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .email-form input[type="email"]:focus { border-color: var(--gold); }
+    .email-form input[type="email"]::placeholder { color: var(--muted); }
+    .email-form select {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .email-form select:focus { border-color: var(--gold); color: var(--text); }
+    .email-form button {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.5rem;
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .email-form button:hover { background: #f5c842; }
+    .email-note {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .email-note .green { color: var(--green); }
+    /* Netlify honeypot — hidden from humans */
+    .hidden { display: none; }
+
+    /* ── Live trades teaser ── */
     .picks-section {
       padding: 5rem 2.5rem;
       max-width: 1200px;
@@ -547,11 +411,12 @@
       background: rgba(240,180,41,0.12);
       color: var(--gold);
     }
-    .pick-badge.nba  { background: rgba(29,185,84,0.1);  color: #1db954; }
-    .pick-badge.ncaab{ background: rgba(59,130,246,0.1); color: #60a5fa; }
-    .pick-badge.nhl  { background: rgba(139,92,246,0.1); color: #a78bfa; }
-    .pick-badge.soccer{ background: rgba(20,184,166,0.1); color: #2dd4bf;}
-    .pick-badge.tennis{ background: rgba(249,115,22,0.1); color: #fb923c;}
+    .pick-badge.nba   { background: rgba(29,185,84,0.1);   color: #1db954; }
+    .pick-badge.ncaab { background: rgba(59,130,246,0.1);  color: #60a5fa; }
+    .pick-badge.nhl   { background: rgba(139,92,246,0.1);  color: #a78bfa; }
+    .pick-badge.mlb   { background: rgba(239,68,68,0.1);   color: #f87171; }
+    .pick-badge.soccer{ background: rgba(20,184,166,0.1);  color: #2dd4bf; }
+    .pick-badge.tennis{ background: rgba(249,115,22,0.1);  color: #fb923c; }
     .pick-ev {
       font-family: var(--font-mono);
       font-size: 0.75rem;
@@ -791,8 +656,16 @@
       .stats-bar { gap: 2rem; }
       .roi-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
       nav { padding: 1rem 1.5rem; }
       .hero { padding: 7rem 1.5rem 3rem; }
+      .picks-section { padding: 3.5rem 1.5rem; }
+      .how-section { padding: 3.5rem 1.5rem; }
+      .roi-section { padding: 3.5rem 1.5rem; }
+      .cta-section { padding: 4rem 1.5rem; }
+      .email-band { padding: 2.5rem 1.5rem; }
+      footer { padding: 1.5rem; }
+      .footer-links { flex-wrap: wrap; gap: 1rem; }
     }
   </style>
 </head>
@@ -801,126 +674,103 @@
 <!-- Nav -->
 <nav>
   <a class="nav-logo" href="/">
-    <div class="wordmark">Arc<em>Vest</em></div>
+    <svg viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
+      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
+      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
+    </svg>
+    <span>Arc<em>Vest</em></span>
   </a>
   <div class="nav-links">
-    <a href="/dashboard.html">Dashboard</a>
+    <a href="/scorecard.html">Scorecard</a>
     <a href="/tournaments.html">Tournaments</a>
-    <a href="/library.html">Learn</a>
-    <a href="/pricing.html">Pricing</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
   </div>
-  <a class="nav-cta" href="#" onclick="openModal(); return false;">Get Daily Picks</a>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav-cta" href="#waitlist" id="nav-cta-btn">Get Daily Trades</a>
 </nav>
+
+<!-- Mobile menu -->
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/tournaments.html">Tournaments</a>
+  <a href="/edgevault.html">EdgeVault</a>
+  <a href="/odds.html">Odds</a>
+  <a href="#waitlist" style="color:var(--gold);">Get Daily Trades — Free</a>
+</div>
 
 <!-- Hero -->
 <section class="hero">
-  <div class="hero-inner">
-
-    <!-- Left: copy + stats -->
-    <div class="hero-content">
-      <div class="hero-eyebrow">Quantitative Sports Investing</div>
-      <h1 class="hero-h1">
-        Find The<br>
-        <span class="accent">Edge.</span><br>
-        <span class="dim">Daily.</span>
-      </h1>
-      <p class="hero-sub">
-        ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering,
-        and fractional Kelly sizing to generate daily sports investment picks.
-        No gut feel. No touts. Pure math.
-      </p>
-      <div class="hero-actions">
-        <a class="btn-primary" href="#" onclick="openModal(); return false;">Get Daily Picks — Free</a>
-        <a class="btn-ghost" href="/dashboard.html">View Live Dashboard</a>
-      </div>
-      <div class="stats-bar" id="stats-bar">
-        <div class="stat-item">
-          <div class="stat-value" id="stat-sports">10+</div>
-          <div class="stat-label">Sports covered</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-picks">—</div>
-          <div class="stat-label">Picks today</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-ev">5%+</div>
-          <div class="stat-label">Min EV gate</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="stat-model">50k</div>
-          <div class="stat-label">Daily simulations</div>
-        </div>
-      </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Quantitative Sports Investing</div>
+    <h1 class="hero-h1">
+      Find The<br>
+      <span class="accent">Edge.</span><br>
+      <span class="dim">Daily.</span>
+    </h1>
+    <p class="hero-sub">
+      ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering,
+      and fractional Kelly sizing to identify daily sports investment trades.
+      No gut feel. No touts. Pure math.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#waitlist">Get Daily Trades — Free</a>
+      <a class="btn-ghost" href="/scorecard.html">View Live Scorecard</a>
     </div>
 
-    <!-- Right: live P&L bar chart -->
-    <div class="hero-chart-panel">
-      <div class="hero-chart-header">
-        <div class="hero-chart-label">Daily P&amp;L — Track Record</div>
-        <div class="hero-chart-bankroll" id="hero-bankroll">—</div>
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-sports">10+</div>
+        <div class="stat-label">Sports covered</div>
       </div>
-      <div class="hero-bars" id="hero-bars">
-        <!-- injected by JS -->
+      <div class="stat-item">
+        <div class="stat-value" id="stat-picks">—</div>
+        <div class="stat-label">Trades today</div>
       </div>
-      <div class="hero-chart-footer">
-        <div class="hero-chart-stat">
-          <div class="hero-chart-stat-val" id="hero-record">—</div>
-          <div class="hero-chart-stat-lbl">Record</div>
-        </div>
-        <div class="hero-chart-stat">
-          <div class="hero-chart-stat-val pos" id="hero-roi">—</div>
-          <div class="hero-chart-stat-lbl">ROI</div>
-        </div>
-        <div class="hero-chart-stat">
-          <div class="hero-chart-stat-val" id="hero-days">—</div>
-          <div class="hero-chart-stat-lbl">Days tracked</div>
-        </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-ev">5%+</div>
+        <div class="stat-label">Min EV gate</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-model">50k</div>
+        <div class="stat-label">Daily simulations</div>
       </div>
     </div>
-
   </div>
 </section>
 
 <!-- Email capture band -->
-<section class="email-band">
+<div class="email-band" id="waitlist">
   <div class="email-band-inner">
-    <div class="email-band-label">Free Beta Access</div>
-    <div class="email-band-title">Get ArcVest picks in your inbox</div>
-    <p class="email-band-sub">Daily model output delivered every morning. Free while we're in beta. Be among the first to track the edge with us.</p>
-    <div class="email-band-form">
-      <input class="email-band-input" type="email" placeholder="your@email.com" id="band-email" />
-      <button class="email-band-btn" onclick="submitBandEmail()">Subscribe</button>
-    </div>
-    <div class="email-band-note">Free during beta · No credit card · Unsubscribe anytime</div>
-  </div>
-</section>
-
-<!-- Email modal -->
-<div class="modal-overlay" id="email-modal" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div id="modal-form-view">
-      <div class="modal-eyebrow">Free Beta Access</div>
-      <div class="modal-title">Get Daily Picks Free</div>
-      <p class="modal-sub">Model output delivered every morning. Full EV, matchup, and book data. Free while we're in beta.</p>
-      <div class="modal-form">
-        <input class="modal-input" type="text" placeholder="First name" id="modal-name" />
-        <input class="modal-input" type="email" placeholder="Email address" id="modal-email" />
-        <button class="modal-submit" onclick="submitModalEmail()">Send Me Daily Picks</button>
-      </div>
-      <div class="modal-note">Free during beta · No credit card · Unsubscribe anytime</div>
-    </div>
-    <div class="modal-success" id="modal-success-view">
-      <div class="modal-success-icon">✓</div>
-      <div class="modal-success-text">You're in.</div>
-      <p class="modal-success-sub">First picks land in your inbox tomorrow morning. Welcome to the edge.</p>
+    <div class="email-band-title">JOIN THE ARCVEST WAITLIST</div>
+    <p class="email-band-sub">Get launch updates, new EdgeVault tools, and public model insights as ArcVest moves from soft launch to full release.</p>
+    <form class="email-form" name="arcvest-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+      <input type="hidden" name="form-name" value="arcvest-waitlist" />
+      <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
+      <input type="email" name="email" placeholder="Email address" required />
+      <select name="interest">
+        <option value="" disabled selected>What are you most interested in?</option>
+        <option value="scorecard">Public Scorecard updates</option>
+        <option value="odds">Odds page access</option>
+        <option value="daily-card">Daily Card waitlist</option>
+        <option value="edgevault">EdgeVault tools &amp; articles</option>
+      </select>
+      <button type="submit">Join the Waitlist</button>
+    </form>
+    <div class="email-note">
+      We will send occasional product updates, new tool releases, and launch notes. No spam, no hype, and no promises of guaranteed results.
     </div>
   </div>
 </div>
+
+<!-- Live trades teaser -->
 <section class="picks-section">
-  <div class="section-label">Today's Picks — Free Preview</div>
+  <div class="section-label">Today's Market Signals — Free Preview</div>
   <h2 class="section-title">What the Model Found Today</h2>
-  <p class="section-sub">EV and matchup visible free. Kelly sizing and full position details unlocked with Pro.</p>
+  <p class="section-sub">EV and matchup visible free. Full trade details and Kelly sizing on the Scorecard.</p>
 
   <div class="picks-grid" id="picks-grid">
     <!-- populated by JS from daily_picks.json -->
@@ -946,18 +796,18 @@
       <div class="how-step">
         <div class="how-num">03</div>
         <div class="how-title">Two-Gate Filter</div>
-        <div class="how-desc">Every bet must clear both gates: minimum 5% expected value AND positive edge vs. no-vig probability. Most picks fail. The survivors are real edge.</div>
+        <div class="how-desc">Every trade must clear both gates: minimum 5% expected value AND positive edge vs. no-vig probability. Most candidates fail. The survivors are real edge.</div>
       </div>
       <div class="how-step">
         <div class="how-num">04</div>
         <div class="how-title">Kelly Sizing</div>
-        <div class="how-desc">Quarter Kelly criterion with a 10% daily bankroll cap. Positions sized proportionally — no single bet dominates. Treat it like a portfolio.</div>
+        <div class="how-desc">Quarter Kelly criterion with a 10% daily bankroll cap. Positions sized proportionally — no single trade dominates. Treat it like a portfolio.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ROI section -->
+<!-- Track record section -->
 <section class="roi-section">
   <div class="section-label">Track Record</div>
   <h2 class="section-title">Public Paper Trading Log</h2>
@@ -983,16 +833,16 @@
   </div>
 </section>
 
-<!-- CTA -->
+<!-- CTA section -->
 <section class="cta-section">
   <div class="cta-inner">
-    <h2 class="cta-title">Find The<br><span>Real Edge</span></h2>
+    <h2 class="cta-title">Start Finding<br><span>Real Edge</span></h2>
     <p class="cta-sub">
-      Daily picks from institutional-grade models. Full audit trail.
-      No gut feel. No touts. Get the picks in your inbox while we're in beta — free.
+      Free during beta. No credit card required.
+      See today's trades, track the model, decide if it's for you.
     </p>
-    <a class="btn-primary" href="#" onclick="openModal(); return false;" style="font-size:0.85rem; padding: 1rem 2.5rem;">
-      Get Daily Picks — Free
+    <a class="btn-primary" href="#waitlist" style="font-size:0.85rem; padding: 1rem 2.5rem;">
+      Get Daily Trades — Free
     </a>
     <div class="cta-note">Free during beta · No credit card · Unsubscribe anytime</div>
   </div>
@@ -1000,19 +850,12 @@
 
 <!-- Footer -->
 <footer>
-  <div class="footer-logo">Arc<span style="color:#c9a84c">Vest</span></div>
+  <div class="footer-logo">ArcVest</div>
   <div class="footer-links">
-    <a href="/dashboard.html">Dashboard</a>
+    <a href="/scorecard.html">Scorecard</a>
     <a href="/tournaments.html">Tournaments</a>
-    <a href="/pricing.html">Pricing</a>
-    <a href="/library.html">Learn</a>
-  </div>
-  <div style="display:flex; gap:0.5rem; align-items:center;">
-    <input class="email-band-input" type="email" placeholder="Get picks in your inbox" id="footer-email"
-      style="padding:0.55rem 0.9rem; font-size:0.78rem; width:220px;" />
-    <button class="email-band-btn" onclick="submitFooterEmail()" style="padding:0.55rem 1rem; font-size:0.68rem;">
-      Subscribe
-    </button>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
   </div>
   <div class="footer-disclaimer">
     For informational and entertainment purposes only. Not financial or betting advice.
@@ -1022,6 +865,18 @@
 </footer>
 
 <script>
+// Mobile menu toggle
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
+hamburger.addEventListener('click', () => {
+  mobileMenu.classList.toggle('open');
+});
+// Close menu when a link is clicked
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+});
+
+// JSON loader
 async function loadJSON(path) {
   try {
     const r = await fetch(path);
@@ -1030,53 +885,33 @@ async function loadJSON(path) {
   } catch { return null; }
 }
 
+// Sport badge helper
 function sportBadge(sport) {
-  const s = (sport||'').toUpperCase();
-  if (s.includes('NBA'))    return ['nba',   'NBA'];
-  if (s.includes('NCAAB'))  return ['ncaab', 'NCAAB'];
-  if (s.includes('NHL'))    return ['nhl',   'NHL'];
-  if (s.includes('SOCCER')) return ['soccer','⚽ ' + s.replace('SOCCER-','')];
-  if (s.includes('ATP')||s.includes('WTA')) return ['tennis','🎾 Tennis'];
-  if (s.includes('CHA'))    return ['tennis','🎾 Challenger'];
+  const s = (sport || '').toUpperCase();
+  if (s.includes('NBA'))                    return ['nba',    'NBA'];
+  if (s.includes('NCAAB'))                  return ['ncaab',  'NCAAB'];
+  if (s.includes('NHL'))                    return ['nhl',    'NHL'];
+  if (s.includes('MLB'))                    return ['mlb',    'MLB'];
+  if (s.includes('SOCCER'))                 return ['soccer', '⚽ ' + s.replace('SOCCER-','').replace('SOCCER ','')];
+  if (s.includes('ATP') || s.includes('WTA')) return ['tennis','🎾 Tennis'];
+  if (s.includes('CHA'))                    return ['tennis', '🎾 Challenger'];
   return ['', sport];
 }
 
+// Cap EV display — anything over 200% is a data artifact, show as "--"
+function formatEV(raw) {
+  const val = (raw || 0) * 100;
+  if (val > 200) return '—';
+  return val.toFixed(1) + '%';
+}
+
 async function init() {
-  const [picks, paper, summary] = await Promise.all([
+  const [picks, paper] = await Promise.all([
     loadJSON('data/daily_picks.json'),
     loadJSON('data/paper_log.json'),
-    loadJSON('data/summary.json'),
   ]);
 
-  // Hero chart + stats
-  if (paper && paper.length) {
-    const last = paper[paper.length - 1];
-    const br = last.ending_bankroll;
-    const wins = paper.reduce((s,r) => s+(r.wins||0), 0);
-    const losses = paper.reduce((s,r) => s+(r.losses||0), 0);
-    const totalRisked = paper.reduce((s,r) => s+(r.total_risked||0), 0);
-    const totalPnl = br - 1000;
-    const roi = totalRisked > 0 ? (totalPnl / totalRisked * 100) : 0;
-
-    document.getElementById('hero-bankroll').textContent =
-      '$' + br.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('hero-record').textContent = `${wins}W — ${losses}L`;
-    document.getElementById('hero-roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
-    document.getElementById('hero-roi').className = 'hero-chart-stat-val ' + (roi >= 0 ? 'pos' : 'neg');
-    document.getElementById('hero-days').textContent = paper.length + ' days';
-
-    const heroBars = document.getElementById('hero-bars');
-    const maxAbs = Math.max(...paper.map(r => Math.abs(r.daily_roi||0)));
-    heroBars.innerHTML = paper.map(r => {
-      const pnl = r.daily_roi || 0;
-      const h = maxAbs > 0 ? Math.max(4, Math.round((Math.abs(pnl)/maxAbs) * 120)) : 4;
-      const color = pnl >= 0 ? '#10b981' : '#ef4444';
-      return `<div class="hero-bar" style="height:${h}px;background:${color};opacity:0.75"
-               title="${(pnl*100).toFixed(2)}% daily ROI"></div>`;
-    }).join('');
-  }
-
-  // Stats bar picks count
+  // Stats bar — trades today
   if (picks) {
     document.getElementById('stat-picks').textContent = picks.length;
   }
@@ -1086,43 +921,44 @@ async function init() {
     const last = paper[paper.length - 1];
     const br = last.ending_bankroll;
     document.getElementById('roi-bankroll').textContent =
-      '$' + br.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    const wins = paper.reduce((s,r) => s+(r.wins||0), 0);
-    const losses = paper.reduce((s,r) => s+(r.losses||0), 0);
+      '$' + parseFloat(br).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const wins   = paper.reduce((s, r) => s + (r.wins   || 0), 0);
+    const losses = paper.reduce((s, r) => s + (r.losses || 0), 0);
     document.getElementById('roi-record').textContent = `${wins}W — ${losses}L`;
-    document.getElementById('roi-days').textContent = paper.length + ' days';
+    document.getElementById('roi-days').textContent   = paper.length + ' days';
 
     // ROI bars
-    const chart = document.getElementById('roi-chart');
-    const maxAbs = Math.max(...paper.map(r => Math.abs(r.daily_roi||0)));
+    const chart  = document.getElementById('roi-chart');
+    const maxAbs = Math.max(...paper.map(r => Math.abs(r.daily_roi || 0)));
     chart.innerHTML = paper.map(r => {
-      const roi = r.daily_roi || 0;
-      const h = maxAbs > 0 ? Math.round((Math.abs(roi)/maxAbs) * 180) : 10;
+      const roi   = r.daily_roi || 0;
+      const h     = maxAbs > 0 ? Math.round((Math.abs(roi) / maxAbs) * 180) : 10;
       const color = roi >= 0 ? '#10b981' : '#ef4444';
       return `<div class="roi-bar" style="height:${h}px;background:${color};opacity:0.7"
-               title="${(roi*100).toFixed(2)}%"></div>`;
+               title="${(roi * 100).toFixed(2)}%"></div>`;
     }).join('');
   }
 
-  // Picks teaser — show 6 picks, blur Kelly on last 3
+  // Trades teaser — show first 6, blur last 3
   if (picks && picks.length) {
-    const grid = document.getElementById('picks-grid');
+    const grid   = document.getElementById('picks-grid');
     const sample = picks.slice(0, 6);
     grid.innerHTML = sample.map((p, i) => {
       const [badgeClass, badgeText] = sportBadge(p.Sport || p.sport);
-      const ev = ((p.EV || p.bet_ev || 0) * 100).toFixed(1);
-      const home = p.Home || p.home_team || '';
-      const away = p.Away || p.away_team || '';
-      const pick = p.Pick || p.bet_team || '';
-      const odds = parseFloat(p.Odds || p.bet_ml || 0).toFixed(2);
-      const book = p.Book || p.bookmaker_name || '';
+      const ev     = formatEV(p.EV || p.bet_ev || 0);
+      const home   = p.Home  || p.home_team  || '';
+      const away   = p.Away  || p.away_team  || '';
+      const pick   = p.Pick  || p.bet_team   || '';
+      const oddsRaw = parseFloat(p.Odds || p.bet_ml || 0);
+      const odds   = isNaN(oddsRaw) ? '—' : oddsRaw.toFixed(2);
+      const book   = p.Book  || p.bookmaker_name || '';
       const isGated = i >= 3;
 
       return `
         <div class="pick-card">
           <div class="pick-card-top">
             <span class="pick-badge ${badgeClass}">${badgeText}</span>
-            <span class="pick-ev">+EV ${ev}%</span>
+            <span class="pick-ev">${ev !== '—' ? '+EV ' + ev : 'EV —'}</span>
           </div>
           <div class="pick-matchup">${home} vs ${away}</div>
           <div class="pick-pick ${isGated ? 'pick-blur' : ''}">${pick}</div>
@@ -1130,56 +966,10 @@ async function init() {
             <span class="pick-odds">${odds}</span>
             <span class="pick-book">${book}</span>
           </div>
-          ${isGated ? '<div class="pick-gate"><span class="pick-gate-text">Pro — Unlock Full Pick</span></div>' : ''}
+          ${isGated ? '<div class="pick-gate"><span class="pick-gate-text">View Full Scorecard →</span></div>' : ''}
         </div>`;
     }).join('');
   }
-}
-
-function openModal() {
-  document.getElementById('email-modal').classList.add('open');
-  setTimeout(() => document.getElementById('modal-name').focus(), 100);
-}
-function closeModal() {
-  document.getElementById('email-modal').classList.remove('open');
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-function showSuccess(modalView, successView) {
-  document.getElementById(modalView).style.display = 'none';
-  const s = document.getElementById(successView);
-  s.style.display = 'block';
-  setTimeout(closeModal, 3000);
-}
-
-function submitModalEmail() {
-  const email = document.getElementById('modal-email').value.trim();
-  if (!email || !email.includes('@')) {
-    document.getElementById('modal-email').focus();
-    return;
-  }
-  // TODO: Replace with Mailchimp API call once account is set up
-  console.log('Modal signup:', document.getElementById('modal-name').value, email);
-  showSuccess('modal-form-view', 'modal-success-view');
-}
-
-function submitBandEmail() {
-  const email = document.getElementById('band-email').value.trim();
-  if (!email || !email.includes('@')) {
-    document.getElementById('band-email').focus();
-    return;
-  }
-  console.log('Band signup:', email);
-  document.getElementById('band-email').value = '';
-  document.getElementById('band-email').placeholder = '✓ You\'re in — check your inbox tomorrow';
-}
-
-function submitFooterEmail() {
-  const email = document.getElementById('footer-email').value.trim();
-  if (!email || !email.includes('@')) return;
-  console.log('Footer signup:', email);
-  document.getElementById('footer-email').value = '';
-  document.getElementById('footer-email').placeholder = '✓ Subscribed';
 }
 
 init();

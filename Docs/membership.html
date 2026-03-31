@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Membership</title>
+  <meta name="description" content="ArcVest membership is in public beta. Join the waitlist for The Daily Card, portfolio tools, and subscriber workflows.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b12; --bg2: #0e1220; --bg3: #141929;
+      --border: #1a2238; --gold: #f0b429;
+      --text: #eceef4; --muted: #6b7794; --green: #10b981;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Outfit', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(8,11,18,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .nav-logo svg { width: 24px; height: 24px; }
+    .nav-logo span { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); letter-spacing: 0.03em; }
+    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-back {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      padding: 9rem 2.5rem 5rem;
+      max-width: 780px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 400px;
+      background: radial-gradient(circle, rgba(240,180,41,0.06) 0%, transparent 70%);
+      top: 20%; left: 50%; transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gold); }
+    .hero h1 {
+      font-family: var(--font-head); font-size: clamp(2.5rem, 5vw, 4.5rem);
+      letter-spacing: 0.02em; color: var(--text); line-height: 1.0;
+      margin-bottom: 1.5rem; position: relative;
+    }
+    .hero h1 span { color: var(--gold); }
+    .hero-body {
+      font-size: 1rem; color: var(--muted); font-weight: 300;
+      line-height: 1.8; margin-bottom: 2.5rem; max-width: 600px; position: relative;
+    }
+
+    /* What's included */
+    .included-section {
+      padding: 0 2.5rem 5rem;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .included-label {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 1rem;
+    }
+    .included-list { list-style: none; margin-bottom: 3rem; }
+    .included-list li {
+      font-size: 0.9rem; color: var(--muted); font-weight: 300;
+      padding: 0.75rem 0; border-bottom: 1px solid rgba(26,34,56,0.5);
+      display: flex; align-items: flex-start; gap: 0.75rem; line-height: 1.5;
+    }
+    .included-list li::before {
+      content: '→'; color: var(--gold); font-family: var(--font-mono);
+      font-size: 0.75rem; flex-shrink: 0; margin-top: 0.1rem;
+    }
+
+    /* Waitlist form */
+    .form-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--gold);
+      border-radius: 10px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .form-card-title {
+      font-family: var(--font-head); font-size: 1.8rem; letter-spacing: 0.04em;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+    .form-card-sub {
+      font-size: 0.82rem; color: var(--muted); font-weight: 300;
+      line-height: 1.6; margin-bottom: 1.8rem;
+    }
+    .form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 200px; }
+    .form-label {
+      font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .form-input {
+      font-family: var(--font-mono); font-size: 0.88rem;
+      padding: 0.7rem 1rem; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text); outline: none; transition: border-color 0.2s; width: 100%;
+    }
+    .form-input:focus { border-color: var(--gold); }
+    .form-input::placeholder { color: var(--muted); }
+    .form-btn {
+      font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.75rem 2rem;
+      background: var(--gold); color: var(--bg);
+      border: none; border-radius: 4px; cursor: pointer;
+      font-weight: 500; transition: background 0.2s; white-space: nowrap;
+    }
+    .form-btn:hover { background: #f5c842; }
+    .form-note {
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
+      line-height: 1.6; margin-top: 0.75rem;
+    }
+    .hidden { display: none; }
+
+    /* Fine print */
+    .fine-print {
+      font-size: 0.78rem; color: var(--muted); font-weight: 300;
+      line-height: 1.7; font-style: italic; margin-bottom: 1rem;
+    }
+    .disc {
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted);
+      line-height: 1.6; border-top: 1px solid var(--border); padding-top: 1rem;
+    }
+
+    footer {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      padding: 1.5rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-family: var(--font-head); font-size: 1.1rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-disc {
+      width: 100%; font-size: 0.65rem; color: var(--muted);
+      font-family: var(--font-mono); border-top: 1px solid var(--border); padding-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .included-section { padding: 0 1.5rem 4rem; }
+      .form-card { padding: 1.5rem; }
+      nav { padding: 1rem 1.5rem; }
+      footer { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <svg viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
+      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
+      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
+    </svg>
+    <span>Arc<em>Vest</em></span>
+  </a>
+  <a class="nav-back" href="/">← Back to Home</a>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">Public Beta</div>
+  <h1>ArcVest Membership<br>is in <span>public beta.</span></h1>
+  <p class="hero-body">
+    ArcVest is being built in public. We are validating the engine, expanding the public Scorecard, and refining the product before opening paid membership. Join the waitlist to be first in line when The Daily Card, deeper portfolio tools, and subscriber workflows are ready.
+  </p>
+</div>
+
+<div class="included-section">
+
+  <div class="included-label">What waitlist members receive</div>
+  <ul class="included-list">
+    <li>Early access updates on membership rollout.</li>
+    <li>Notices when The Daily Card and related workflow tools open.</li>
+    <li>Product notes on new EdgeVault tools, model features, and public data releases.</li>
+  </ul>
+
+  <div class="form-card">
+    <div class="form-card-title">Join the Membership Waitlist</div>
+    <p class="form-card-sub">No payment required. No commitment. We'll reach out directly when paid membership is ready to open.</p>
+    <form name="arcvest-membership" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+      <input type="hidden" name="form-name" value="arcvest-membership" />
+      <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">Email address</label>
+          <input class="form-input" type="email" name="email" placeholder="you@example.com" required />
+        </div>
+        <button class="form-btn" type="submit">Join the membership waitlist</button>
+      </div>
+      <div class="form-note">
+        We will not share your email or contact you outside of ArcVest product updates.
+      </div>
+    </form>
+  </div>
+
+  <p class="fine-print">ArcVest does not sell certainty. We publish data, methodology, and model-driven insights for disciplined users who want a more systematic process.</p>
+  <div class="disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal.</div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">ArcVest</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+</body>
+</html>
