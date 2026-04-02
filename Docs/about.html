@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — About</title>
+  <meta name="description" content="About ArcVest — quantitative sports analytics built on Pythagorean models, two-gate EV filtering, and fractional Kelly sizing. No touts. No gut feel. Pure math.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b12; --bg2: #0e1220; --bg3: #141929;
+      --border: #1a2238; --gold: #f0b429; --text: #eceef4;
+      --muted: #6b7794; --green: #10b981;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Outfit', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(8,11,18,0.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .wordmark { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; color: #e8eaf0; line-height: 1; }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 1.2rem; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; border-radius: 4px; transition: all 0.2s; }
+    .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; }
+    .nav-mobile-menu { display: none; position: fixed; top: 57px; left: 0; right: 0; background: rgba(8,11,18,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); padding: 1.5rem 2.5rem; flex-direction: column; gap: 1.2rem; z-index: 99; }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 6rem 2.5rem 4rem;
+      max-width: 1200px; margin: 0 auto;
+      position: relative;
+    }
+    .hero-eyebrow { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .hero-eyebrow::before { content: ''; display: block; width: 32px; height: 1px; background: var(--gold); }
+    .hero-title { font-family: var(--font-head); font-size: clamp(2.5rem, 6vw, 5rem); line-height: 0.95; letter-spacing: 0.02em; color: var(--text); margin-bottom: 1.5rem; }
+    .hero-title span { color: var(--gold); }
+    .hero-sub { font-size: 1.05rem; font-weight: 300; color: var(--muted); max-width: 580px; line-height: 1.8; margin-bottom: 3rem; }
+
+    /* ── Content ── */
+    .content { max-width: 1200px; margin: 0 auto; padding: 0 2.5rem 6rem; }
+
+    /* ── Principles grid ── */
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+    }
+    .principle {
+      background: var(--bg2);
+      padding: 1.5rem 1.75rem;
+      transition: background 0.15s;
+    }
+    .principle:hover { background: var(--bg3); }
+    .principle-num { font-family: var(--font-head); font-size: 2.5rem; color: rgba(240,180,41,0.15); line-height: 1; margin-bottom: 0.5rem; }
+    .principle-title { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .principle-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── Methodology section ── */
+    .section { margin-bottom: 4rem; }
+    .section-eyebrow { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.6rem; }
+    .section-eyebrow::before { content: ''; display: inline-block; width: 24px; height: 1px; background: var(--gold); }
+    .section-title { font-family: var(--font-head); font-size: 2rem; letter-spacing: 0.03em; color: var(--text); margin-bottom: 1.25rem; }
+    .section-body p { font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 1rem; max-width: 700px; }
+    .section-body strong { color: var(--text); font-weight: 600; }
+
+    /* ── Architecture steps ── */
+    .arch-steps { display: flex; flex-direction: column; gap: 1px; background: var(--border); border-radius: 8px; overflow: hidden; margin-top: 1.5rem; }
+    .arch-step { background: var(--bg2); padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 80px 1fr; gap: 1.5rem; align-items: start; transition: background 0.15s; }
+    .arch-step:hover { background: var(--bg3); }
+    .arch-step-num { font-family: var(--font-head); font-size: 1.8rem; color: var(--gold); line-height: 1; }
+    .arch-step-name { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
+    .arch-step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── Transparency block ── */
+    .transparency {
+      background: linear-gradient(135deg, rgba(240,180,41,0.05), rgba(240,180,41,0.02));
+      border: 1px solid rgba(240,180,41,0.15);
+      border-radius: 10px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 4rem;
+    }
+    .transparency-title { font-family: var(--font-head); font-size: 1.6rem; letter-spacing: 0.05em; color: var(--text); margin-bottom: 1rem; }
+    .transparency-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+    .t-item-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+    .t-item-val { font-family: var(--font-head); font-size: 1.4rem; color: var(--gold); }
+
+    /* ── CTA ── */
+    .cta-band { text-align: center; padding: 3rem 0; border-top: 1px solid var(--border); }
+    .cta-band h2 { font-family: var(--font-head); font-size: 2.2rem; letter-spacing: 0.03em; color: var(--text); margin-bottom: 0.75rem; }
+    .cta-band p { font-size: 0.9rem; color: var(--muted); font-weight: 300; margin-bottom: 2rem; }
+    .btn-primary { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.9rem 2rem; background: var(--gold); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-weight: 500; transition: all 0.2s; display: inline-block; }
+    .btn-primary:hover { background: #f5c842; transform: translateY(-1px); }
+
+    footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; color: var(--muted); }
+    .footer-logo em { color: #c9a84c; font-style: normal; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-disc { width: 100%; font-size: 0.65rem; color: var(--muted); font-family: var(--font-mono); border-top: 1px solid var(--border); padding-top: 1rem; line-height: 1.5; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      nav { padding: 1rem 1.5rem; }
+      .hero { padding: 5rem 1.5rem 3rem; }
+      .content { padding: 0 1.5rem 4rem; }
+      .arch-step { grid-template-columns: 1fr; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/"><span class="wordmark">Arc<em>Vest</em></span></a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/daily-card.html">Daily Card</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav-cta" href="/#waitlist">Get Daily Trades</a>
+</nav>
+
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/">Home</a>
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/daily-card.html">Daily Card</a>
+  <a href="/edgevault.html">EdgeVault</a>
+  <a href="/odds.html">Odds</a>
+  <a href="/#waitlist" style="color:var(--gold);">Get Daily Trades — Free</a>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-eyebrow">About ArcVest</div>
+  <h1 class="hero-title">Quantitative Sports<br><span>Investing.</span><br>Built in Public.</h1>
+  <p class="hero-sub">
+    ArcVest applies institutional-grade probability models, two-gate EV filtering,
+    and fractional Kelly position sizing to find daily sports betting opportunities with
+    genuine mathematical edge. Every pick is logged. Every result is published.
+    No cherry-picking. No backtesting theater.
+  </p>
+</section>
+
+<div class="content">
+
+  <!-- Core principles -->
+  <div class="principles">
+    <div class="principle">
+      <div class="principle-num">01</div>
+      <div class="principle-title">Model-Driven, Not Gut-Driven</div>
+      <div class="principle-desc">Every trade recommendation comes from quantitative models — Pythagorean win probability, no-vig market pricing, and Kelly criterion sizing. Human judgment is removed from the selection process.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">02</div>
+      <div class="principle-title">Full Public Audit Trail</div>
+      <div class="principle-desc">The complete pick log is public from day one. Wins, losses, stakes, odds, and closing line value — all published on the Scorecard. If the edge is real, the data shows it over hundreds of bets.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">03</div>
+      <div class="principle-title">Portfolio Discipline</div>
+      <div class="principle-desc">Quarter-Kelly sizing with a 10% daily bankroll cap. No single trade dominates the portfolio. Risk is distributed across 6+ sports simultaneously — the same diversification logic that governs investment portfolios.</div>
+    </div>
+    <div class="principle">
+      <div class="principle-num">04</div>
+      <div class="principle-title">Transparency Over Hype</div>
+      <div class="principle-desc">Win rates around 38–42% are expected and correct at the target odds levels. ArcVest explains this math publicly and does not hide losing periods or inflate performance claims.</div>
+    </div>
+  </div>
+
+  <!-- Methodology -->
+  <div class="section">
+    <div class="section-eyebrow">The Engine</div>
+    <h2 class="section-title">How the Model Works</h2>
+    <div class="section-body">
+      <p>The ArcVest engine — called the SureBet Archer architecture internally — runs every morning to fetch live odds, compute model probabilities, apply the two-gate filter, and size positions using fractional Kelly. The process is fully automated and deterministic.</p>
+      <p>Sport-specific Pythagorean models compute win probability from points scored vs. allowed — <strong>PythagenPat</strong> for basketball, <strong>PythagenPuck</strong> for hockey, <strong>BaseRuns blend</strong> for baseball, and <strong>Elo ratings</strong> for tennis. These are the same underlying frameworks used in academic sports analytics research.</p>
+    </div>
+
+    <div class="arch-steps">
+      <div class="arch-step">
+        <div class="arch-step-num">01</div>
+        <div>
+          <div class="arch-step-name">Odds Fetch — SureBetTarget</div>
+          <div class="arch-step-desc">Live odds pulled from FanDuel, DraftKings, Hard Rock Bet, Fanatics, and ESPN Bet across 13+ sports every morning. Best-available line selected per market.</div>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-num">02</div>
+        <div>
+          <div class="arch-step-name">Model Probability — Sport Pipelines</div>
+          <div class="arch-step-desc">Pythagorean win probability computed for each matchup. No-vig market probability stripped from the best available line. Both figures used in gate evaluation.</div>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-num">03</div>
+        <div>
+          <div class="arch-step-name">Two-Gate Filter — SureBetAim</div>
+          <div class="arch-step-desc">Every trade must clear both gates independently: (1) model EV ≥ 5% and (2) positive model edge vs. no-vig probability. Most candidates fail. The survivors are the Daily Card.</div>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-num">04</div>
+        <div>
+          <div class="arch-step-name">Kelly Sizing — Portfolio Allocation</div>
+          <div class="arch-step-desc">Quarter-Kelly criterion determines stake size. A 10% daily bankroll cap prevents any single session from dominating. Positions are sized proportionally to edge strength.</div>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step-num">05</div>
+        <div>
+          <div class="arch-step-name">Settlement & CLV — SureBetAssessor</div>
+          <div class="arch-step-desc">Results settled daily. Closing Line Value tracked to measure whether the model consistently beats the closing market price — the gold standard for evaluating edge sustainability.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transparency block -->
+  <div class="transparency">
+    <div class="transparency-title">Built in Public</div>
+    <p style="font-size:0.88rem;color:var(--muted);font-weight:300;line-height:1.7;max-width:600px;">
+      ArcVest launched paper trading on March 13, 2026. Every result since then is published
+      on the public Scorecard — no cherry-picking, no selective reporting, no adjusted start dates.
+      Reset 3 began April 1, 2026 with a verified clean baseline following accounting pipeline fixes.
+    </p>
+    <div class="transparency-grid">
+      <div>
+        <div class="t-item-label">Paper Trading Start</div>
+        <div class="t-item-val">Mar 13, 2026</div>
+      </div>
+      <div>
+        <div class="t-item-label">Sports Covered</div>
+        <div class="t-item-val">10+</div>
+      </div>
+      <div>
+        <div class="t-item-label">Books Monitored</div>
+        <div class="t-item-val">5</div>
+      </div>
+      <div>
+        <div class="t-item-label">Min EV Gate</div>
+        <div class="t-item-val">5%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-band">
+    <h2>See the Model in Action</h2>
+    <p>The Scorecard is always public. The Daily Card is free during beta.</p>
+    <a class="btn-primary" href="/scorecard.html">View the Scorecard</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Arc<em>Vest</em></div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+</script>
+</body>
+</html>

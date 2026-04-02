@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Terms of Service</title>
+  <meta name="description" content="ArcVest Terms of Service — the terms governing your use of arcvest.io.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b12; --bg2: #0e1220; --border: #1a2238;
+      --gold: #f0b429; --text: #eceef4; --muted: #6b7794;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Outfit', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(8,11,18,0.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .wordmark { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; color: #e8eaf0; line-height: 1; }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; }
+    .nav-mobile-menu { display: none; position: fixed; top: 57px; left: 0; right: 0; background: rgba(8,11,18,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); padding: 1.5rem 2.5rem; flex-direction: column; gap: 1.2rem; z-index: 99; }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4); }
+
+    .main { max-width: 780px; margin: 0 auto; padding: 4rem 2.5rem 6rem; }
+    .page-eyebrow { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .page-title { font-family: var(--font-head); font-size: 3rem; letter-spacing: 0.03em; color: var(--text); margin-bottom: 0.5rem; }
+    .page-meta { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+
+    .doc h2 { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 0.05em; color: var(--text); margin: 2.5rem 0 0.75rem; }
+    .doc p { font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 1rem; }
+    .doc ul { margin: 0.5rem 0 1rem 1.5rem; }
+    .doc ul li { font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 0.3rem; }
+    .doc a { color: var(--gold); text-decoration: none; }
+    .doc a:hover { text-decoration: underline; }
+    .doc .highlight {
+      background: rgba(240,180,41,0.05);
+      border-left: 2px solid var(--gold);
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .doc .highlight p { margin-bottom: 0; }
+
+    footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; color: var(--muted); }
+    .footer-logo em { color: #c9a84c; font-style: normal; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-disc { width: 100%; font-size: 0.65rem; color: var(--muted); font-family: var(--font-mono); border-top: 1px solid var(--border); padding-top: 1rem; line-height: 1.5; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      nav { padding: 1rem 1.5rem; }
+      .main { padding: 3rem 1.5rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/"><span class="wordmark">Arc<em>Vest</em></span></a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/daily-card.html">Daily Card</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/">Home</a>
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/daily-card.html">Daily Card</a>
+  <a href="/edgevault.html">EdgeVault</a>
+  <a href="/odds.html">Odds</a>
+</div>
+
+<main class="main">
+  <div class="page-eyebrow">Legal</div>
+  <h1 class="page-title">Terms of Service</h1>
+  <div class="page-meta">Last updated: April 1, 2026 &nbsp;·&nbsp; ArcVest / Mountain Engineering &nbsp;·&nbsp; arcvest.io</div>
+
+  <div class="doc">
+
+    <div class="highlight">
+      <p>ArcVest provides quantitative sports analytics for informational and entertainment purposes only. Nothing on this site constitutes financial, investment, or betting advice. You must be 21 or older and located in a jurisdiction where sports wagering is legal to use this service.</p>
+    </div>
+
+    <h2>Acceptance of Terms</h2>
+    <p>By accessing or using arcvest.io ("the Site"), you agree to be bound by these Terms of Service. If you do not agree, do not use the Site. We may update these terms at any time; continued use after changes constitutes acceptance.</p>
+
+    <h2>Description of Service</h2>
+    <p>ArcVest provides publicly accessible quantitative sports analytics, model outputs, paper trading records, and educational content. During the current beta period, core features are available at no charge. We reserve the right to introduce paid tiers, modify features, or discontinue services at any time with reasonable notice.</p>
+
+    <h2>Not Financial or Betting Advice</h2>
+    <p>All content on ArcVest — including model picks, expected value calculations, Kelly sizing recommendations, scorecard results, and EdgeVault articles — is provided for informational and entertainment purposes only. It does not constitute financial advice, investment advice, sports betting advice, or any recommendation to place any wager.</p>
+    <p>Past model performance does not guarantee future results. Sports betting involves significant risk of financial loss. You are solely responsible for any decisions you make based on content from this site.</p>
+
+    <h2>Eligibility</h2>
+    <p>You must be at least 21 years of age and located in a jurisdiction where sports wagering is legal to use ArcVest. By using the Site you represent and warrant that you meet these requirements. We reserve the right to terminate access for users who do not meet eligibility requirements.</p>
+
+    <h2>User Conduct</h2>
+    <p>You agree not to:</p>
+    <ul>
+      <li>Use the Site for any unlawful purpose or in violation of any applicable laws or regulations</li>
+      <li>Scrape, copy, or redistribute ArcVest content, model outputs, or data without written permission</li>
+      <li>Attempt to reverse engineer, decompile, or extract proprietary model logic</li>
+      <li>Use automated systems to access the Site in ways that impose unreasonable load</li>
+      <li>Misrepresent ArcVest's results or methodology in public communications</li>
+    </ul>
+
+    <h2>Intellectual Property</h2>
+    <p>All content on ArcVest — including model methodology, tool designs, written content, trade names, and site design — is the property of Mountain Engineering and protected by applicable intellectual property laws. You may not reproduce or distribute this content without express written permission.</p>
+
+    <h2>Disclaimer of Warranties</h2>
+    <p>The Site is provided "as is" and "as available" without warranties of any kind, express or implied. We do not warrant that the Site will be uninterrupted, error-free, or that model outputs will be accurate or profitable. We expressly disclaim any implied warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+
+    <h2>Limitation of Liability</h2>
+    <p>To the fullest extent permitted by law, ArcVest and Mountain Engineering shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the Site or reliance on any content, including any financial losses from sports wagering decisions.</p>
+
+    <h2>Third-Party Links and Services</h2>
+    <p>The Site may contain links to third-party websites including sportsbooks, affiliate programs, and data providers. We are not responsible for the content, accuracy, or practices of those sites. Links do not constitute endorsements.</p>
+
+    <h2>Governing Law</h2>
+    <p>These Terms are governed by the laws of the State of Tennessee, without regard to its conflict of law provisions. Any disputes arising from these Terms or your use of the Site shall be resolved in the courts of Tennessee.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about these Terms can be directed to: <a href="mailto:contact@arcvest.io">contact@arcvest.io</a></p>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">Arc<em>Vest</em></div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/about.html">About</a>
+    <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — Quantitative Sports Investing</title>
   <meta name="description" content="ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering, and fractional Kelly sizing to find daily sports betting picks with genuine edge. Free during beta.">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:         #080b12;
@@ -40,15 +40,16 @@
       backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(26,34,56,0.6);
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-logo svg { width: 26px; height: 26px; }
-    .nav-logo span {
-      font-family: var(--font-head);
-      font-size: 1.6rem;
-      color: var(--text);
-      letter-spacing: 0.03em;
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.55rem;
+      letter-spacing: -0.02em;
+      color: #e8eaf0;
+      line-height: 1;
     }
-    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
     .nav-links { display: flex; align-items: center; gap: 2rem; }
     .nav-links a {
       font-family: var(--font-mono);
@@ -150,7 +151,7 @@
       pointer-events: none;
     }
 
-    .hero-content { position: relative; max-width: 640px; }
+    .hero-content { position: relative; max-width: 1200px; width: 100%; margin: 0 auto; }
 
     .hero-eyebrow {
       font-family: var(--font-mono);
@@ -375,40 +376,59 @@
 
     .picks-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1rem;
     }
+
+    /* ── Pick card — redesigned ── */
     .pick-card {
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem 1.4rem;
+      border-radius: 10px;
+      padding: 0;
       position: relative;
       overflow: hidden;
-      transition: border-color 0.2s, transform 0.2s;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
     }
-    .pick-card:hover { border-color: rgba(240,180,41,0.3); transform: translateY(-2px); }
+    .pick-card:hover {
+      border-color: rgba(240,180,41,0.35);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+
+    /* Colored left accent bar by sport */
     .pick-card::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--gold), transparent);
+      top: 0; left: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      opacity: 0.7;
     }
+    .pick-card.nba::before   { background: #1db954; }
+    .pick-card.ncaab::before { background: #60a5fa; }
+    .pick-card.nhl::before   { background: #a78bfa; }
+    .pick-card.mlb::before   { background: #f87171; }
+    .pick-card.soccer::before{ background: #2dd4bf; }
+    .pick-card.tennis::before{ background: #fb923c; }
+
+    .pick-card-inner { padding: 1.1rem 1.3rem 1.1rem 1.4rem; }
+
+    /* Top row: sport badge + EV pill */
     .pick-card-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 0.8rem;
+      align-items: center;
+      margin-bottom: 0.85rem;
     }
     .pick-badge {
       font-family: var(--font-mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 0.2rem 0.5rem;
+      padding: 0.18rem 0.5rem;
       border-radius: 3px;
-      background: rgba(240,180,41,0.12);
+      background: rgba(240,180,41,0.1);
       color: var(--gold);
     }
     .pick-badge.nba   { background: rgba(29,185,84,0.1);   color: #1db954; }
@@ -417,61 +437,108 @@
     .pick-badge.mlb   { background: rgba(239,68,68,0.1);   color: #f87171; }
     .pick-badge.soccer{ background: rgba(20,184,166,0.1);  color: #2dd4bf; }
     .pick-badge.tennis{ background: rgba(249,115,22,0.1);  color: #fb923c; }
-    .pick-ev {
+
+    /* EV pill — prominent */
+    .pick-ev-pill {
       font-family: var(--font-mono);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      font-weight: 500;
       color: var(--green);
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.2);
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
     }
-    .pick-matchup {
-      font-size: 0.82rem;
+    .pick-ev-pill.suppressed {
       color: var(--muted);
-      margin-bottom: 0.3rem;
+      background: transparent;
+      border-color: var(--border);
     }
+
+    /* Matchup */
+    .pick-matchup {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      font-weight: 300;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Pick team — main emphasis */
     .pick-pick {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.85rem;
+      line-height: 1.2;
     }
+
+    /* Divider */
+    .pick-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 0 0.8rem;
+      opacity: 0.6;
+    }
+
+    /* Bottom meta row */
     .pick-meta {
       display: flex;
-      gap: 1rem;
+      gap: 0;
       align-items: center;
+      justify-content: space-between;
     }
-    .pick-odds {
+    .pick-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .pick-meta-label {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+    .pick-meta-val {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
       color: var(--gold);
     }
-    .pick-book {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
+    .pick-meta-val.book {
       color: var(--muted);
+      font-size: 0.72rem;
     }
-    .pick-blur {
-      filter: blur(5px);
-      user-select: none;
-      pointer-events: none;
-    }
+
+    /* Blur overlay for gated cards */
+    .pick-blur .pick-pick,
+    .pick-blur .pick-meta { filter: blur(5px); user-select: none; pointer-events: none; }
     .pick-gate {
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(8,11,18,0.7);
+      background: rgba(8,11,18,0.65);
       backdrop-filter: blur(2px);
     }
     .pick-gate-text {
       font-family: var(--font-mono);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--gold);
-      border: 1px solid rgba(240,180,41,0.3);
-      padding: 0.4rem 0.8rem;
+      border: 1px solid rgba(240,180,41,0.35);
+      padding: 0.45rem 0.9rem;
       border-radius: 4px;
+      text-decoration: none;
+      transition: background 0.2s;
     }
+    .pick-gate-text:hover { background: rgba(240,180,41,0.08); }
 
     /* ── How it works ── */
     .how-section {
@@ -572,6 +639,8 @@
       text-align: center;
       position: relative;
       overflow: hidden;
+      background: linear-gradient(135deg, rgba(240,180,41,0.05), rgba(240,180,41,0.02));
+      border-top: 1px solid rgba(240,180,41,0.12);
     }
     .cta-section::before {
       content: '';
@@ -602,7 +671,26 @@
       font-size: 0.65rem;
       letter-spacing: 0.08em;
       color: var(--muted);
-      margin-top: 1rem;
+      margin-top: 1.75rem;
+    }
+
+    /* Email form inside CTA section */
+    .cta-form {
+      flex-direction: column;
+      align-items: center;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .cta-form input[type="email"],
+    .cta-form select {
+      width: 100%;
+      min-width: unset;
+    }
+    .cta-form button {
+      width: 100%;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      padding: 0.9rem 2rem;
     }
 
     /* ── Footer ── */
@@ -674,12 +762,7 @@
 <!-- Nav -->
 <nav>
   <a class="nav-logo" href="/">
-    <svg viewBox="0 0 26 26" fill="none">
-      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
-      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
-      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
-    </svg>
-    <span>Arc<em>Vest</em></span>
+    <span class="wordmark">Arc<em>Vest</em></span>
   </a>
   <div class="nav-links">
     <a href="/scorecard.html">Scorecard</a>
@@ -713,7 +796,7 @@
     </h1>
     <p class="hero-sub">
       ArcVest applies institutional-grade Pythagorean models, two-gate EV filtering,
-      and fractional Kelly sizing to identify daily sports investment trades.
+      and fractional Kelly sizing to find daily sports investment trades with genuine edge.
       No gut feel. No touts. Pure math.
     </p>
     <div class="hero-actions">
@@ -742,35 +825,13 @@
   </div>
 </section>
 
-<!-- Email capture band -->
-<div class="email-band" id="waitlist">
-  <div class="email-band-inner">
-    <div class="email-band-title">JOIN THE ARCVEST WAITLIST</div>
-    <p class="email-band-sub">Get launch updates, new EdgeVault tools, and public model insights as ArcVest moves from soft launch to full release.</p>
-    <form class="email-form" name="arcvest-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
-      <input type="hidden" name="form-name" value="arcvest-waitlist" />
-      <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
-      <input type="email" name="email" placeholder="Email address" required />
-      <select name="interest">
-        <option value="" disabled selected>What are you most interested in?</option>
-        <option value="scorecard">Public Scorecard updates</option>
-        <option value="odds">Odds page access</option>
-        <option value="daily-card">Daily Card waitlist</option>
-        <option value="edgevault">EdgeVault tools &amp; articles</option>
-      </select>
-      <button type="submit">Join the Waitlist</button>
-    </form>
-    <div class="email-note">
-      We will send occasional product updates, new tool releases, and launch notes. No spam, no hype, and no promises of guaranteed results.
-    </div>
-  </div>
-</div>
+
 
 <!-- Live trades teaser -->
 <section class="picks-section">
   <div class="section-label">Today's Market Signals — Free Preview</div>
   <h2 class="section-title">What the Model Found Today</h2>
-  <p class="section-sub">EV and matchup visible free. Full trade details and Kelly sizing on the Scorecard.</p>
+  <p class="section-sub">Filtered to highest-conviction trades. Full Kelly sizing and trade details on the Scorecard.</p>
 
   <div class="picks-grid" id="picks-grid">
     <!-- populated by JS from daily_picks.json -->
@@ -833,18 +894,30 @@
   </div>
 </section>
 
-<!-- CTA section -->
-<section class="cta-section">
+<!-- CTA + Waitlist — merged closing section -->
+<section class="cta-section" id="waitlist">
   <div class="cta-inner">
     <h2 class="cta-title">Start Finding<br><span>Real Edge</span></h2>
     <p class="cta-sub">
-      Free during beta. No credit card required.
-      See today's trades, track the model, decide if it's for you.
+      Get launch updates, new EdgeVault tools, and public model insights as ArcVest moves from soft launch to full release.
     </p>
-    <a class="btn-primary" href="#waitlist" style="font-size:0.85rem; padding: 1rem 2.5rem;">
-      Get Daily Trades — Free
-    </a>
+    <form class="email-form cta-form" name="arcvest-waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+      <input type="hidden" name="form-name" value="arcvest-waitlist" />
+      <p class="hidden"><label>Don't fill this out: <input name="bot-field" /></label></p>
+      <input type="email" name="email" placeholder="Email address" required />
+      <select name="interest">
+        <option value="" disabled selected>What interests you most?</option>
+        <option value="scorecard">Public Scorecard updates</option>
+        <option value="odds">Odds page access</option>
+        <option value="daily-card">Daily Card waitlist</option>
+        <option value="edgevault">EdgeVault tools &amp; articles</option>
+      </select>
+      <button type="submit">Get Daily Trades — Free</button>
+    </form>
     <div class="cta-note">Free during beta · No credit card · Unsubscribe anytime</div>
+    <div class="cta-note" style="margin-top:0.5rem; opacity:0.6;">
+      We will send occasional product updates, new tool releases, and launch notes. No spam, no hype, and no promises of guaranteed results.
+    </div>
   </div>
 </section>
 
@@ -888,21 +961,66 @@ async function loadJSON(path) {
 // Sport badge helper
 function sportBadge(sport) {
   const s = (sport || '').toUpperCase();
-  if (s.includes('NBA'))                    return ['nba',    'NBA'];
-  if (s.includes('NCAAB'))                  return ['ncaab',  'NCAAB'];
-  if (s.includes('NHL'))                    return ['nhl',    'NHL'];
-  if (s.includes('MLB'))                    return ['mlb',    'MLB'];
-  if (s.includes('SOCCER'))                 return ['soccer', '⚽ ' + s.replace('SOCCER-','').replace('SOCCER ','')];
-  if (s.includes('ATP') || s.includes('WTA')) return ['tennis','🎾 Tennis'];
-  if (s.includes('CHA'))                    return ['tennis', '🎾 Challenger'];
+  if (s.includes('NBA'))                       return ['nba',    'NBA'];
+  if (s.includes('NCAAB'))                     return ['ncaab',  'NCAAB'];
+  if (s.includes('NHL'))                       return ['nhl',    'NHL'];
+  if (s.includes('MLB'))                       return ['mlb',    'MLB'];
+  if (s.includes('SOCCER'))                    return ['soccer', '⚽ ' + s.replace('SOCCER-','').replace('SOCCER ','')];
+  if (s.includes('ATP') || s.includes('WTA'))  return ['tennis', '🎾 Tennis'];
+  if (s.includes('CHA'))                       return ['tennis', '🎾 Challenger'];
   return ['', sport];
 }
 
-// Cap EV display — anything over 200% is a data artifact, show as "--"
+// EV display — EV is already a percentage in daily_picks.json (e.g. 29.3 = 29.3%)
+// Cap at 75% — anything above is a data artifact, suppress it
 function formatEV(raw) {
-  const val = (raw || 0) * 100;
-  if (val > 200) return '—';
-  return val.toFixed(1) + '%';
+  const val = parseFloat(raw) || 0;
+  if (val > 75) return null;
+  if (val < 5)  return null;
+  return '+' + val.toFixed(1) + '%';
+}
+
+// Sport family grouping — consolidates all tennis variants into one group
+function sportFamily(sport) {
+  const s = (sport || '').toUpperCase();
+  if (s.includes('NBA'))   return 'NBA';
+  if (s.includes('MLB'))   return 'MLB';
+  if (s.includes('NHL'))   return 'NHL';
+  if (s.includes('NCAAB')) return 'NCAAB';
+  if (s.includes('NFL'))   return 'NFL';
+  // All tennis: ATP, WTA, CHA variants → one group
+  if (s.includes('ATP') || s.includes('WTA') || s.includes('CHA') ||
+      s.includes('TENNIS')) return 'Tennis';
+  return 'Other';
+}
+
+// Best-per-sport selection:
+// Quality band: EV 5–75%, odds 1.50–6.00, placed picks only
+// Then take the single highest-EV pick per sport family, sorted by EV desc
+function bestPerSport(picks) {
+  const qualified = picks.filter(p => {
+    const odds = parseFloat(p.Odds) || 0;
+    const ev   = parseFloat(p.EV)   || 0;
+    const placed = (p.placed || '').toString().toUpperCase();
+    return odds >= 1.50 && odds <= 6.00 &&
+           ev >= 5 && ev <= 75 &&
+           placed === 'TRUE';
+  });
+
+  // Group by sport family, keep highest EV per group
+  const best = {};
+  qualified.forEach(p => {
+    const family = sportFamily(p.Sport);
+    const ev = parseFloat(p.EV) || 0;
+    if (!best[family] || ev > parseFloat(best[family].EV)) {
+      best[family] = p;
+    }
+  });
+
+  // Return as array sorted by EV descending
+  return Object.values(best).sort((a, b) =>
+    (parseFloat(b.EV) || 0) - (parseFloat(a.EV) || 0)
+  );
 }
 
 async function init() {
@@ -911,7 +1029,7 @@ async function init() {
     loadJSON('data/paper_log.json'),
   ]);
 
-  // Stats bar — trades today
+  // Stats bar — trades today (raw count before filter)
   if (picks) {
     document.getElementById('stat-picks').textContent = picks.length;
   }
@@ -939,34 +1057,60 @@ async function init() {
     }).join('');
   }
 
-  // Trades teaser — show first 6, blur last 3
+  // Trades teaser — best per sport family, no blur needed (max ~5 cards)
   if (picks && picks.length) {
     const grid   = document.getElementById('picks-grid');
-    const sample = picks.slice(0, 6);
+    const sample = bestPerSport(picks);
+
+    if (sample.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;
+        font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);padding:3rem 0;">
+        No high-conviction trades found today. Check back tomorrow.</div>`;
+      return;
+    }
+
     grid.innerHTML = sample.map((p, i) => {
-      const [badgeClass, badgeText] = sportBadge(p.Sport || p.sport);
-      const ev     = formatEV(p.EV || p.bet_ev || 0);
-      const home   = p.Home  || p.home_team  || '';
-      const away   = p.Away  || p.away_team  || '';
-      const pick   = p.Pick  || p.bet_team   || '';
-      const oddsRaw = parseFloat(p.Odds || p.bet_ml || 0);
-      const odds   = isNaN(oddsRaw) ? '—' : oddsRaw.toFixed(2);
-      const book   = p.Book  || p.bookmaker_name || '';
+      const [badgeClass, badgeText] = sportBadge(p.Sport);
+      const evStr   = formatEV(p.EV);
+      const home    = p.Home  || '';
+      const away    = p.Away  || '';
+      const pick    = p.Pick  || '';
+      const oddsRaw = parseFloat(p.Odds) || 0;
+      const odds    = oddsRaw ? oddsRaw.toFixed(2) : '—';
+      const book    = p.Book  || '';
+      const betType = p['Bet Type'] || '';
       const isGated = i >= 3;
 
+      const evPill = evStr
+        ? `<span class="pick-ev-pill">${evStr} EV</span>`
+        : `<span class="pick-ev-pill suppressed">EV —</span>`;
+
       return `
-        <div class="pick-card">
-          <div class="pick-card-top">
-            <span class="pick-badge ${badgeClass}">${badgeText}</span>
-            <span class="pick-ev">${ev !== '—' ? '+EV ' + ev : 'EV —'}</span>
+        <div class="pick-card ${badgeClass}${isGated ? ' pick-blur-card' : ''}">
+          <div class="pick-card-inner">
+            <div class="pick-card-top">
+              <span class="pick-badge ${badgeClass}">${badgeText}</span>
+              ${evPill}
+            </div>
+            <div class="pick-matchup">${away} @ ${home}</div>
+            <div class="pick-pick ${isGated ? 'pick-blur' : ''}">${pick}</div>
+            <div class="pick-divider"></div>
+            <div class="pick-meta ${isGated ? 'pick-blur' : ''}">
+              <div class="pick-meta-item">
+                <span class="pick-meta-label">Odds</span>
+                <span class="pick-meta-val">${odds}</span>
+              </div>
+              <div class="pick-meta-item">
+                <span class="pick-meta-label">Type</span>
+                <span class="pick-meta-val book">${betType}</span>
+              </div>
+              <div class="pick-meta-item" style="text-align:right">
+                <span class="pick-meta-label">Book</span>
+                <span class="pick-meta-val book">${book}</span>
+              </div>
+            </div>
           </div>
-          <div class="pick-matchup">${home} vs ${away}</div>
-          <div class="pick-pick ${isGated ? 'pick-blur' : ''}">${pick}</div>
-          <div class="pick-meta ${isGated ? 'pick-blur' : ''}">
-            <span class="pick-odds">${odds}</span>
-            <span class="pick-book">${book}</span>
-          </div>
-          ${isGated ? '<div class="pick-gate"><span class="pick-gate-text">View Full Scorecard →</span></div>' : ''}
+          ${isGated ? '<div class="pick-gate"><a class="pick-gate-text" href="/scorecard.html">View Full Scorecard →</a></div>' : ''}
         </div>`;
     }).join('');
   }

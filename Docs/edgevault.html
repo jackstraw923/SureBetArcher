@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — EdgeVault</title>
   <meta name="description" content="EdgeVault by ArcVest — free tools and educational content for quantitative sports bettors. No-vig calculator, odds converter, hedge calculator, and deep-dive articles.">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg:        #080b12;
@@ -39,10 +39,16 @@
       backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(26,34,56,0.6);
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-logo svg { width: 24px; height: 24px; }
-    .nav-logo span { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); letter-spacing: 0.03em; }
-    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: #e8eaf0;
+      line-height: 1;
+    }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
     .nav-links { display: flex; align-items: center; gap: 2rem; }
     .nav-links a {
       font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
@@ -498,6 +504,25 @@
     @media (min-width: 901px) {
       .sidebar-toggle-btn { display: none; }
     }
+    /* ── Ad placeholders ── */
+    .ad-slot {
+      width: 100%;
+      margin: 1.5rem 0;
+      display: flex;
+      justify-content: center;
+    }
+    .ad-slot-inner {
+      /* Constrain to standard sizes; swap content for real ad code at launch */
+      max-width: 728px;
+      width: 100%;
+      min-height: 90px;
+      background: transparent;
+      /* Uncomment border below to visualize placement during development: */
+      /* border: 1px dashed rgba(240,180,41,0.2); */
+    }
+    @media (max-width: 768px) {
+      .ad-slot-inner { max-width: 320px; min-height: 100px; }
+    }
   </style>
 </head>
 <body>
@@ -505,15 +530,11 @@
 <!-- Top nav -->
 <nav class="topnav">
   <a class="nav-logo" href="/">
-    <svg viewBox="0 0 26 26" fill="none">
-      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
-      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
-      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
-    </svg>
-    <span>Arc<em>Vest</em></span>
+    <span class="wordmark">Arc<em>Vest</em></span>
   </a>
   <div class="nav-links">
     <a href="/scorecard.html">Scorecard</a>
+    <a href="/daily-card.html">Daily Card</a>
     <a href="/tournaments.html">Tournaments</a>
     <a href="/edgevault.html" class="active">EdgeVault</a>
     <a href="/odds.html">Odds</a>
@@ -527,6 +548,7 @@
 <!-- Mobile menu -->
 <div class="nav-mobile-menu" id="mobile-menu">
   <a href="/scorecard.html">Scorecard</a>
+  <a href="/daily-card.html">Daily Card</a>
   <a href="/tournaments.html">Tournaments</a>
   <a href="/edgevault.html" style="color:var(--gold);">EdgeVault</a>
   <a href="/odds.html">Odds</a>
@@ -612,6 +634,16 @@
     <div style="margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border);">
       <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem;">EdgeVault · Research &amp; Utility Hub</div>
       <p style="font-size:0.85rem;color:var(--muted);font-weight:300;line-height:1.7;max-width:580px;">EdgeVault is ArcVest's research and utility hub. Explore the math behind expected value, use the same core tools that disciplined traders use to evaluate lines, and learn how ArcVest approaches position sizing, price, and portfolio management.</p>
+    </div>
+
+    <!-- ── Ad Slot 1 — Top of content, below intro ──────────────
+         Replace inner div content with AdSense or Adsterra code at launch.
+         Desktop: 728×90 leaderboard | Mobile: 320×100
+    ─────────────────────────────────────────────────────────── -->
+    <div class="ad-slot" id="ad-slot-top">
+      <div class="ad-slot-inner">
+        <!-- AD CODE HERE -->
+      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════
@@ -850,6 +882,16 @@
           </div>
         </div>
         <p class="tool-note">Hedging reduces upside in exchange for certainty. Whether to hedge depends on your bankroll position, the odds movement, and your edge conviction. A hedge that eliminates all upside on a +EV original bet may not be optimal long-run.</p>
+      </div>
+    </div>
+
+    <!-- ── Ad Slot 2 — Between tools and articles ────────────────
+         Replace inner div content with AdSense or Adsterra code at launch.
+         Desktop: 728×90 leaderboard | Mobile: 300×250 rectangle
+    ─────────────────────────────────────────────────────────── -->
+    <div class="ad-slot" id="ad-slot-mid">
+      <div class="ad-slot-inner">
+        <!-- AD CODE HERE -->
       </div>
     </div>
 

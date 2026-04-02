@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Privacy Policy</title>
+  <meta name="description" content="ArcVest Privacy Policy — how we collect, use, and protect your information.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080b12; --bg2: #0e1220; --border: #1a2238;
+      --gold: #f0b429; --text: #eceef4; --muted: #6b7794;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Outfit', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(8,11,18,0.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(26,34,56,0.6);
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo .wordmark { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; color: #e8eaf0; line-height: 1; }
+    .nav-logo .wordmark em { color: #c9a84c; font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; }
+    .nav-mobile-menu { display: none; position: fixed; top: 57px; left: 0; right: 0; background: rgba(8,11,18,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); padding: 1.5rem 2.5rem; flex-direction: column; gap: 1.2rem; z-index: 99; }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4); }
+
+    .main { max-width: 780px; margin: 0 auto; padding: 4rem 2.5rem 6rem; }
+    .page-eyebrow { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .page-title { font-family: var(--font-head); font-size: 3rem; letter-spacing: 0.03em; color: var(--text); margin-bottom: 0.5rem; }
+    .page-meta { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+
+    .doc h2 { font-family: var(--font-head); font-size: 1.4rem; letter-spacing: 0.05em; color: var(--text); margin: 2.5rem 0 0.75rem; }
+    .doc p { font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 1rem; }
+    .doc ul { margin: 0.5rem 0 1rem 1.5rem; }
+    .doc ul li { font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; margin-bottom: 0.3rem; }
+    .doc a { color: var(--gold); text-decoration: none; }
+    .doc a:hover { text-decoration: underline; }
+
+    footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; color: var(--muted); }
+    .footer-logo em { color: #c9a84c; font-style: normal; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-disc { width: 100%; font-size: 0.65rem; color: var(--muted); font-family: var(--font-mono); border-top: 1px solid var(--border); padding-top: 1rem; line-height: 1.5; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      nav { padding: 1rem 1.5rem; }
+      .main { padding: 3rem 1.5rem 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/"><span class="wordmark">Arc<em>Vest</em></span></a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/daily-card.html">Daily Card</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/odds.html">Odds</a>
+  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="nav-mobile-menu" id="mobile-menu">
+  <a href="/">Home</a>
+  <a href="/scorecard.html">Scorecard</a>
+  <a href="/daily-card.html">Daily Card</a>
+  <a href="/edgevault.html">EdgeVault</a>
+  <a href="/odds.html">Odds</a>
+</div>
+
+<main class="main">
+  <div class="page-eyebrow">Legal</div>
+  <h1 class="page-title">Privacy Policy</h1>
+  <div class="page-meta">Last updated: April 1, 2026 &nbsp;·&nbsp; ArcVest / Mountain Engineering &nbsp;·&nbsp; arcvest.io</div>
+
+  <div class="doc">
+    <h2>Overview</h2>
+    <p>ArcVest ("we," "us," or "our") operates arcvest.io. This Privacy Policy explains what information we collect, how we use it, and your rights with respect to that information. By using this site you agree to the practices described here.</p>
+
+    <h2>Information We Collect</h2>
+    <p>We collect information you provide directly, including:</p>
+    <ul>
+      <li>Email address when you join the waitlist or subscribe to updates</li>
+      <li>Interest preferences submitted through our waitlist form</li>
+    </ul>
+    <p>We may also collect limited technical data automatically, including browser type, pages visited, and approximate location, through standard analytics tools. We do not collect sensitive personal information such as financial account details or government identifiers.</p>
+
+    <h2>How We Use Your Information</h2>
+    <p>We use collected information to:</p>
+    <ul>
+      <li>Send product updates, new tool announcements, and model insights you opted into</li>
+      <li>Improve site functionality and understand how visitors use ArcVest</li>
+      <li>Communicate launch timing, membership availability, and material changes</li>
+    </ul>
+    <p>We do not sell, rent, or trade your personal information to third parties for their marketing purposes.</p>
+
+    <h2>Email Communications</h2>
+    <p>If you join our waitlist, you will receive occasional product updates and launch notes. Every email includes an unsubscribe link. You can also opt out at any time by emailing us at the contact address below.</p>
+
+    <h2>Cookies and Analytics</h2>
+    <p>ArcVest may use cookies and third-party analytics services (such as Google Analytics) to understand site usage. These tools may set cookies in your browser. You can disable cookies through your browser settings, though some site functionality may be affected.</p>
+    <p>If we serve advertisements through Google AdSense or similar platforms, those services may use cookies to show relevant ads based on your browsing history. You can opt out of personalized advertising at <a href="https://adssettings.google.com" target="_blank">adssettings.google.com</a>.</p>
+
+    <h2>Data Retention</h2>
+    <p>We retain your email address and preferences for as long as you remain subscribed. You may request deletion of your information at any time by contacting us.</p>
+
+    <h2>Third-Party Links</h2>
+    <p>ArcVest may link to external sites including sportsbooks, data providers, and research resources. We are not responsible for the privacy practices of those sites and encourage you to review their policies independently.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>ArcVest is not directed at individuals under 21 years of age. We do not knowingly collect information from minors. If you believe a minor has submitted information to us, please contact us and we will remove it promptly.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Material changes will be noted by updating the "Last updated" date above. Continued use of the site after changes constitutes acceptance of the revised policy.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy or requests to access, correct, or delete your information can be directed to: <a href="mailto:contact@arcvest.io">contact@arcvest.io</a></p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">Arc<em>Vest</em></div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/about.html">About</a>
+    <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+});
+</script>
+</body>
+</html>
