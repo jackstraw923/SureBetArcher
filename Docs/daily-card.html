@@ -89,20 +89,20 @@
   }
   .nav-center a:hover { color: var(--text); }
   .nav-center a.active { color: var(--gold); }
-  .nav-right { display: flex; align-items: center; gap: 1.5rem; }
-  .nav-stat { display: flex; flex-direction: column; align-items: flex-end; }
-  .nav-stat-label {
-    font-family: var(--font-mono); font-size: 0.6rem;
-    color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s;
+    white-space: nowrap;
   }
-  .nav-stat-value {
-    font-family: var(--font-mono); font-size: 0.85rem;
-    font-weight: 500; color: var(--text);
-  }
-  .nav-run {
-    font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted);
-    padding: 0.25rem 0.6rem; border: 1px solid var(--border); border-radius: 4px;
-  }
+  .nav-cta:hover { background: var(--gold); color: var(--bg); }
 
   /* ── Disclaimer ── */
   .disclaimer {
@@ -133,6 +133,13 @@
     font-family: var(--font-head);
     font-size: 2rem; letter-spacing: 0.05em; color: var(--text);
   }
+  .page-stats {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.72rem;
+    color: var(--gold); letter-spacing: 0.06em;
+    margin-top: 0.2rem;
+  }
+  .page-stats-sep { color: var(--muted); }
   .page-sub {
     font-family: var(--font-mono); font-size: 0.65rem;
     color: var(--muted); letter-spacing: 0.06em; margin-top: 0.25rem;
@@ -291,12 +298,11 @@
   @media (max-width: 900px) {
     .nav-center { display: none; }
     .nav-hamburger { display: flex; }
+    .nav-cta { display: none; }
   }
   @media (max-width: 600px) {
     .main { padding: 1rem; }
     nav { padding: 0 1rem; }
-    .nav-right { gap: 0.75rem; }
-    .nav-stat:not(:first-child) { display: none; }
   }
 </style>
 </head>
@@ -308,36 +314,25 @@
     <span class="nav-logo-name">Arc<em>Vest</em></span>
   </a>
   <div class="nav-center">
-    <a href="/">Home</a>
     <a href="/scorecard.html">Scorecard</a>
     <a href="/daily-card.html" class="active">Daily Card</a>
+    <a href="/odds.html">Odds</a>
     <a href="/tournaments.html">Tournaments</a>
     <a href="/edgevault.html">EdgeVault</a>
-    <a href="/odds.html">Odds</a>
   </div>
-  <div class="nav-right">
-    <div class="nav-stat">
-      <span class="nav-stat-label">Trades</span>
-      <span class="nav-stat-value" id="header-count">—</span>
-    </div>
-    <div class="nav-stat">
-      <span class="nav-stat-label">Total Risk</span>
-      <span class="nav-stat-value" id="header-risk">—</span>
-    </div>
-    <div class="nav-run" id="last-run">Loading...</div>
-    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
 </nav>
 
 <div class="nav-mobile-menu" id="mobile-menu">
-  <a href="/">Home</a>
   <a href="/scorecard.html">Scorecard</a>
   <a href="/daily-card.html" class="active">Daily Card</a>
+  <a href="/odds.html">Odds</a>
   <a href="/tournaments.html">Tournaments</a>
   <a href="/edgevault.html">EdgeVault</a>
-  <a href="/odds.html">Odds</a>
+  <a href="/membership.html" style="color:var(--gold);">Login / Sign Up</a>
 </div>
 
 <!-- ── Disclaimer ── -->
@@ -354,6 +349,13 @@
   <div class="page-header">
     <div>
       <div class="page-title">The Daily Card</div>
+      <div class="page-stats" id="page-stats">
+        <span id="page-date">—</span>
+        <span class="page-stats-sep">·</span>
+        <span id="page-trades">— Trades</span>
+        <span class="page-stats-sep">·</span>
+        <span id="page-risk">$— Total Risk</span>
+      </div>
       <div class="page-sub">Full model trade slate · Kelly sizing · EV · Best-book selection · Free during beta</div>
     </div>
     <a class="back-link" href="/scorecard.html">← Scorecard</a>
@@ -497,8 +499,13 @@ function buildSportFilters() {
   const totalRisk = allPicks.reduce((s,p) => s + parseFloat(p['Risk $'] || p.risk_dollar || 0), 0);
   document.getElementById('picks-count').textContent =
     `${allPicks.length} trades · ${fmt.dollar(totalRisk)} total risk`;
-  document.getElementById('header-count').textContent = allPicks.length;
-  document.getElementById('header-risk').textContent  = fmt.dollar(totalRisk);
+
+  // Page header stats line
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', {month:'2-digit', day:'2-digit', year:'numeric'});
+  document.getElementById('page-date').textContent = dateStr;
+  document.getElementById('page-trades').textContent = `${allPicks.length} Trades`;
+  document.getElementById('page-risk').textContent = `${fmt.dollar(totalRisk)} Total Risk`;
 }
 
 function filterPicks(sport) {
@@ -567,16 +574,10 @@ async function init() {
   allPicks = picksData   || [];
   summary  = summaryData || {};
 
-  // Header last run
-  const el = document.getElementById('last-run');
-  el.textContent = summary.last_run ? `Run: ${summary.last_run}` : 'Paper trading · Live';
-
   if (!allPicks.length) {
     document.getElementById('picks-tbody').innerHTML =
       '<tr><td colspan="11" class="empty">No trades today — check back after the morning run.</td></tr>';
     document.getElementById('picks-count').textContent = '0 trades';
-    document.getElementById('header-count').textContent = '0';
-    document.getElementById('header-risk').textContent = '$0.00';
     return;
   }
 
