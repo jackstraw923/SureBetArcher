@@ -41,7 +41,7 @@
     --teal:         #10b981;
     --red:          #ef4444;
     --text:         #eceef4;
-    --muted:        #8e9ab5;
+    --muted:        #b0bdd4;
     --font-head:    'Bebas Neue', sans-serif;
     --font-body:    'Outfit', sans-serif;
     --font-mono:    'DM Mono', monospace;
@@ -74,7 +74,7 @@
   .nav-logo-name {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     letter-spacing: -0.02em;
     color: #e8eaf0;
     line-height: 1;
@@ -83,7 +83,7 @@
   .nav-center { display: flex; align-items: center; gap: 2rem; }
   .nav-center a {
     font-family: var(--font-mono);
-    font-size: 0.7rem; letter-spacing: 0.1em;
+    font-size: 0.72rem; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--muted);
     text-decoration: none; transition: color 0.2s;
   }
@@ -166,11 +166,11 @@
 
   /* ── Picks Table ── */
   .table-wrapper { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.73rem; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
   thead tr { border-bottom: 1px solid var(--border-light); }
   th {
     padding: 0.6rem 0.75rem; text-align: left;
-    color: var(--muted); font-weight: 400; font-size: 0.62rem;
+    color: var(--muted); font-weight: 400; font-size: 0.68rem;
     text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap;
   }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
@@ -396,16 +396,17 @@
 
 </main>
 
-<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2rem;">
-  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-0.02em;color:#8e9ab5;">Arc<span style="color:#c9a84c">Vest</span></div>
-  <div style="display:flex;gap:1.5rem;">
-    <a href="/" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Home</a>
-    <a href="/scorecard.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Scorecard</a>
-    <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Tournaments</a>
-    <a href="/edgevault.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">EdgeVault</a>
-    <a href="/odds.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Odds</a>
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2rem;">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.02em;color:#8e9ab5;">Arc<span style="color:#c9a84c">Vest</span></div>
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+    <a href="/" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;">Home</a>
+    <a href="/scorecard.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;">Scorecard</a>
+    <a href="/daily-card.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;transition:color 0.2s;">Daily Card</a>
+    <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;">Tournaments</a>
+    <a href="/edgevault.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;">EdgeVault</a>
+    <a href="/odds.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;">Odds</a>
   </div>
-  <div style="width:100%;font-size:0.62rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;">
+  <div style="width:100%;font-size:0.68rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;line-height:1.5;">
     For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io
   </div>
 </footer>
@@ -447,7 +448,8 @@ const fmt = {
   odds:   v => v == null ? '—' : parseFloat(v).toFixed(2),
   // EV guard: daily_picks.json writes whole-number pct (e.g. 29.3 = 29.3%)
   // manifest will write decimal (e.g. 0.293) — guard handles both
-  ev:     v => { if (v == null) return '—'; const pct = Math.abs(parseFloat(v)) < 10 ? parseFloat(v)*100 : parseFloat(v); return `${pct.toFixed(1)}%`; },
+  // Threshold is < 1: decimal format is always 0–1, whole-number is always >= 1
+  ev:     v => { if (v == null) return '—'; const pct = Math.abs(parseFloat(v)) < 1 ? parseFloat(v)*100 : parseFloat(v); return `${pct.toFixed(1)}%`; },
   kelly:  v => v == null ? '—' : parseFloat(v).toFixed(4),
 };
 
@@ -467,7 +469,7 @@ function sportBadge(sport) {
 
 function evPips(ev) {
   const raw = parseFloat(ev);
-  const pct = Math.abs(raw) < 10 ? raw * 100 : raw;
+  const pct = Math.abs(raw) < 1 ? raw * 100 : raw;
   const lit = pct > 100 ? 5 : pct > 50 ? 4 : pct > 20 ? 3 : pct > 10 ? 2 : pct > 5 ? 1 : 0;
   return Array.from({length:5}, (_,i) =>
     `<span class="ev-pip ${i < lit ? 'lit' : ''}"></span>`
