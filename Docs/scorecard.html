@@ -73,12 +73,12 @@
   }
   .nav-logo-name em { color: #c9a84c; font-style: normal; }
 
-  .nav-center {
+  .nav-links {
     display: flex;
     align-items: center;
     gap: 2rem;
   }
-  .nav-center a {
+  .nav-links a {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.1em;
@@ -87,8 +87,8 @@
     text-decoration: none;
     transition: color 0.2s;
   }
-  .nav-center a:hover { color: var(--text); }
-  .nav-center a.active { color: var(--gold); }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a.active { color: var(--gold); }
 
   .nav-cta {
     font-family: var(--font-mono);
@@ -497,7 +497,7 @@
     .kpi-grid { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 900px) {
-    .nav-center { display: none; }
+    .nav-links { display: none; }
     .nav-hamburger { display: flex; }
     .nav-cta { display: none; }
   }
@@ -516,7 +516,7 @@
     <span class="nav-logo-name">Arc<em>Vest</em></span>
   </a>
 
-  <div class="nav-center">
+  <div class="nav-links">
     <a href="/scorecard.html" class="active">Scorecard</a>
     <a href="/daily-card.html">Daily Card</a>
     <a href="/odds.html">Odds</a>
