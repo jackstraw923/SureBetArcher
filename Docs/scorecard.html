@@ -650,34 +650,53 @@
     </div>
   </div>
 
-  <!-- ── Deeper Breakdown Tabs (placeholder — populated when market.json is live) ── -->
-  <div style="margin-top:2.5rem;" class="fade-in">
-    <div class="section-header">
-      <span class="section-title">Deeper Breakdowns</span>
-      <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);border:1px solid var(--border);padding:0.2rem 0.5rem;border-radius:3px;">Expanding Soon</span>
+  <!-- ── Model Scorecard — wired to scorecard.json (AssessorM) ── -->
+  <div style="margin-top:2.5rem;" class="fade-in" id="model-scorecard-section">
+
+    <!-- Section header with model KPI strip -->
+    <div class="section-header" style="margin-bottom:1rem;">
+      <span class="section-title">Model Scorecard</span>
+      <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);letter-spacing:0.06em;" id="model-last-updated">—</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;">
-      <div style="background:var(--bg2);padding:1.25rem;opacity:0.5;">
-        <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">By Bet Type</div>
-        <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">ML / Spread / Total</div>
-        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-top:0.3rem;">Win rate + ROI per market type</div>
+
+    <!-- Model overall KPIs -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;">
+      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Model Picks</div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--text);" id="model-picks">—</div>
       </div>
-      <div style="background:var(--bg2);padding:1.25rem;opacity:0.5;">
-        <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">By Book</div>
-        <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">FD / DK / HRB / FAN</div>
-        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-top:0.3rem;">CLV + ROI per sportsbook</div>
+      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Record</div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--text);" id="model-record">—</div>
       </div>
-      <div style="background:var(--bg2);padding:1.25rem;opacity:0.5;">
-        <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">By Odds Range</div>
-        <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">Fav / Even / Dog</div>
-        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-top:0.3rem;">Edge distribution by price bucket</div>
+      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Model ROI</div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;" id="model-roi">—</div>
       </div>
-      <div style="background:var(--bg2);padding:1.25rem;opacity:0.5;">
-        <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">CLV Tracker</div>
-        <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">Closing Line Value</div>
-        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-top:0.3rem;">Actual odds vs. closing line</div>
+      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Avg EV</div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--gold);" id="model-avg-ev">—</div>
+      </div>
+      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
+        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Avg CLV</div>
+        <div style="font-family:var(--font-head);font-size:1.5rem;" id="model-avg-clv">—</div>
+        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--muted);margin-top:0.2rem;">vs closing line</div>
       </div>
     </div>
+
+    <!-- Tabs: By Sport / By Bet Type / By Book -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;">
+      <button id="tab-sport"    onclick="switchTab('sport')"    style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid var(--gold);color:var(--gold);cursor:pointer;">By Sport</button>
+      <button id="tab-bettype"  onclick="switchTab('bettype')"  style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">By Bet Type</button>
+      <button id="tab-book"     onclick="switchTab('book')"     style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">By Book</button>
+      <button id="tab-recent"   onclick="switchTab('recent')"   style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">Recent Form</button>
+    </div>
+
+    <div id="tab-content-sport"   class="tab-panel"></div>
+    <div id="tab-content-bettype" class="tab-panel" style="display:none;"></div>
+    <div id="tab-content-book"    class="tab-panel" style="display:none;"></div>
+    <div id="tab-content-recent"  class="tab-panel" style="display:none;"></div>
+
   </div>
 
 </main>
@@ -691,14 +710,16 @@
 // Data file paths — relative to this HTML file
 // SureBet.R writes these to docs/data/ for GitHub Pages
 const DATA = {
-  picks:   'data/daily_picks.json',
-  paper:   'data/paper_log.json',
-  summary: 'data/summary.json'
+  picks:     'data/daily_picks.json',
+  paper:     'data/paper_log.json',
+  summary:   'data/summary.json',
+  scorecard: 'data/scorecard.json'
 };
 
 let allPicks = [];
 let paperLog = [];
 let summary  = {};
+let scorecard = {};
 
 // ── Inline data injection ─────────────────────────────────────────────────────
 // SureBet.R writes these variables directly into the HTML so the dashboard
@@ -707,6 +728,7 @@ let summary  = {};
 var INLINE_PICKS   = [{"Sport":"NBA","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Los Angeles Lakers","Away":"Denver Nuggets","Bet Type":"ML","Pick":"Los Angeles Lakers","Odds":2.44,"Book":"FanDuel","EV":26.9,"Kelly":0.0021,"Risk $":1.03},{"Sport":"NBA","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Los Angeles Lakers","Away":"Denver Nuggets","Bet Type":"ML","Pick":"Denver Nuggets","Odds":1.91,"Book":"Fanatics","EV":16.6,"Kelly":0.002,"Risk $":1.01},{"Sport":"NBA","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Miami Heat","Away":"Orlando Magic","Bet Type":"Spread","Pick":"Miami Heat +6.5","Odds":2.05,"Book":"DraftKings","EV":22.9,"Kelly":0.005,"Risk $":2.47},{"Sport":"NBA","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Los Angeles Lakers","Away":"Denver Nuggets","Bet Type":"Total","Pick":"Under 240.5","Odds":1.8,"Book":"Hard Rock Bet","EV":7.3,"Kelly":0.0018,"Risk $":0.91},{"Sport":"NHL","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Vegas Golden Knights","Away":"Chicago Blackhawks","Bet Type":"ML","Pick":"Chicago Blackhawks","Odds":4.25,"Book":"DraftKings","EV":70.5,"Kelly":0.0024,"Risk $":1.2},{"Sport":"NHL","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Dallas Stars","Away":"Detroit Red Wings","Bet Type":"ML","Pick":"Detroit Red Wings","Odds":2.4,"Book":"Hard Rock Bet","EV":16.5,"Kelly":0.0013,"Risk $":0.65},{"Sport":"NHL","Date":"03/14/26","Time (ET)":"08:00 PM","Home":"Dallas Stars","Away":"Detroit Red Wings","Bet Type":"ML","Pick":"Dallas Stars","Odds":1.77,"Book":"Fanatics","EV":14.6,"Kelly":0.0021,"Risk $":1.05},{"Sport":"CHA - Cap Cana","Date":"03/14/26","Time (ET)":"TBD","Home":"Alexander Blockx (BEL)","Away":"(6)Mariano Navone (ARG)","Bet Type":"ML","Pick":"Alexander Blockx (BEL)","Odds":1.53,"Book":"theScore Bet","EV":19.6,"Kelly":0.0041,"Risk $":2.05},{"Sport":"CHA - Phoenix","Date":"03/14/26","Time (ET)":"TBD","Home":"(1)Corentin Moutet (FRA)","Away":"(7)Marcos Giron (USA)","Bet Type":"ML","Pick":"(1)Corentin Moutet (FRA)","Odds":2,"Book":"theScore Bet","EV":10.4,"Kelly":0.0012,"Risk $":0.57},{"Sport":"MLB","Date":"03/14/26","Time (ET)":"TBD","Home":"Atlanta Braves","Away":"Boston Red Sox","Bet Type":"Total","Pick":"Under 10","Odds":1.87,"Book":"DraftKings","EV":22.2,"Kelly":0.0028,"Risk $":1.41},{"Sport":"MLB","Date":"03/14/26","Time (ET)":"TBD","Home":"Houston Astros","Away":"New York Mets","Bet Type":"Total","Pick":"Over 7.5","Odds":2.05,"Book":"theScore Bet","EV":41.5,"Kelly":0.0044,"Risk $":2.18},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Oklahoma City Thunder","Away":"Minnesota Timberwolves","Bet Type":"ML","Pick":"Minnesota Timberwolves","Odds":4.1,"Book":"DraftKings","EV":161.9,"Kelly":0.0058,"Risk $":2.88},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Philadelphia 76ers","Away":"Portland Trail Blazers","Bet Type":"ML","Pick":"Philadelphia 76ers","Odds":3.3,"Book":"theScore Bet","EV":63.7,"Kelly":0.0031,"Risk $":1.53},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Cleveland Cavaliers","Away":"Dallas Mavericks","Bet Type":"Spread","Pick":"Dallas Mavericks +17.5","Odds":1.89,"Book":"DraftKings","EV":41.3,"Kelly":0.0097,"Risk $":4.85},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"New York Knicks","Away":"Golden State Warriors","Bet Type":"Spread","Pick":"Golden State Warriors +13.5","Odds":1.89,"Book":"FanDuel","EV":35.1,"Kelly":0.0083,"Risk $":4.12},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Philadelphia 76ers","Away":"Portland Trail Blazers","Bet Type":"Spread","Pick":"Philadelphia 76ers +7.5","Odds":1.89,"Book":"FanDuel","EV":26.5,"Kelly":0.0063,"Risk $":3.11},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Oklahoma City Thunder","Away":"Minnesota Timberwolves","Bet Type":"Spread","Pick":"Minnesota Timberwolves +9.5","Odds":1.88,"Book":"FanDuel","EV":23.7,"Kelly":0.0056,"Risk $":2.8},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Milwaukee Bucks","Away":"Indiana Pacers","Bet Type":"Spread","Pick":"Indiana Pacers +7.5","Odds":1.91,"Book":"FanDuel","EV":15.5,"Kelly":0.0036,"Risk $":1.79},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"New York Knicks","Away":"Golden State Warriors","Bet Type":"Total","Pick":"Over 216.5","Odds":1.89,"Book":"FanDuel","EV":15.5,"Kelly":0.0036,"Risk $":1.81},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Cleveland Cavaliers","Away":"Dallas Mavericks","Bet Type":"Total","Pick":"Under 237.5","Odds":1.93,"Book":"FanDuel","EV":7.4,"Kelly":0.0017,"Risk $":0.85},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Philadelphia 76ers","Away":"Portland Trail Blazers","Bet Type":"Total","Pick":"Over 228","Odds":1.91,"Book":"Fanatics","EV":6.6,"Kelly":0.0015,"Risk $":0.77},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Oklahoma City Thunder","Away":"Minnesota Timberwolves","Bet Type":"Total","Pick":"Over 225.5","Odds":1.93,"Book":"FanDuel","EV":5.7,"Kelly":0.0013,"Risk $":0.66},{"Sport":"NBA","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Toronto Raptors","Away":"Detroit Pistons","Bet Type":"Total","Pick":"Over 220.5","Odds":1.88,"Book":"FanDuel","EV":4.7,"Kelly":0.0011,"Risk $":0.55},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Yale Bulldogs","Away":"Pennsylvania Quakers","Bet Type":"ML","Pick":"Pennsylvania Quakers","Odds":4.75,"Book":"Hard Rock Bet","EV":156,"Kelly":0.0046,"Risk $":2.3},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Michigan Wolverines","Away":"Purdue Boilermakers","Bet Type":"ML","Pick":"Purdue Boilermakers","Odds":3.2,"Book":"DraftKings","EV":112.1,"Kelly":0.0056,"Risk $":2.81},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Yale Bulldogs","Away":"Pennsylvania Quakers","Bet Type":"Spread","Pick":"Pennsylvania Quakers +10.5","Odds":1.83,"Book":"theScore Bet","EV":28,"Kelly":0.0068,"Risk $":3.41},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Arkansas Razorbacks","Away":"Vanderbilt Commodores","Bet Type":"Total","Pick":"Over 166.5","Odds":1.91,"Book":"DraftKings","EV":25.9,"Kelly":0.006,"Risk $":3},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"UC Irvine Anteaters","Away":"Hawai'i Rainbow Warriors","Bet Type":"Total","Pick":"Over 130.5","Odds":1.83,"Book":"Hard Rock Bet","EV":22.1,"Kelly":0.0054,"Risk $":2.69},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"South Florida Bulls","Away":"Wichita State Shockers","Bet Type":"Total","Pick":"Over 149.5","Odds":1.87,"Book":"Hard Rock Bet","EV":21.9,"Kelly":0.0052,"Risk $":2.6},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Louisiana Tech Bulldogs","Away":"Kennesaw State Owls","Bet Type":"Spread","Pick":"Louisiana Tech Bulldogs +6.5","Odds":1.77,"Book":"theScore Bet","EV":18.2,"Kelly":0.0046,"Risk $":2.31},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Michigan Wolverines","Away":"Purdue Boilermakers","Bet Type":"Spread","Pick":"Purdue Boilermakers +6.5","Odds":1.91,"Book":"DraftKings","EV":17.2,"Kelly":0.004,"Risk $":1.99},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"VCU Rams","Away":"Dayton Flyers","Bet Type":"Total","Pick":"Over 139.5","Odds":1.87,"Book":"DraftKings","EV":15.5,"Kelly":0.0037,"Risk $":1.84},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Yale Bulldogs","Away":"Pennsylvania Quakers","Bet Type":"Total","Pick":"Over 142.5","Odds":1.93,"Book":"DraftKings","EV":14.4,"Kelly":0.0033,"Risk $":1.66},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Michigan Wolverines","Away":"Purdue Boilermakers","Bet Type":"Total","Pick":"Over 150.5","Odds":1.91,"Book":"DraftKings","EV":12.7,"Kelly":0.003,"Risk $":1.48},{"Sport":"NCAAB","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Louisiana Tech Bulldogs","Away":"Kennesaw State Owls","Bet Type":"Total","Pick":"Over 138.5","Odds":1.77,"Book":"theScore Bet","EV":8.5,"Kelly":0.0022,"Risk $":1.07},{"Sport":"NHL","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Minnesota Wild","Away":"Toronto Maple Leafs","Bet Type":"ML","Pick":"Toronto Maple Leafs","Odds":3.1,"Book":"Fanatics","EV":34.4,"Kelly":0.0018,"Risk $":0.91},{"Sport":"NHL","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Ottawa Senators","Away":"San Jose Sharks","Bet Type":"ML","Pick":"San Jose Sharks","Odds":2.8,"Book":"DraftKings","EV":22.8,"Kelly":0.0014,"Risk $":0.7},{"Sport":"SOCCER-MLS","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Chicago Fire FC","Away":"DC United","Bet Type":"ML","Pick":"DC United","Odds":8.5,"Book":"DraftKings","EV":159.4,"Kelly":0.004,"Risk $":1.97},{"Sport":"SOCCER-MLS","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Chicago Fire FC","Away":"DC United","Bet Type":"ML","Pick":"Chicago Fire FC","Odds":5,"Book":"Fanatics","EV":142.9,"Kelly":0.004,"Risk $":1.97},{"Sport":"SOCCER-MLS","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Houston Dynamo FC","Away":"Portland Timbers","Bet Type":"ML","Pick":"Portland Timbers","Odds":7.5,"Book":"Fanatics","EV":164.1,"Kelly":0.0026,"Risk $":1.32},{"Sport":"SOCCER-MLS","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"Houston Dynamo FC","Away":"Portland Timbers","Bet Type":"ML","Pick":"Houston Dynamo FC","Odds":4.1,"Book":"FanDuel","EV":79.9,"Kelly":0.0029,"Risk $":1.42},{"Sport":"SOCCER-MLS","Date":"03/15/26","Time (ET)":"08:00 PM","Home":"LA Galaxy","Away":"Sporting Kansas City","Bet Type":"ML","Pick":"LA Galaxy","Odds":4.3,"Book":"Fanatics","EV":113.6,"Kelly":0.0038,"Risk $":1.9},{"Sport":"ATP - Indian Wells","Date":"03/15/26","Time (ET)":"TBD","Home":"Daniil Medvedev","Away":"Jannik Sinner","Bet Type":"ML","Pick":"Daniil Medvedev","Odds":4.1,"Book":"theScore Bet","EV":92.6,"Kelly":0.0033,"Risk $":1.65},{"Sport":"MLB","Date":"03/15/26","Time (ET)":"TBD","Home":"Los Angeles Angels","Away":"Colorado Rockies","Bet Type":"ML","Pick":"Los Angeles Angels","Odds":1.82,"Book":"DraftKings","EV":7.9,"Kelly":0.0011,"Risk $":0.53},{"Sport":"MLB","Date":"03/15/26","Time (ET)":"TBD","Home":"New York Mets","Away":"Toronto Blue Jays","Bet Type":"ML","Pick":"Toronto Blue Jays","Odds":2.3,"Book":"DraftKings","EV":13.4,"Kelly":0.0011,"Risk $":0.57},{"Sport":"WTA - Indian Wells","Date":"03/15/26","Time (ET)":"TBD","Home":"Aryna Sabalenka","Away":"Elena Rybakina","Bet Type":"ML","Pick":"Elena Rybakina","Odds":2.3,"Book":"Fanatics","EV":12.1,"Kelly":0.001,"Risk $":0.51},{"Sport":"SOCCER-SERA","Date":"03/16/26","Time (ET)":"08:00 PM","Home":"Cremonese","Away":"Fiorentina","Bet Type":"ML","Pick":"Cremonese","Odds":4.1,"Book":"FanDuel","EV":33.4,"Kelly":0.0012,"Risk $":0.59},{"Sport":"SOCCER-UCL","Date":"03/18/26","Time (ET)":"08:00 PM","Home":"Tottenham Hotspur","Away":"Atletico Madrid","Bet Type":"ML","Pick":"Tottenham Hotspur","Odds":2.45,"Book":"Fanatics","EV":18.5,"Kelly":0.0014,"Risk $":0.7},{"Sport":"SOCCER-UEL","Date":"03/19/26","Time (ET)":"08:00 PM","Home":"FC Midtjylland","Away":"Nottingham Forest","Bet Type":"ML","Pick":"FC Midtjylland","Odds":3.5,"Book":"Fanatics","EV":45.8,"Kelly":0.002,"Risk $":1.01},{"Sport":"SOCCER-SERA","Date":"03/20/26","Time (ET)":"08:00 PM","Home":"Cagliari","Away":"Napoli","Bet Type":"ML","Pick":"Cagliari","Odds":5.9,"Book":"FanDuel","EV":73.7,"Kelly":0.0017,"Risk $":0.83},{"Sport":"SOCCER-LIG1","Date":"03/21/26","Time (ET)":"08:00 PM","Home":"Nice","Away":"Paris Saint-Germain","Bet Type":"ML","Pick":"Draw","Odds":5.3,"Book":"FanDuel","EV":18,"Kelly":0.0015,"Risk $":0.73},{"Sport":"SOCCER-LIG1","Date":"03/21/26","Time (ET)":"08:00 PM","Home":"Nice","Away":"Paris Saint-Germain","Bet Type":"ML","Pick":"Nice","Odds":7,"Book":"Fanatics","EV":79.3,"Kelly":0.0015,"Risk $":0.73},{"Sport":"SOCCER-EPL","Date":"04/11/26","Time (ET)":"08:00 PM","Home":"Burnley","Away":"Brighton & Hove Albion","Bet Type":"ML","Pick":"Draw","Odds":4,"Book":"FanDuel","EV":5.4,"Kelly":0.001,"Risk $":0.5},{"Sport":"SOCCER-EPL","Date":"04/11/26","Time (ET)":"08:00 PM","Home":"Burnley","Away":"Brighton & Hove Albion","Bet Type":"ML","Pick":"Burnley","Odds":5,"Book":"Fanatics","EV":38.1,"Kelly":0.0011,"Risk $":0.53}];  // injected by R
 var INLINE_PAPER   = [{"date":"2026-03-13","starting_bankroll":1000,"total_risked":272.0442,"settled_pnl_kelly":-0.0916,"settled_pnl_dollar":-91.5789,"ending_bankroll":908.42,"daily_roi":-0.0916,"cumulative_roi":-0.0916,"wins":46,"losses":89,"unsettled":22}];  // injected by R
 var INLINE_SUMMARY = {"starting_bankroll":1000,"current_bankroll":908.42,"today_risk":86.48,"last_run":"2026-03-14 22:28","record_by_sport":{"NCAAB":{"wins":34,"losses":63,"roi":-0.2616},"NBA":{"wins":12,"losses":26,"roi":-0.4974}}};  // injected by R
+var INLINE_SCORECARD = null;  // injected by R — AssessorM writes scorecard.json
 
 // ── Fetch helpers ─────────────────────────────────────────
 async function loadJSON(path, inline) {
@@ -770,21 +792,24 @@ function evPips(ev) {
 
 // ── Init ──────────────────────────────────────────────────
 async function init() {
-  const [picksData, paperData, summaryData] = await Promise.all([
-    loadJSON(DATA.picks,   INLINE_PICKS),
-    loadJSON(DATA.paper,   INLINE_PAPER),
-    loadJSON(DATA.summary, INLINE_SUMMARY)
+  const [picksData, paperData, summaryData, scorecardData] = await Promise.all([
+    loadJSON(DATA.picks,     INLINE_PICKS),
+    loadJSON(DATA.paper,     INLINE_PAPER),
+    loadJSON(DATA.summary,   INLINE_SUMMARY),
+    loadJSON(DATA.scorecard, INLINE_SCORECARD)
   ]);
 
-  allPicks = picksData  || getDemoPicks();
-  paperLog = paperData  || getDemoPaperLog();
-  summary  = summaryData || getDemoSummary();
+  allPicks  = picksData     || getDemoPicks();
+  paperLog  = paperData     || getDemoPaperLog();
+  summary   = summaryData   || getDemoSummary();
+  scorecard = scorecardData || {};
 
   renderKPIs();
   renderChart();
   renderSportAllocation();
   renderPicks(allPicks);
   renderRecordBySport();
+  renderModelScorecard();
   updateHeader();
 }
 
@@ -1041,6 +1066,163 @@ function renderRecordBySport() {
 function updateHeader() {
   const el = document.getElementById('last-run');
   el.textContent = summary.last_run ? `Run: ${summary.last_run}` : 'Paper trading · Live';
+}
+
+// ── Model Scorecard — wired to scorecard.json ─────────────
+let activeTab = 'sport';
+
+function switchTab(tab) {
+  activeTab = tab;
+  ['sport','bettype','book','recent'].forEach(t => {
+    const btn = document.getElementById(`tab-${t}`);
+    const panel = document.getElementById(`tab-content-${t}`);
+    const active = t === tab;
+    btn.style.borderBottomColor  = active ? 'var(--gold)' : 'transparent';
+    btn.style.color               = active ? 'var(--gold)' : 'var(--muted)';
+    panel.style.display           = active ? 'block' : 'none';
+  });
+}
+
+function renderBreakdownTable(data, cols) {
+  if (!data || !Object.keys(data).length) {
+    return '<div class="empty" style="padding:1.5rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">No settled data yet — check back after games complete</div>';
+  }
+  const rows = Object.entries(data).map(([key, rec]) => {
+    const total  = (rec.picks || (rec.wins||0) + (rec.losses||0) + (rec.pushes||0));
+    const wins   = rec.wins   || 0;
+    const losses = rec.losses || 0;
+    const pushes = rec.pushes || 0;
+    const roi    = rec.model_roi != null ? parseFloat(rec.model_roi) : null;
+    const ev     = rec.avg_ev  != null ? parseFloat(rec.avg_ev)  : null;
+    return `<tr>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text);padding:0.65rem 0.75rem;">${key}</td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);padding:0.65rem 0.75rem;text-align:center;">${total}</td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:center;">
+        <span style="color:var(--teal);">${wins}W</span>
+        <span style="color:var(--muted);"> – </span>
+        <span style="color:var(--red);">${losses}L</span>
+        ${pushes ? `<span style="color:var(--muted);"> – ${pushes}P</span>` : ''}
+      </td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:right;">
+        ${total ? `<span style="color:var(--muted);">${(wins/total*100).toFixed(1)}%</span>` : '—'}
+      </td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:right;">
+        ${roi != null ? `<span class="${roi>=0?'positive':'negative'}" style="color:${roi>=0?'var(--teal)':'var(--red)'};">${roi>=0?'+':''}${(roi*100).toFixed(1)}%</span>` : '—'}
+      </td>
+      ${cols.includes('ev') ? `<td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--gold);padding:0.65rem 0.75rem;text-align:right;">${ev != null ? (ev*100).toFixed(1)+'%' : '—'}</td>` : ''}
+    </tr>`;
+  }).join('');
+
+  const evHeader = cols.includes('ev') ? '<th style="text-align:right;padding:0.5rem 0.75rem;">Avg EV</th>' : '';
+  return `<div class="table-wrapper">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">${cols[0]||'Category'}</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Picks</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Record</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">Win%</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">ROI</th>
+          ${evHeader}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderRecentForm(recentPicks) {
+  if (!recentPicks || !recentPicks.length) {
+    return '<div class="empty" style="padding:1.5rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">No recent settled picks yet</div>';
+  }
+  const rows = recentPicks.slice(0,15).map(p => {
+    const result = p.result || '—';
+    const clv    = p.clv != null ? parseFloat(p.clv) : null;
+    const roi    = p.model_pnl != null ? parseFloat(p.model_pnl) : null;
+    const resultColor = result === 'W' ? 'var(--teal)' : result === 'L' ? 'var(--red)' : 'var(--muted)';
+    return `<tr style="border-bottom:1px solid rgba(26,34,56,0.5);">
+      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);padding:0.55rem 0.75rem;">${p.game_date||'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text);padding:0.55rem 0.75rem;">${p.sport||'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);padding:0.55rem 0.75rem;">${p.home_team||''} vs ${p.away_team||''}</td>
+      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text);padding:0.55rem 0.75rem;">${p.bet_team||'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gold);padding:0.55rem 0.75rem;text-align:right;">${p.model_odds ? parseFloat(p.model_odds).toFixed(2) : '—'}</td>
+      <td style="font-family:var(--font-mono);font-size:0.72rem;font-weight:500;color:${resultColor};padding:0.55rem 0.75rem;text-align:center;">${result}</td>
+      <td style="font-family:var(--font-mono);font-size:0.65rem;padding:0.55rem 0.75rem;text-align:right;color:${clv!=null?(clv>=0?'var(--teal)':'var(--red)'):'var(--muted)'};">${clv!=null?(clv>=0?'+':'')+clv.toFixed(3):'—'}</td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="table-wrapper">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Date</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Sport</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Game</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Pick</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">Odds</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Result</th>
+          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">CLV</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderModelScorecard() {
+  const sc = scorecard;
+  const overall = sc.overall || {};
+
+  // Overall KPIs
+  const picks  = overall.picks  || 0;
+  const wins   = overall.wins   || 0;
+  const losses = overall.losses || 0;
+  const pushes = overall.pushes || 0;
+  const roi    = overall.model_roi != null ? parseFloat(overall.model_roi) : null;
+  const avgEv  = overall.avg_ev    != null ? parseFloat(overall.avg_ev)   : null;
+  const avgClv = overall.avg_clv   != null ? parseFloat(overall.avg_clv)  : null;
+
+  document.getElementById('model-picks').textContent   = picks || '—';
+  document.getElementById('model-record').textContent  = picks ? `${wins}W – ${losses}L` : '—';
+
+  const roiEl = document.getElementById('model-roi');
+  if (roi != null) {
+    roiEl.textContent  = `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%`;
+    roiEl.style.color  = roi >= 0 ? 'var(--teal)' : 'var(--red)';
+  } else {
+    roiEl.textContent = '—';
+    roiEl.style.color = 'var(--muted)';
+  }
+
+  const evEl = document.getElementById('model-avg-ev');
+  evEl.textContent = avgEv != null ? `${(avgEv).toFixed(1)}%` : '—';
+
+  const clvEl = document.getElementById('model-avg-clv');
+  if (avgClv != null) {
+    clvEl.textContent = `${avgClv >= 0 ? '+' : ''}${avgClv.toFixed(4)}`;
+    clvEl.style.color = avgClv >= 0 ? 'var(--teal)' : 'var(--red)';
+  } else {
+    clvEl.textContent = '—';
+    clvEl.style.color = 'var(--muted)';
+  }
+
+  const lastEl = document.getElementById('model-last-updated');
+  lastEl.textContent = sc.last_updated ? `Updated: ${sc.last_updated}` : '—';
+
+  // Tab panels
+  document.getElementById('tab-content-sport').innerHTML =
+    renderBreakdownTable(sc.by_sport, ['Sport', 'ev']);
+  document.getElementById('tab-content-bettype').innerHTML =
+    renderBreakdownTable(sc.by_bet_type, ['Bet Type']);
+  document.getElementById('tab-content-book').innerHTML =
+    renderBreakdownTable(sc.by_book, ['Book']);
+  document.getElementById('tab-content-recent').innerHTML =
+    renderRecentForm(sc.recent_picks);
+
+  // Show/hide section if no data at all
+  if (!picks && !sc.by_sport) {
+    document.getElementById('model-scorecard-section').style.opacity = '0.5';
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
