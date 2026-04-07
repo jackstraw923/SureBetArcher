@@ -504,6 +504,48 @@
     @media (min-width: 901px) {
       .sidebar-toggle-btn { display: none; }
     }
+    /* ── Global odds format toggle ── */
+    .odds-toggle-wrap {
+      padding: 1rem 1.5rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.5rem;
+    }
+    .odds-toggle-label {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+    .odds-toggle-btns {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .odds-toggle-btn {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .odds-toggle-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+    .odds-toggle-btn:hover:not(.active) {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
     /* ── Ad placeholders ── */
     .ad-slot {
       width: 100%;
@@ -565,6 +607,15 @@
       <div class="sidebar-brand-sub">Tools &amp; Knowledge Base</div>
     </div>
 
+    <!-- Global odds format toggle — affects No-Vig and Hedge tools -->
+    <div class="odds-toggle-wrap">
+      <div class="odds-toggle-label">Odds Format</div>
+      <div class="odds-toggle-btns">
+        <button class="odds-toggle-btn active" id="ev-btn-american" onclick="setToolOddsFormat('american')">American</button>
+        <button class="odds-toggle-btn" id="ev-btn-decimal" onclick="setToolOddsFormat('decimal')">Decimal</button>
+      </div>
+    </div>
+
     <!-- TOOLS section -->
     <div class="sidebar-section">
       <div class="sidebar-section-label">Tools</div>
@@ -582,8 +633,9 @@
 
       <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">Articles</div>
       <button class="sidebar-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
+      <button class="sidebar-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
       <button class="sidebar-item" data-panel="articles">
-        Why Win Rates Lie <span class="item-badge">Soon</span>
+        Why Win Rates Lie <span class="item-badge">Week 2</span>
       </button>
       <button class="sidebar-item" data-panel="articles">
         Line Shopping Is Free Money <span class="item-badge">Soon</span>
@@ -637,35 +689,12 @@
     </div>
 
     <!-- ── Ad Slot 1 — Top of content, below intro ──────────────
-         Replace inner div content with AdSense or Adsterra code at launch.
          Desktop: 728×90 leaderboard | Mobile: 320×100
+         Paste ad network code inside .ad-slot-inner when ready.
     ─────────────────────────────────────────────────────────── -->
     <div class="ad-slot" id="ad-slot-top">
       <div class="ad-slot-inner">
-        <div class="ad-desktop">
-          <script>
-            atOptions = {
-              'key' : 'c306493f16794fc0926b3b663c5c0e16',
-              'format' : 'iframe',
-              'height' : 90,
-              'width' : 728,
-              'params' : {}
-            };
-          </script>
-          <script src="https://www.highperformanceformat.com/c306493f16794fc0926b3b663c5c0e16/invoke.js"></script>
-        </div>
-        <div class="ad-mobile">
-          <script>
-            atOptions = {
-              'key' : '94553c5ef59e2e475abbddfe9624e7a5',
-              'format' : 'iframe',
-              'height' : 50,
-              'width' : 320,
-              'params' : {}
-            };
-          </script>
-          <script src="https://www.highperformanceformat.com/94553c5ef59e2e475abbddfe9624e7a5/invoke.js"></script>
-        </div>
+        <!-- AD PLACEHOLDER — insert ad code here -->
       </div>
     </div>
 
@@ -771,11 +800,11 @@
 
         <div class="tool-row">
           <div class="tool-field">
-            <label class="tool-label">Side A Odds (American)</label>
+            <label class="tool-label" id="nv-a-label">Side A Odds (American)</label>
             <input class="tool-input" id="nv-a" type="number" placeholder="e.g. -110" />
           </div>
           <div class="tool-field">
-            <label class="tool-label">Side B Odds (American)</label>
+            <label class="tool-label" id="nv-b-label">Side B Odds (American)</label>
             <input class="tool-input" id="nv-b" type="number" placeholder="e.g. -110" />
           </div>
           <button class="tool-btn" onclick="calcNoVig2()">Calculate</button>
@@ -809,15 +838,15 @@
         <div class="tool-card-desc" style="margin-bottom:1rem;">Enter all three outcomes — Home, Draw, Away — for soccer or any three-way market.</div>
         <div class="tool-row">
           <div class="tool-field">
-            <label class="tool-label">Home (American)</label>
+            <label class="tool-label" id="nv-h-label">Home (American)</label>
             <input class="tool-input" id="nv-h" type="number" placeholder="e.g. +120" />
           </div>
           <div class="tool-field">
-            <label class="tool-label">Draw (American)</label>
+            <label class="tool-label" id="nv-d-label">Draw (American)</label>
             <input class="tool-input" id="nv-d" type="number" placeholder="e.g. +220" />
           </div>
           <div class="tool-field">
-            <label class="tool-label">Away (American)</label>
+            <label class="tool-label" id="nv-aw-label">Away (American)</label>
             <input class="tool-input" id="nv-aw" type="number" placeholder="e.g. +200" />
           </div>
           <button class="tool-btn" onclick="calcNoVig3()">Calculate</button>
@@ -863,13 +892,13 @@
             <input class="tool-input" id="hg-stake" type="number" step="0.01" placeholder="e.g. 50" />
           </div>
           <div class="tool-field">
-            <label class="tool-label">Original Odds (American)</label>
+            <label class="tool-label" id="hg-orig-label">Original Odds (American)</label>
             <input class="tool-input" id="hg-orig-odds" type="number" placeholder="e.g. +150" />
           </div>
         </div>
         <div class="tool-row">
           <div class="tool-field">
-            <label class="tool-label">Hedge Odds (American)</label>
+            <label class="tool-label" id="hg-hedge-label">Hedge Odds (American)</label>
             <input class="tool-input" id="hg-hedge-odds" type="number" placeholder="e.g. -130" />
           </div>
           <div class="tool-field">
@@ -909,35 +938,12 @@
     </div>
 
     <!-- ── Ad Slot 2 — Between tools and articles ────────────────
-         Replace inner div content with AdSense or Adsterra code at launch.
          Desktop: 728×90 leaderboard | Mobile: 300×250 rectangle
+         Paste ad network code inside .ad-slot-inner when ready.
     ─────────────────────────────────────────────────────────── -->
     <div class="ad-slot ad-slot-mid" id="ad-slot-mid">
       <div class="ad-slot-inner">
-        <div class="ad-desktop">
-          <script>
-            atOptions = {
-              'key' : 'c98f0066010dea30ef0d443533d4cadc',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script src="https://www.highperformanceformat.com/c98f0066010dea30ef0d443533d4cadc/invoke.js"></script>
-        </div>
-        <div class="ad-mobile">
-          <script>
-            atOptions = {
-              'key' : 'c98f0066010dea30ef0d443533d4cadc',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script src="https://www.highperformanceformat.com/c98f0066010dea30ef0d443533d4cadc/invoke.js"></script>
-        </div>
+        <!-- AD PLACEHOLDER — insert ad code here -->
       </div>
     </div>
 
@@ -987,6 +993,90 @@ A trade must have Edge > 0 to pass Gate 2.
     </div>
 
     <!-- ═══════════════════════════════════════════
+         PANEL: Article — American vs. Decimal Odds
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-article-odds-formats">
+      <div class="panel-eyebrow">Library · Articles</div>
+      <h1 class="panel-title">American vs. Decimal Odds</h1>
+      <p class="panel-sub">Which format gives you the edge? The answer depends on what you're doing with the number.</p>
+      <div class="article-meta">ArcVest Research · April 2026 · 5 min read</div>
+
+      <div class="article-body">
+
+        <p>Odds formats aren't just display preferences — they shape how you think about value. American odds dominate U.S. sportsbooks because they're compact and intuitive for execution. Decimal odds rule in modeling because they make expected value math direct and repeatable. Neither is universally better, but one will serve your workflow more effectively depending on whether you're scanning lines or sizing positions.</p>
+
+        <p>This isn't opinion; it's about reducing friction in the two core tasks of sports trading: spotting inefficiency and allocating capital.</p>
+
+        <h3>American Odds: The Execution Standard</h3>
+
+        <p>American odds are the default at FanDuel, DraftKings, and every U.S. book for a reason. The +/− sign tells you at a glance whether it's a favorite (−150 means lay $150 to win $100) or a dog (+200 means win $200 on $100 risked). No mental math needed to classify the side.</p>
+
+        <p><strong>Strengths:</strong> Native to U.S. execution — matches exactly what you see when placing the trade. Compact for dense displays. Psychologically clear: positive feels like upside, negative feels like cost.</p>
+
+        <p><strong>Weaknesses:</strong> EV requires a conversion step. Implied probability splits by sign — favorites use |−odds| / (|−odds| + 100), underdogs use 100 / (+odds + 100). Payout math bifurcates the same way. For a quick scan on the homepage, American wins. Open a spreadsheet for Kelly sizing and the conversions start adding up.</p>
+
+        <h3>Decimal Odds: The Modeler's Language</h3>
+
+        <p>Decimal odds treat every price as a total return multiple. A 2.50 decimal means $1 risked returns $2.50 total — $1.50 profit. Implied probability is always 1 ÷ decimal odds. Expected value simplifies to one formula regardless of whether you're looking at a favorite or a longshot.</p>
+
+        <div class="formula">
+          EV = (true_prob × decimal_odds) − 1<br>
+          Implied prob = 1 / decimal_odds<br>
+          Kelly f = (b × p − q) / b &nbsp;&nbsp;where b = decimal_odds − 1
+        </div>
+
+        <p><strong>Strengths:</strong> Universal payout formula, no sign-based branching. No-vig and Kelly sizing flow without reformatting. Consistent across sports, markets, and bet types.</p>
+
+        <p><strong>Weaknesses:</strong> U.S. readers need a brief learning curve. 1.91 reads as a blank until it clicks as −110. Less visual punch for distinguishing favorites from dogs at a glance.</p>
+
+        <p>ArcVest's engine computes entirely in decimal internally — that's why the manifest stores <code>model_odds</code> as 1.91, not −110. It's the natural format for the two-gate filter, fractional Kelly, and CLV calculation.</p>
+
+        <h3>Head-to-Head: Five Real Trades</h3>
+
+        <p>Same five positions, same model probabilities — the only difference is which format you're reading.</p>
+
+        <div class="formula" style="line-height:2;">
+          American &nbsp;| Decimal | Implied | True Prob | EV<br>
+          ─────────────────────────────────────────────────<br>
+          −110 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1.91 &nbsp;&nbsp;&nbsp;| 52.4% &nbsp;&nbsp;| 55.0% &nbsp;&nbsp;&nbsp;| +5.0%<br>
+          −150 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1.67 &nbsp;&nbsp;&nbsp;| 60.0% &nbsp;&nbsp;| 65.0% &nbsp;&nbsp;&nbsp;| +8.5%<br>
+          +120 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 2.20 &nbsp;&nbsp;&nbsp;| 45.5% &nbsp;&nbsp;| 48.0% &nbsp;&nbsp;&nbsp;| +5.6%<br>
+          +200 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 3.00 &nbsp;&nbsp;&nbsp;| 33.3% &nbsp;&nbsp;| 35.0% &nbsp;&nbsp;&nbsp;| +5.0%<br>
+          +500 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 6.00 &nbsp;&nbsp;&nbsp;| 16.7% &nbsp;&nbsp;| 20.0% &nbsp;&nbsp;&nbsp;| +20.0%
+        </div>
+
+        <p>In decimal, EV is one formula across every row. In American, you convert each line first. The longshot at +500 jumps out in both formats, but for daily portfolio sizing across a 40-pick slate, decimal's consistency matters.</p>
+
+        <h3>No-Vig Is Also Cleaner in Decimal</h3>
+
+        <p>Vig removal illustrates this well. A standard −110/−110 market totals 105.3% implied probability — that 5.3% excess is the bookmaker's margin. In decimal, removing the vig is a single step: divide each implied probability by the overround. A 1.91/1.91 market becomes a 1.81/1.81 fair line. Plug directly into EV or edge calculations without reformatting.</p>
+
+        <div class="callout">
+          <strong>Try it:</strong> Enter −110/−110 into the <button onclick="showPanel('novig')" style="background:none;border:none;color:var(--gold);font-family:var(--font-mono);font-size:0.82rem;cursor:pointer;padding:0;text-decoration:underline;">No-Vig Calculator</button> and watch the fair probability appear instantly. That number — 50.0% — is what Gate 2 of the ArcVest filter checks your model's estimate against.
+        </div>
+
+        <h3>The Trader Workflow</h3>
+
+        <p>The right answer isn't picking a winner — it's matching the format to the task.</p>
+
+        <p><strong>Scan in American.</strong> Your book shows −135, not 1.74. American matches the execution environment and lets you classify favorites and dogs at a glance before you do any math.</p>
+
+        <p><strong>Model in decimal.</strong> Once you're computing EV, Kelly fraction, or CLV, decimal removes all the conversion friction. One formula, every market, every sport.</p>
+
+        <p><strong>Toggle as needed.</strong> ArcVest's homepage cards default to American for the scan. The Scorecard and tools use decimal for the math. That's not inconsistency — it's using the right tool for the right job.</p>
+
+        <p>The hybrid approach is what disciplined traders actually use. American for the glance, decimal for the math. Now you know why.</p>
+
+        <div class="callout">
+          <strong>Tools in EdgeVault:</strong> The <button onclick="showPanel('odds-converter')" style="background:none;border:none;color:var(--gold);font-family:var(--font-mono);font-size:0.82rem;cursor:pointer;padding:0;text-decoration:underline;">Odds Converter</button> converts between American, Decimal, and Implied Probability in both directions. The <button onclick="showPanel('novig')" style="background:none;border:none;color:var(--gold);font-family:var(--font-mono);font-size:0.82rem;cursor:pointer;padding:0;text-decoration:underline;">No-Vig Calculator</button> strips the juice and shows you the fair line underneath.
+        </div>
+
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:2rem;font-style:italic;">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal.</p>
+
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
          PANEL: Articles (coming soon)
     ═══════════════════════════════════════════ -->
     <div class="panel" id="panel-articles">
@@ -1000,8 +1090,13 @@ A trade must have Edge > 0 to pass Gate 2.
       </div>
       <div class="section-divider">Planned Articles</div>
       <div class="soon-grid">
+        <div class="soon-card" style="opacity:1;cursor:pointer;" onclick="showPanel('article-odds-formats')">
+          <div class="soon-badge" style="color:var(--green);border-color:var(--green);">Live Now</div>
+          <div class="soon-title">American vs. Decimal Odds: Which Format Gives You the Edge?</div>
+          <div class="soon-desc">Scan in American, model in decimal. Why the format you use for math matters — and how ArcVest handles both.</div>
+        </div>
         <div class="soon-card">
-          <div class="soon-badge">Launch Week</div>
+          <div class="soon-badge">Week 2</div>
           <div class="soon-title">Why Win Rates Lie: The Case for ROI in Sports Trading</div>
           <div class="soon-desc">A 55% win rate sounds great until you realize it loses money at −110 odds. How to evaluate model performance the right way.</div>
         </div>
@@ -1131,12 +1226,17 @@ A trade must have Edge > 0 to pass Gate 2.
 
 <!-- Footer -->
 <footer>
-  <div class="footer-logo">ArcVest</div>
+  <div class="footer-logo">Arc<span style="color:#c9a84c">Vest</span></div>
   <div class="footer-links">
     <a href="/">Home</a>
     <a href="/scorecard.html">Scorecard</a>
-    <a href="/tournaments.html">Tournaments</a>
+    <a href="/daily-card.html">Daily Card</a>
     <a href="/odds.html">Odds</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/edgevault.html">EdgeVault</a>
+    <a href="/about.html">About</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
   </div>
   <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
 </footer>
@@ -1160,7 +1260,6 @@ function showPanel(id) {
   const target = document.getElementById('panel-' + id);
   if (target) target.classList.add('active');
   sidebarItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
-  // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0, 0);
 }
@@ -1169,16 +1268,91 @@ sidebarItems.forEach(item => {
   item.addEventListener('click', () => showPanel(item.dataset.panel));
 });
 
-// Mobile sidebar toggle
 document.getElementById('sidebar-toggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
 });
 
-// Handle hash on load (e.g. /edgevault.html#odds-converter)
 const hash = window.location.hash.replace('#','');
 if (hash) showPanel(hash);
 
+// ── Global odds format toggle ─────────────────────────────
+// 'american' = inputs expect American odds (e.g. -110, +150)
+// 'decimal'  = inputs expect decimal odds (e.g. 1.91, 2.50)
+let toolOddsMode = 'american';
+
+// Label/placeholder configs per mode
+const ODDS_CONFIG = {
+  american: {
+    'nv-a-label':     'Side A Odds (American)',
+    'nv-b-label':     'Side B Odds (American)',
+    'nv-h-label':     'Home (American)',
+    'nv-d-label':     'Draw (American)',
+    'nv-aw-label':    'Away (American)',
+    'hg-orig-label':  'Original Odds (American)',
+    'hg-hedge-label': 'Hedge Odds (American)',
+    placeholders: {
+      'nv-a': '-110', 'nv-b': '-110',
+      'nv-h': '+120', 'nv-d': '+220', 'nv-aw': '+200',
+      'hg-orig-odds': '+150', 'hg-hedge-odds': '-130',
+    }
+  },
+  decimal: {
+    'nv-a-label':     'Side A Odds (Decimal)',
+    'nv-b-label':     'Side B Odds (Decimal)',
+    'nv-h-label':     'Home (Decimal)',
+    'nv-d-label':     'Draw (Decimal)',
+    'nv-aw-label':    'Away (Decimal)',
+    'hg-orig-label':  'Original Odds (Decimal)',
+    'hg-hedge-label': 'Hedge Odds (Decimal)',
+    placeholders: {
+      'nv-a': '1.91', 'nv-b': '1.91',
+      'nv-h': '2.20', 'nv-d': '3.20', 'nv-aw': '3.00',
+      'hg-orig-odds': '2.50', 'hg-hedge-odds': '1.77',
+    }
+  }
+};
+
+function setToolOddsFormat(fmt) {
+  toolOddsMode = fmt;
+
+  // Toggle button styles
+  document.getElementById('ev-btn-american').classList.toggle('active', fmt === 'american');
+  document.getElementById('ev-btn-decimal').classList.toggle('active', fmt === 'decimal');
+
+  // Update all labels
+  const cfg = ODDS_CONFIG[fmt];
+  Object.keys(cfg).forEach(id => {
+    if (id === 'placeholders') return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = cfg[id];
+  });
+
+  // Update all placeholders and clear values
+  Object.entries(cfg.placeholders).forEach(([id, ph]) => {
+    const el = document.getElementById(id);
+    if (el) { el.placeholder = 'e.g. ' + ph; el.value = ''; }
+  });
+
+  // Hide stale results
+  ['nv-result-2way','nv-result-3way','hg-result'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+
+// ── Helper: parse input → decimal odds regardless of mode ──
+function parseToDecimal(val) {
+  const n = parseFloat(val);
+  if (isNaN(n)) return null;
+  if (toolOddsMode === 'decimal') {
+    return n > 1 ? n : null;
+  }
+  // American mode — use existing converter
+  return americanToDecimal(n);
+}
+
 // ── TOOL: Odds Converter ──────────────────────────────────
+// (unchanged — always takes explicit American or Decimal input fields)
 function americanToDecimal(american) {
   american = parseFloat(american);
   if (isNaN(american)) return null;
@@ -1227,16 +1401,16 @@ function convertFromProb() {
   document.getElementById('oc-result-prob').classList.add('show');
 }
 
-// Enter key support for odds converter
 ['oc-american','oc-decimal','oc-prob'].forEach((id, i) => {
   const fns = [convertFromAmerican, convertFromDecimal, convertFromProb];
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fns[i](); });
 });
 
 // ── TOOL: No-Vig Calculator ───────────────────────────────
+// Respects toolOddsMode — parseToDecimal() handles both formats
 function calcNoVig2() {
-  const decA = americanToDecimal(document.getElementById('nv-a').value);
-  const decB = americanToDecimal(document.getElementById('nv-b').value);
+  const decA = parseToDecimal(document.getElementById('nv-a').value);
+  const decB = parseToDecimal(document.getElementById('nv-b').value);
   if (!decA || !decB) return;
   const impA   = 1 / decA;
   const impB   = 1 / decB;
@@ -1254,9 +1428,9 @@ function calcNoVig2() {
   document.getElementById('nv-result-2way').classList.add('show');
 }
 function calcNoVig3() {
-  const decH = americanToDecimal(document.getElementById('nv-h').value);
-  const decD = americanToDecimal(document.getElementById('nv-d').value);
-  const decA = americanToDecimal(document.getElementById('nv-aw').value);
+  const decH = parseToDecimal(document.getElementById('nv-h').value);
+  const decD = parseToDecimal(document.getElementById('nv-d').value);
+  const decA = parseToDecimal(document.getElementById('nv-aw').value);
   if (!decH || !decD || !decA) return;
   const iH    = 1 / decH, iD = 1 / decD, iA = 1 / decA;
   const total = iH + iD + iA;
@@ -1267,7 +1441,6 @@ function calcNoVig3() {
   document.getElementById('nv-result-3way').classList.add('show');
 }
 
-// Enter key support for no-vig
 ['nv-a','nv-b'].forEach(id => {
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig2(); });
 });
@@ -1276,33 +1449,24 @@ function calcNoVig3() {
 });
 
 // ── TOOL: Hedge Calculator ────────────────────────────────
+// Respects toolOddsMode — parseToDecimal() handles both formats
 function calcHedge() {
   const stake     = parseFloat(document.getElementById('hg-stake').value);
-  const origOdds  = parseFloat(document.getElementById('hg-orig-odds').value);
-  const hedgeOdds = parseFloat(document.getElementById('hg-hedge-odds').value);
+  const decOrig   = parseToDecimal(document.getElementById('hg-orig-odds').value);
+  const decHedge  = parseToDecimal(document.getElementById('hg-hedge-odds').value);
   const target    = document.getElementById('hg-target').value;
-  if (isNaN(stake) || isNaN(origOdds) || isNaN(hedgeOdds)) return;
+  if (isNaN(stake) || !decOrig || !decHedge) return;
 
-  const decOrig  = americanToDecimal(origOdds);
-  const decHedge = americanToDecimal(hedgeOdds);
-  if (!decOrig || !decHedge) return;
-
-  const origPayout = stake * decOrig; // total return if orig wins
+  const origPayout = stake * decOrig;
   const origProfit = origPayout - stake;
 
   let hedgeStake;
   if (target === 'equal') {
-    // Equal profit both sides: hedgeStake = origPayout / decHedge
     hedgeStake = origPayout / decHedge;
   } else if (target === 'break') {
-    // Break even: hedge profit = original stake
     hedgeStake = stake / (decHedge - 1);
   } else {
-    // Lock half original profit
     const halfProfit = origProfit / 2;
-    // profit if orig wins = origProfit - hedgeStake
-    // profit if hedge wins = hedgeStake * (decHedge-1)
-    // target: hedgeStake * (decHedge-1) = halfProfit
     hedgeStake = halfProfit / (decHedge - 1);
   }
 
@@ -1317,7 +1481,6 @@ function calcHedge() {
   document.getElementById('hg-total-committed').textContent= '$' + totalCommitted.toFixed(2);
   document.getElementById('hg-floor').textContent          = '$' + floor.toFixed(2);
 
-  // Color floor green/red
   const floorEl = document.getElementById('hg-floor');
   floorEl.className = 'tool-result-val ' + (floor >= 0 ? 'green' : 'red');
 
