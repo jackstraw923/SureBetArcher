@@ -938,6 +938,9 @@
     <a href="/odds.html">Odds</a>
     <a href="/tournaments.html">Tournaments</a>
     <a href="/edgevault.html">EdgeVault</a>
+    <a href="/about.html">About</a>
+    <a href="/privacy.html">Privacy Policy</a>
+    <a href="/terms.html">Terms of Use</a>
   </div>
   <div class="footer-disclaimer">
     For informational and entertainment purposes only. Not financial or betting advice.
@@ -980,67 +983,162 @@ function sportBadge(sport) {
   return ['', sport];
 }
 
-// EV display — EV is already a percentage in daily_picks.json (e.g. 29.3 = 29.3%)
-// Cap at 75% — anything above is a data artifact, suppress it
+// ── Conviction filter — #91 ───────────────────────────────────────────────────
+// Source: pick_manifest.json (full manifest, all ACTIVE picks across all sports)
+// Logic:
+//   1. ACTIVE status only — STALE picks excluded
+//   2. Sport-specific EV floors and odds bands (Plex framework)
+//   3. commence_time aware — prefer same-day games not yet started;
+//      once a sport's slate has all started, roll to next available date
+//   4. Tennis: ATP/WTA (TOA-sourced, STALE-eligible) takes priority over Challenger
+//   5. One card per sport family. "Tomorrow · Sport" badge when rolling forward.
+
+// Plex sport-specific thresholds
+const CONVICTION_THRESHOLDS = {
+  MLB:        { evMin: 0.06,  oddsMin: 1.62, oddsMax: 2.60 },
+  NBA:        { evMin: 0.07,  oddsMin: 1.55, oddsMax: 2.20 },
+  NCAAB:      { evMin: 0.075, oddsMin: 1.55, oddsMax: 2.35 },
+  NHL:        { evMin: 0.065, oddsMin: 1.70, oddsMax: 2.70 },
+  ATP_WTA:    { evMin: 0.065, oddsMin: 1.55, oddsMax: 2.50 },
+  CHALLENGER: { evMin: 0.08,  oddsMin: 1.65, oddsMax: 2.80 },
+};
+
+// Map manifest sport string → threshold key + display family
+function manifestSportKey(sport) {
+  const s = (sport || '').toUpperCase();
+  if (s === 'MLB')    return { key: 'MLB',    family: 'MLB' };
+  if (s === 'NHL')    return { key: 'NHL',    family: 'NHL' };
+  if (s === 'NBA')    return { key: 'NBA',    family: 'NBA' };
+  if (s === 'NCAAB')  return { key: 'NCAAB',  family: 'NCAAB' };
+  if (s.startsWith('CHA')) return { key: 'CHALLENGER', family: 'Tennis', tier: 'challenger' };
+  if (s.includes('ATP') || s.includes('WTA'))
+                      return { key: 'ATP_WTA', family: 'Tennis', tier: 'atp_wta' };
+  return null;
+}
+
+// EV display — manifest model_ev is a decimal fraction (e.g. 0.40 = 40%)
 function formatEV(raw) {
   const val = parseFloat(raw) || 0;
-  if (val > 75) return null;
-  if (val < 5)  return null;
-  return '+' + val.toFixed(1) + '%';
+  const pct = val * 100;
+  if (pct < 1) return null;
+  return '+' + pct.toFixed(1) + '%';
 }
 
-// Sport family grouping — consolidates all tennis variants into one group
-function sportFamily(sport) {
-  const s = (sport || '').toUpperCase();
-  if (s.includes('NBA'))   return 'NBA';
-  if (s.includes('MLB'))   return 'MLB';
-  if (s.includes('NHL'))   return 'NHL';
-  if (s.includes('NCAAB')) return 'NCAAB';
-  if (s.includes('NFL'))   return 'NFL';
-  // All tennis: ATP, WTA, CHA variants → one group
-  if (s.includes('ATP') || s.includes('WTA') || s.includes('CHA') ||
-      s.includes('TENNIS')) return 'Tennis';
-  return 'Other';
+// Given a list of manifest rows for one sport family + threshold key,
+// filter by Plex rules and return eligible rows sorted by EV desc
+function filterByThreshold(rows, thresholdKey) {
+  const t = CONVICTION_THRESHOLDS[thresholdKey];
+  if (!t) return [];
+  return rows
+    .filter(p => {
+      const ev   = parseFloat(p.model_ev)   || 0;
+      const odds = parseFloat(p.model_odds) || 0;
+      return p.status === 'ACTIVE' &&
+             ev   >= t.evMin  &&
+             odds >= t.oddsMin && odds <= t.oddsMax;
+    })
+    .sort((a, b) => (parseFloat(b.model_ev) || 0) - (parseFloat(a.model_ev) || 0));
 }
 
-// Best-per-sport selection:
-// Quality band: EV 5–75%, odds 1.50–6.00, placed picks only
-// Then take the single highest-EV pick per sport family, sorted by EV desc
-function bestPerSport(picks) {
-  const qualified = picks.filter(p => {
-    const odds = parseFloat(p.Odds) || 0;
-    const ev   = parseFloat(p.EV)   || 0;
-    const placed = (p.placed || '').toString().toUpperCase();
-    return odds >= 1.50 && odds <= 6.00 &&
-           ev >= 5 && ev <= 75 &&
-           placed === 'TRUE';
+// For a list of eligible picks, select the best considering commence_time:
+//   - Prefer picks whose game has NOT yet started (commence_time > now)
+//   - Among those, prefer today's date first, then earliest future date
+//   - If all same-day games have started, roll to next available date
+// Returns { pick, isTomorrow } or null
+function selectByTime(eligible) {
+  if (!eligible.length) return null;
+  const now = Date.now();
+
+  const notStarted = eligible.filter(p => {
+    const ct = p.commence_time ? new Date(p.commence_time).getTime() : Infinity;
+    return ct > now;
   });
 
-  // Group by sport family, keep highest EV per group
-  const best = {};
-  qualified.forEach(p => {
-    const family = sportFamily(p.Sport);
-    const ev = parseFloat(p.EV) || 0;
-    if (!best[family] || ev > parseFloat(best[family].EV)) {
-      best[family] = p;
+  if (!notStarted.length) return null; // all games started for this sport today
+
+  // Sort by date asc, then EV desc within same date
+  notStarted.sort((a, b) => {
+    const da = new Date(a.commence_time).getTime();
+    const db = new Date(b.commence_time).getTime();
+    if (da !== db) return da - db;
+    return (parseFloat(b.model_ev) || 0) - (parseFloat(a.model_ev) || 0);
+  });
+
+  const best       = notStarted[0];
+  const bestDate   = new Date(best.commence_time).toDateString();
+  const todayDate  = new Date().toDateString();
+  const isTomorrow = bestDate !== todayDate;
+
+  return { pick: best, isTomorrow };
+}
+
+// Main conviction selector — returns array of card objects, one per sport family
+function buildConvictionCards(manifest) {
+  // Group ACTIVE rows by sport key
+  const groups = {};
+  manifest.forEach(p => {
+    if (p.status !== 'ACTIVE') return;
+    const mapped = manifestSportKey(p.sport);
+    if (!mapped) return;
+    if (!groups[mapped.key]) groups[mapped.key] = { family: mapped.family, tier: mapped.tier || null, rows: [] };
+    groups[mapped.key].rows.push(p);
+  });
+
+  const cards = [];
+  const familiesSeen = new Set();
+
+  // Process non-tennis sports
+  for (const key of ['MLB', 'NHL', 'NBA', 'NCAAB']) {
+    const g = groups[key];
+    if (!g) continue;
+    const eligible = filterByThreshold(g.rows, key);
+    const result   = selectByTime(eligible);
+    if (!result) continue;
+    cards.push({ ...result, family: key, thresholdKey: key });
+    familiesSeen.add(key);
+  }
+
+  // Tennis: try ATP_WTA first, fall back to Challenger
+  if (!familiesSeen.has('Tennis')) {
+    let result = null;
+    let source = null;
+
+    const atpRows = (groups['ATP_WTA'] || {}).rows || [];
+    const atpEligible = filterByThreshold(atpRows, 'ATP_WTA');
+    result = selectByTime(atpEligible);
+    if (result) { source = 'ATP/WTA'; }
+
+    if (!result) {
+      const chaRows = (groups['CHALLENGER'] || {}).rows || [];
+      const chaEligible = filterByThreshold(chaRows, 'CHALLENGER');
+      result = selectByTime(chaEligible);
+      if (result) { source = 'Challenger'; }
     }
+
+    if (result) {
+      cards.push({ ...result, family: 'Tennis', source });
+    }
+  }
+
+  // Sort: today's picks first (by EV desc), then tomorrow picks
+  cards.sort((a, b) => {
+    if (a.isTomorrow !== b.isTomorrow) return a.isTomorrow ? 1 : -1;
+    return (parseFloat(b.pick.model_ev) || 0) - (parseFloat(a.pick.model_ev) || 0);
   });
 
-  // Return as array sorted by EV descending
-  return Object.values(best).sort((a, b) =>
-    (parseFloat(b.EV) || 0) - (parseFloat(a.EV) || 0)
-  );
+  return cards;
 }
 
 async function init() {
-  const [picks, paper] = await Promise.all([
-    loadJSON('data/daily_picks.json'),
+  const [manifest, paper] = await Promise.all([
+    loadJSON('data/pick_manifest.json'),
     loadJSON('data/paper_log.json'),
   ]);
 
-  // Stats bar — trades today (raw count before filter)
-  if (picks) {
-    document.getElementById('stat-picks').textContent = picks.length;
+  // Stats bar — active pick count from manifest
+  if (manifest) {
+    const activeCount = manifest.filter(p => p.status === 'ACTIVE').length;
+    document.getElementById('stat-picks').textContent = activeCount;
   }
 
   // Paper log stats
@@ -1066,52 +1164,96 @@ async function init() {
     }).join('');
   }
 
-  // Trades teaser — best per sport family, no blur needed (max ~5 cards)
-  if (picks && picks.length) {
-    const grid   = document.getElementById('picks-grid');
-    const sample = bestPerSport(picks);
+  // ── Conviction cards — #91 ──────────────────────────────────────────────────
+  const grid = document.getElementById('picks-grid');
 
-    if (sample.length === 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;
-        font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);padding:3rem 0;">
-        No high-conviction trades found today. Check back tomorrow.</div>`;
-      return;
-    }
+  if (!manifest || !manifest.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;
+      font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);padding:3rem 0;">
+      No picks available. Check back after the morning run.</div>`;
+    return;
+  }
 
-    grid.innerHTML = sample.map((p, i) => {
-      const [badgeClass, badgeText] = sportBadge(p.Sport);
-      const evStr   = formatEV(p.EV);
-      const home    = p.Home  || '';
-      const away    = p.Away  || '';
-      const pick    = p.Pick  || '';
-      const oddsRaw = parseFloat(p.Odds) || 0;
-      const odds    = oddsRaw ? oddsRaw.toFixed(2) : '—';
-      const book    = p.Book  || '';
-      const betType = p['Bet Type'] || '';
+  const cards = buildConvictionCards(manifest);
+
+  if (cards.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;
+      font-family:var(--font-mono);font-size:0.75rem;color:var(--muted);padding:3rem 0;">
+      No high-conviction trades found today. Check back tomorrow.</div>`;
+    return;
+  }
+
+  // Assign to module-scope _cards so setOddsFormat can reach them
+  _cards = cards;
+
+  function renderCards() {
+    grid.innerHTML = cards.map((card, i) => {
+      const p       = card.pick;
       const isGated = i >= 3;
 
+      // Sport badge
+      const s = (p.sport || '').toUpperCase();
+      let badgeClass, badgeText;
+      if (s === 'MLB')                                 { badgeClass = 'mlb';    badgeText = 'MLB'; }
+      else if (s === 'NHL')                            { badgeClass = 'nhl';    badgeText = 'NHL'; }
+      else if (s === 'NBA')                            { badgeClass = 'nba';    badgeText = 'NBA'; }
+      else if (s === 'NCAAB')                          { badgeClass = 'ncaab';  badgeText = 'NCAAB'; }
+      else if (s.includes('ATP') || s.includes('WTA')) { badgeClass = 'tennis'; badgeText = '🎾 ATP/WTA'; }
+      else if (s.startsWith('CHA'))                    { badgeClass = 'tennis'; badgeText = '🎾 Challenger'; }
+      else                                             { badgeClass = '';       badgeText = p.sport; }
+
+      // Tomorrow label
+      const timingLabel = card.isTomorrow
+        ? `<span style="font-family:var(--font-mono);font-size:0.65rem;
+             color:var(--arc-gold);letter-spacing:0.08em;margin-left:0.5rem;">TOMORROW</span>`
+        : '';
+
+      // EV pill — manifest model_ev is decimal fraction (0.40 = 40%)
+      const evStr  = formatEV(p.model_ev);
       const evPill = evStr
         ? `<span class="pick-ev-pill">${evStr} EV</span>`
         : `<span class="pick-ev-pill suppressed">EV —</span>`;
+
+      // Pick display
+      const betType = (p.bet_type || '').toUpperCase();
+      const betTeam = p.bet_team || '';
+      const betLine = p.bet_line && p.bet_line !== 'NA' ? parseFloat(p.bet_line) : null;
+      let pickDisplay;
+      if (betType === 'SPREAD' && betLine !== null) {
+        pickDisplay = `${betTeam} ${betLine > 0 ? '+' : ''}${betLine.toFixed(1)}`;
+      } else if (betType === 'TOTAL' && betLine !== null) {
+        pickDisplay = `${betTeam} ${betLine.toFixed(1)}`;
+      } else {
+        pickDisplay = betTeam;
+      }
+
+      const betTypeLabel = betType === 'TOTAL'
+        ? (betTeam === 'OVER' ? 'Total · Over' : 'Total · Under')
+        : betType === 'SPREAD' ? 'Spread' : 'Moneyline';
+
+      const oddsDisplay = renderOdds(p.model_odds);
+      const home = p.home_team || '';
+      const away = p.away_team || '';
+      const book = p.book || '';
 
       return `
         <div class="pick-card ${badgeClass}${isGated ? ' pick-blur-card' : ''}">
           <div class="pick-card-inner">
             <div class="pick-card-top">
-              <span class="pick-badge ${badgeClass}">${badgeText}</span>
+              <span class="pick-badge ${badgeClass}">${badgeText}</span>${timingLabel}
               ${evPill}
             </div>
             <div class="pick-matchup">${away} @ ${home}</div>
-            <div class="pick-pick ${isGated ? 'pick-blur' : ''}">${pick}</div>
+            <div class="pick-pick ${isGated ? 'pick-blur' : ''}">${pickDisplay}</div>
             <div class="pick-divider"></div>
             <div class="pick-meta ${isGated ? 'pick-blur' : ''}">
               <div class="pick-meta-item">
                 <span class="pick-meta-label">Odds</span>
-                <span class="pick-meta-val">${odds}</span>
+                <span class="pick-meta-val odds-val">${oddsDisplay}</span>
               </div>
               <div class="pick-meta-item">
                 <span class="pick-meta-label">Type</span>
-                <span class="pick-meta-val book">${betType}</span>
+                <span class="pick-meta-val">${betTypeLabel}</span>
               </div>
               <div class="pick-meta-item" style="text-align:right">
                 <span class="pick-meta-label">Book</span>
@@ -1123,6 +1265,70 @@ async function init() {
         </div>`;
     }).join('');
   }
+
+  // Initial render
+  renderCards();
+
+  // Inject the odds toggle below the section subtitle
+  // Toggle sits right-aligned above the grid, styled to match the mono aesthetic
+  const toggleHTML = `
+    <div id="odds-toggle-row" style="
+      display:flex;justify-content:flex-end;align-items:center;
+      gap:0.5rem;margin-bottom:1rem;font-family:var(--font-mono);font-size:0.7rem;
+      color:var(--muted);letter-spacing:0.06em;">
+      <span>ODDS:</span>
+      <button id="btn-american" onclick="setOddsFormat('american')" style="
+        background:var(--arc-gold);color:#0a0c10;border:none;border-radius:3px;
+        padding:0.2rem 0.55rem;font-family:var(--font-mono);font-size:0.7rem;
+        letter-spacing:0.06em;cursor:pointer;font-weight:700;">AMERICAN</button>
+      <button id="btn-decimal" onclick="setOddsFormat('decimal')" style="
+        background:transparent;color:var(--muted);border:1px solid var(--border);
+        border-radius:3px;padding:0.2rem 0.55rem;font-family:var(--font-mono);
+        font-size:0.7rem;letter-spacing:0.06em;cursor:pointer;">DECIMAL</button>
+    </div>`;
+  grid.insertAdjacentHTML('beforebegin', toggleHTML);
+}
+
+// Module-scope state for odds toggle — outside init() so setOddsFormat can reach them
+let showDecimal = false;
+let _cards      = [];
+function renderOdds(decOdds) {
+  const dec = parseFloat(decOdds) || 0;
+  if (!dec) return '—';
+  if (showDecimal) return dec.toFixed(2);
+  if (dec >= 2.0) return '+' + Math.round((dec - 1) * 100);
+  return String(Math.round(-100 / (dec - 1)));
+}
+
+// Odds format switcher — called by toggle buttons
+function setOddsFormat(fmt) {
+  showDecimal = (fmt === 'decimal');
+  // Update button styles
+  const btnAm  = document.getElementById('btn-american');
+  const btnDec = document.getElementById('btn-decimal');
+  if (btnAm && btnDec) {
+    if (showDecimal) {
+      btnAm.style.background  = 'transparent';
+      btnAm.style.color       = 'var(--muted)';
+      btnAm.style.border      = '1px solid var(--border)';
+      btnDec.style.background = 'var(--arc-gold)';
+      btnDec.style.color      = '#0a0c10';
+      btnDec.style.border     = 'none';
+    } else {
+      btnAm.style.background  = 'var(--arc-gold)';
+      btnAm.style.color       = '#0a0c10';
+      btnAm.style.border      = 'none';
+      btnDec.style.background = 'transparent';
+      btnDec.style.color      = 'var(--muted)';
+      btnDec.style.border     = '1px solid var(--border)';
+    }
+  }
+  // Re-render just the odds values — swap text in place, no full redraw needed
+  document.querySelectorAll('.odds-val').forEach((el, i) => {
+    if (i < _cards.length) {
+      el.textContent = renderOdds(_cards[i].pick.model_odds);
+    }
+  });
 }
 
 init();
