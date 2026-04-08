@@ -781,6 +781,35 @@ function renderSoccerSection(games) {
 </section>`;
 }
 
+// ── Build sport anchor pills ──────────────────────────────────────────────────
+// Only called with families that have data — pills are always in sync with sections
+function buildSportPills(familyOrder) {
+  const container = document.getElementById('sport-pills');
+  container.innerHTML = familyOrder.map(f => {
+    const cfg = sportCfg(f);
+    return `<a class="sport-pill ${cfg.cls}" href="#section-${f.toLowerCase()}">${cfg.icon} ${cfg.display}</a>`;
+  }).join('');
+}
+
+// ── Render sport section (team sports) ───────────────────────────────────────
+function renderSportSection(family, games) {
+  const cfg = sportCfg(family);
+  const passCount = games.filter(g => g.passes_filter === true || g.passes_filter === 'true').length;
+  const passNote  = passCount > 0
+    ? `<span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--green);letter-spacing:0.04em;">${passCount} pass filter</span>`
+    : '';
+  return `
+<section class="sport-section" id="section-${family.toLowerCase()}">
+  <div class="sport-section-header">
+    <div class="sport-accent ${cfg.cls}"></div>
+    <span class="sport-section-title">${cfg.icon} ${cfg.display}</span>
+    ${passNote}
+    <span class="sport-section-count">${games.length} game${games.length !== 1 ? 's' : ''}</span>
+  </div>
+  ${games.map(renderGameCard).join('')}
+</section>`;
+}
+
 // ── Main render ───────────────────────────────────────────────────────────────
 // Fixed canonical order — only sections with data are shown.
 // Anchors are built dynamically from whatever is present.
