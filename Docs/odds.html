@@ -829,12 +829,17 @@ function renderAll(data) {
   // Sport pills — only for active families
   buildSportPills(activeFamilies);
 
-  // Render sections
+  // Render sections — wrap each in try/catch so one bad sport can't blank the page
   const sections = activeFamilies.map(f => {
     const games = familyMap.get(f);
-    if (f === 'TENNIS') return renderTennisSection(games);
-    if (f === 'SOCCER') return renderSoccerSection(games);
-    return renderSportSection(f, games);
+    try {
+      if (f === 'TENNIS') return renderTennisSection(games);
+      if (f === 'SOCCER') return renderSoccerSection(games);
+      return renderSportSection(f, games);
+    } catch(e) {
+      console.error('Render error for', f, e);
+      return `<div class="run-note" style="color:var(--red)">⚠ Error rendering ${f} section — check console</div>`;
+    }
   });
 
   const html = [
@@ -851,11 +856,11 @@ function renderAll(data) {
 
 // ── Load and init ─────────────────────────────────────────────────────────────
 async function init() {
+  let data = null;
   try {
     const r = await fetch(MARKET_JSON);
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
-    renderAll(data);
+    data = await r.json();
   } catch (e) {
     document.getElementById('main-content').innerHTML = `
       <div class="empty-state">
@@ -864,7 +869,10 @@ async function init() {
           Refreshes each morning after the engine run. Check back after 9 AM ET.
         </span>
       </div>`;
+    return;
   }
+  // Render separately — errors here won't show the "not available" message
+  renderAll(data);
 }
 
 // Mobile nav
