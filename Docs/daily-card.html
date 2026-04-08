@@ -192,7 +192,7 @@
   .table-wrapper { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; table-layout: fixed; }
   /* Fixed column widths — prevents sport pill width variation from pushing Risk$ off screen */
-  col.col-sport  { width: 90px; }
+  col.col-sport  { width: 130px; }
   col.col-date   { width: 88px; }
   col.col-time   { width: 80px; }
   col.col-match  { width: auto; }  /* flex — takes remaining space */
@@ -563,18 +563,30 @@ function isTennisOrChallenger(sport) {
 function sportPill(sport) {
   if (!sport) return '';
   const s = sport.toUpperCase();
-  if (s === 'NBA')    return `<span class="sport-pill-badge sp-nba">🏀 NBA</span>`;
-  if (s === 'NCAAB')  return `<span class="sport-pill-badge sp-ncaab">🏀 NCAAB</span>`;
-  if (s === 'NHL')    return `<span class="sport-pill-badge sp-nhl">🏒 NHL</span>`;
-  if (s === 'MLB')    return `<span class="sport-pill-badge sp-mlb">⚾ MLB</span>`;
-  if (s.includes('SOCCER') || s.includes('EPL') || s.includes('UCL') || s.includes('UEL') ||
-      s.includes('BUNDESLIGA') || s.includes('SERIE') || s.includes('LIGUE') || s.includes('LIGA') || s.includes('MLS'))
-    return `<span class="sport-pill-badge sp-soccer">⚽ ${sport}</span>`;
-  if (s.startsWith('CHA'))
-    return `<span class="sport-pill-badge sp-cha">🎾 CHA</span>`;
-  if (s.includes('ATP') || s.includes('WTA') || s.includes('TENNIS'))
-    return `<span class="sport-pill-badge sp-tennis">🎾 ${sport}</span>`;
-  return `<span class="sport-pill-badge">${sport}</span>`;
+
+  // Shorten long sport labels — keep first two meaningful words after any prefix
+  function shortLabel(raw) {
+    // Strip known prefixes like "ATP - " or "CHA - "
+    let trimmed = raw.replace(/^(ATP|WTA|CHA)\s*[-–]\s*/i, '').trim();
+    // Take first two words max
+    const words = trimmed.split(/\s+/);
+    return words.slice(0, 2).join(' ');
+  }
+
+  let cls, label;
+  if (s === 'NBA')         { cls = 'sp-nba';    label = '🏀 NBA'; }
+  else if (s === 'NCAAB')  { cls = 'sp-ncaab';  label = '🏀 NCAAB'; }
+  else if (s === 'NHL')    { cls = 'sp-nhl';    label = '🏒 NHL'; }
+  else if (s === 'MLB')    { cls = 'sp-mlb';    label = '⚾ MLB'; }
+  else if (s.startsWith('CHA'))  { cls = 'sp-cha';    label = '🎾 CHA · ' + shortLabel(sport); }
+  else if (s.includes('ATP'))    { cls = 'sp-tennis'; label = '🎾 ATP · ' + shortLabel(sport); }
+  else if (s.includes('WTA'))    { cls = 'sp-tennis'; label = '🎾 WTA · ' + shortLabel(sport); }
+  else if (s.includes('SOCCER') || s.includes('EPL') || s.includes('UCL') ||
+           s.includes('UEL') || s.includes('BUNDESLIGA') || s.includes('MLS'))
+    { cls = 'sp-soccer'; label = '⚽ ' + shortLabel(sport); }
+  else { cls = ''; label = shortLabel(sport); }
+
+  return `<span class="sport-pill-badge ${cls}" title="${sport}">${label}</span>`;
 }
 
 // Sport family for filter button coloring
@@ -674,6 +686,10 @@ function renderPicks(picks) {
     // Last name only in matchup column for tennis — prevents overflow
     const homeDisplay = isTennis ? stripPlayerName(home) : home;
     const awayDisplay = isTennis ? stripPlayerName(away) : away;
+    // Full name in pick column but strip seeding/nationality decorators
+    const pickDisplay = isTennis
+      ? pick.replace(/\([^)]*\)/g, '').replace(/^\d+_/, '').trim()
+      : pick;
 
     return `<tr>
       <td>${sportPill(sport)}</td>
@@ -681,7 +697,7 @@ function renderPicks(picks) {
       <td class="muted">${time}</td>
       <td class="primary">${awayDisplay} <span style="color:var(--muted)">vs</span> ${homeDisplay}</td>
       <td class="muted">${betType}</td>
-      <td class="primary">${pick}</td>
+      <td class="primary">${pickDisplay}</td>
       <td class="gold" data-dec-odds="${oddsRaw}">${formatOdds(oddsRaw)}</td>
       <td class="muted">${book}</td>
       <td><span class="ev-val ${evPct > 10 ? 'high' : 'med'}">${fmt.ev(ev)}</span></td>
