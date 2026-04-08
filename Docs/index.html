@@ -704,7 +704,7 @@
       border-top: 1px solid var(--border);
       padding: 2rem 2.5rem;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 1rem;
@@ -718,6 +718,7 @@
     .footer-links {
       display: flex;
       gap: 1.5rem;
+      flex-wrap: wrap;
     }
     .footer-links a {
       font-family: var(--font-mono);
@@ -729,14 +730,32 @@
       transition: color 0.2s;
     }
     .footer-links a:hover { color: var(--text); }
+    .footer-legal {
+      width: 100%;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      padding-bottom: 0.75rem;
+    }
+    .footer-legal a {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      opacity: 0.7;
+      transition: color 0.2s;
+    }
+    .footer-legal a:hover { color: var(--text); opacity: 1; }
     .footer-disclaimer {
       width: 100%;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--muted);
       font-family: var(--font-mono);
       border-top: 1px solid var(--border);
       padding-top: 1rem;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     @keyframes fadeUp {
@@ -796,7 +815,7 @@
 <section class="hero">
   <div class="hero-content">
     <div class="hero-eyebrow">Quantitative Sports Investing</div>
-    <h1 class="hero-h1">
+    <h1 class="hero-h1" id="hero-h1">
       Find The<br>
       <span class="accent">Edge.</span><br>
       <span class="dim">Daily.</span>
@@ -938,6 +957,8 @@
     <a href="/odds.html">Odds</a>
     <a href="/tournaments.html">Tournaments</a>
     <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <div class="footer-legal">
     <a href="/about.html">About</a>
     <a href="/privacy.html">Privacy Policy</a>
     <a href="/terms.html">Terms of Use</a>
@@ -950,6 +971,46 @@
 </footer>
 
 <script>
+// ── Hero catchphrase rotation ─────────────────────────────────────────────────
+// Rotates on page load only — fixed for the session.
+// Each phrase: [line1 (white), line2 (gold/accent), line3 (muted/dim)]
+// Conversion testing: track which phrase → subscribe via UTM or dataLayer event.
+//
+// Full phrase pool (ranked by Plex, 2026-04-07):
+//   Tier 1 — broad homepage, anti-tout positioning:
+//     1. FIND THE / EDGE. / DAILY.
+//     2. TRADE. / DON'T BET. / DAILY.
+//     3. FOLLOW THE / MATH. / NOT NOISE.
+//     4. EXPECTED / VALUE. / EVERY DAY.
+//     5. TRADE THE / NUMBERS. / NOT NARRATIVES.
+//     6. AIM. / INVEST. / ASSESS.
+//   Tier 2 — reserve pool, expand rotation after A/B data:
+//     7. PRICE THE / MARKET. / BETTER.
+//     8. TRADE WITH / DISCIPLINE. / NOT HUNCHES.
+//     9. BUILD THE / EDGE. / EVERY DAY.
+//    10. EDGE FIRST. / EGO LAST. / DAILY.
+//    11. TRUST THE / PROCESS. / NOT PICKS.
+//    12. SIZE THE / POSITION. / RESPECT VARIANCE.
+
+const HERO_PHRASES = [
+  { l1: 'Find The',    l2: 'Edge.',        l3: 'Daily.'          },
+  { l1: 'Trade.',      l2: "Don't Bet.",   l3: 'Daily.'          },
+  { l1: 'Follow The',  l2: 'Math.',        l3: 'Not Noise.'      },
+  { l1: 'Expected',    l2: 'Value.',       l3: 'Every Day.'      },
+  { l1: 'Trade The',   l2: 'Numbers.',     l3: 'Not Narratives.' },
+  { l1: 'Aim.',        l2: 'Invest.',      l3: 'Assess.'         },
+];
+
+(function() {
+  const el = document.getElementById('hero-h1');
+  if (!el) return;
+  const phrase = HERO_PHRASES[Math.floor(Math.random() * HERO_PHRASES.length)];
+  el.innerHTML =
+    `${phrase.l1}<br>` +
+    `<span class="accent">${phrase.l2}</span><br>` +
+    `<span class="dim">${phrase.l3}</span>`;
+})();
+
 // Mobile menu toggle
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobile-menu');
