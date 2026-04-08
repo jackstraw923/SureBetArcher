@@ -516,16 +516,22 @@ function bookLink(key) {
 
 // Derive top-level sport family from market.json sport label
 function sportFamily(sport) {
-  const s = (sport || '').toUpperCase();
-  if (s === 'NBA')   return 'NBA';
-  if (s === 'NCAAB') return 'NCAAB';
-  if (s === 'NHL')   return 'NHL';
-  if (s === 'MLB')   return 'MLB';
-  if (s.includes('SOCCER') || s.includes('EPL') || s.includes('UEFA') ||
-      s.includes('BUNDESLIGA') || s.includes('SERIE') || s.includes('LIGUE') ||
-      s.includes('LIGA') || s.includes('MLS')) return 'SOCCER';
-  if (s.includes('ATP') || s.includes('WTA') || s.includes('TENNIS') ||
-      s.startsWith('CHA')) return 'TENNIS';
+  const s = (sport || '').trim();
+  const su = s.toUpperCase();
+  // Team sports — exact match first
+  if (su === 'NBA')   return 'NBA';
+  if (su === 'NCAAB') return 'NCAAB';
+  if (su === 'NHL')   return 'NHL';
+  if (su === 'MLB')   return 'MLB';
+  // Tennis — TOA sport label in market.json is just 'ATP' or 'WTA'
+  if (su === 'ATP' || su === 'WTA') return 'TENNIS';
+  if (su.startsWith('CHA'))         return 'TENNIS';
+  // Soccer — market.json uses league name directly
+  if (['EPL','UCL','UEL','MLS','BUNDESLIGA','SERIE A','LA LIGA','LIGUE 1',
+       'LIGUE_1','LA_LIGA','SERIE_A'].includes(su)) return 'SOCCER';
+  if (su.includes('BUNDESLIGA') || su.includes('SERIE') || su.includes('LIGUE') ||
+      su.includes('LIGA') || su.includes('UCL') || su.includes('UEL') ||
+      su.includes('EPL') || su.includes('MLS') || su.includes('SOCCER')) return 'SOCCER';
   return null;
 }
 
@@ -641,20 +647,21 @@ function renderGameCard(g) {
 }
 
 // ── Tennis tour classification ────────────────────────────────────────────────
-// Derives ATP / WTA / Challenger sub-group and tournament label from sport string
 function tennisTour(sport) {
-  const s = (sport || '').toUpperCase();
-  if (s.startsWith('CHA'))               return 'CHALLENGER';
-  if (s.includes('WTA'))                 return 'WTA';
-  if (s.includes('ATP') || s.includes('TENNIS')) return 'ATP';
-  return 'ATP';
+  const s = (sport || '').toUpperCase().trim();
+  if (s === 'WTA')           return 'WTA';
+  if (s.startsWith('CHA'))   return 'CHALLENGER';
+  return 'ATP';  // 'ATP' or anything else tennis
 }
 
-function tennisTournamentLabel(sport) {
-  // sport label looks like "ATP - Monte Carlo Masters" or "CHA - Sarasota Challenger"
-  return (sport || '')
-    .replace(/^(ATP|WTA|CHA)\s*[-–]\s*/i, '')
-    .trim() || sport;
+function tennisTournamentLabel(g) {
+  // market.json sport label is just 'ATP' or 'WTA' — tournament name is in
+  // home_team/away_team matchup context. Use sport_title if available,
+  // otherwise fall back to a generic label derived from sport field.
+  // When Target adds a tournament field we can use that directly.
+  if (g.sport_title && g.sport_title !== g.sport) return g.sport_title;
+  // Derive from home_team pattern if possible — last resort: sport label
+  return g.sport || 'Tournament';
 }
 
 // ── Render tennis section with ATP / WTA / Challenger sub-groups ──────────────
@@ -677,10 +684,10 @@ function renderTennisSection(games) {
     const tourGames = byTour[tour];
     if (!tourGames || !tourGames.length) return '';
 
-    // Group by tournament
+    // Group by tournament label
     const byTournament = new Map();
     for (const g of tourGames) {
-      const label = tennisTournamentLabel(g.sport);
+      const label = tennisTournamentLabel(g);
       if (!byTournament.has(label)) byTournament.set(label, []);
       byTournament.get(label).push(g);
     }
@@ -724,21 +731,22 @@ function renderTennisSection(games) {
 
 // ── Soccer section with league sub-groups ─────────────────────────────────────
 function soccerLeagueLabel(sport) {
+  // market.json uses league name directly as sport label
   const leagueMap = {
-    'EPL': 'English Premier League', 'SOCCER-EPL': 'English Premier League',
-    'BUNDESLIGA': 'Bundesliga', 'SOCCER-BUNDESLIGA': 'Bundesliga',
-    'SERIE_A': 'Serie A', 'SERIE A': 'Serie A',
-    'LIGUE_1': 'Ligue 1', 'LIGUE 1': 'Ligue 1', 'LIGUE_ONE': 'Ligue 1',
-    'LA_LIGA': 'La Liga', 'LA LIGA': 'La Liga',
-    'MLS': 'MLS',
-    'UCL': 'UEFA Champions League', 'UEFA_CHAMPS': 'UEFA Champions League',
-    'UEL': 'UEFA Europa League', 'UEFA_EUROPA': 'UEFA Europa League',
+    'EPL':        'English Premier League',
+    'UCL':        'UEFA Champions League',
+    'UEL':        'UEFA Europa League',
+    'BUNDESLIGA': 'Bundesliga',
+    'SERIE A':    'Serie A',
+    'LA LIGA':    'La Liga',
+    'LIGUE 1':    'Ligue 1',
+    'LIGUE_1':    'Ligue 1',
+    'LA_LIGA':    'La Liga',
+    'SERIE_A':    'Serie A',
+    'MLS':        'MLS',
   };
-  const s = (sport || '').toUpperCase().replace(/SOCCER[_-]?/,'').trim();
-  for (const [k, v] of Object.entries(leagueMap)) {
-    if (s.includes(k)) return v;
-  }
-  return sport || 'Soccer';
+  const key = (sport || '').trim().toUpperCase();
+  return leagueMap[key] || sport || 'Soccer';
 }
 
 function renderSoccerSection(games) {
