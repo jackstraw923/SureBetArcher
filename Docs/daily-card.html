@@ -147,25 +147,26 @@
     font-family: var(--font-mono); font-size: 0.65rem;
     color: var(--muted); letter-spacing: 0.06em; margin-top: 0.25rem;
   }
-  /* Scorecard back-link — relationship indicator */
+  /* Scorecard back-link — mirrors "View Today's Card" button on Scorecard */
   .scorecard-link {
-    display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
     text-decoration: none;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.6rem 1rem;
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 0.6rem 1.25rem;
     transition: all 0.2s;
     flex-shrink: 0;
   }
-  .scorecard-link:hover { border-color: var(--gold); }
+  .scorecard-link:hover { background: #f5c842; transform: translateY(-1px); }
   .scorecard-link-label {
-    font-family: var(--font-mono); font-size: 0.65rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--gold);
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--bg); font-weight: 700;
   }
   .scorecard-link-sub {
     font-family: var(--font-mono); font-size: 0.58rem;
-    color: var(--muted); letter-spacing: 0.04em;
+    color: rgba(8,11,18,0.65); letter-spacing: 0.04em;
     font-style: italic;
   }
 
@@ -189,7 +190,19 @@
 
   /* ── Picks Table ── */
   .table-wrapper { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; }
+  table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; table-layout: fixed; }
+  /* Fixed column widths — prevents sport pill width variation from pushing Risk$ off screen */
+  col.col-sport  { width: 90px; }
+  col.col-date   { width: 88px; }
+  col.col-time   { width: 80px; }
+  col.col-match  { width: auto; }  /* flex — takes remaining space */
+  col.col-type   { width: 72px; }
+  col.col-pick   { width: 160px; }
+  col.col-odds   { width: 68px; }
+  col.col-book   { width: 110px; }
+  col.col-ev     { width: 72px; }
+  col.col-kelly  { width: 70px; }
+  col.col-risk   { width: 72px; }
   thead tr { border-bottom: 1px solid var(--border-light); }
   th {
     padding: 0.6rem 0.75rem; text-align: left;
@@ -414,6 +427,12 @@
       </div>
       <div class="table-wrapper">
         <table id="picks-table">
+          <colgroup>
+            <col class="col-sport"><col class="col-date"><col class="col-time">
+            <col class="col-match"><col class="col-type"><col class="col-pick">
+            <col class="col-odds"><col class="col-book"><col class="col-ev">
+            <col class="col-kelly"><col class="col-risk">
+          </colgroup>
           <thead>
             <tr>
               <th>Sport</th>
