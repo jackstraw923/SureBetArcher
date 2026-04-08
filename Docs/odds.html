@@ -264,6 +264,26 @@
     .footer-links a:hover{color:var(--text);}
     .footer-disclaimer{width:100%;font-size:0.65rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;line-height:1.6;}
 
+    /* ── Tennis / Soccer sub-grouping ── */
+    .tennis-tour-group{margin-bottom:1.25rem;}
+    .tennis-tour-header{
+      display:flex;align-items:center;gap:0.6rem;
+      padding:0.4rem 0;margin-bottom:0.4rem;
+    }
+    .tennis-tour-label{
+      font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.12em;
+      text-transform:uppercase;color:var(--tennis);font-weight:500;
+    }
+    .tennis-tour-pass{font-family:var(--font-mono);font-size:0.6rem;color:var(--green);letter-spacing:0.04em;}
+    .tennis-tour-count{font-family:var(--font-mono);font-size:0.6rem;color:var(--muted2);margin-left:auto;}
+    .tennis-tournament-group{margin-bottom:0.75rem;}
+    .tennis-tournament-label{
+      font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.08em;
+      text-transform:uppercase;color:var(--muted);
+      padding:0.3rem 0.2rem 0.4rem;margin-bottom:0.3rem;
+      border-bottom:1px solid rgba(26,34,56,0.5);
+    }
+
     /* ── Responsive ── */
     @media(max-width:768px){
       .nav-links{display:none;}
@@ -472,8 +492,10 @@ function formatPct(val) {
 function formatEV(val) {
   const v = parseFloat(val);
   if (isNaN(v) || v === 0) return null;
-  const pct = v * 100;
-  return (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+  // market.json home_ev / away_ev are already whole-number percentages (e.g. 42.63 = 42.6%)
+  // Do NOT multiply by 100 — unlike manifest model_ev which is a decimal fraction.
+  // Extreme values like +4264% are real model outputs and displayed as-is.
+  return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
 }
 
 function formatTime(utcStr) {
@@ -618,36 +640,144 @@ function renderGameCard(g) {
 </div>`;
 }
 
-// ── Render sport section ──────────────────────────────────────────────────────
-function renderSportSection(family, games) {
-  const cfg = sportCfg(family);
+// ── Tennis tour classification ────────────────────────────────────────────────
+// Derives ATP / WTA / Challenger sub-group and tournament label from sport string
+function tennisTour(sport) {
+  const s = (sport || '').toUpperCase();
+  if (s.startsWith('CHA'))               return 'CHALLENGER';
+  if (s.includes('WTA'))                 return 'WTA';
+  if (s.includes('ATP') || s.includes('TENNIS')) return 'ATP';
+  return 'ATP';
+}
+
+function tennisTournamentLabel(sport) {
+  // sport label looks like "ATP - Monte Carlo Masters" or "CHA - Sarasota Challenger"
+  return (sport || '')
+    .replace(/^(ATP|WTA|CHA)\s*[-–]\s*/i, '')
+    .trim() || sport;
+}
+
+// ── Render tennis section with ATP / WTA / Challenger sub-groups ──────────────
+function renderTennisSection(games) {
+  const cfg = sportCfg('TENNIS');
+
+  // Partition by tour
+  const tourOrder  = ['ATP', 'WTA', 'CHALLENGER'];
+  const tourLabels = { ATP: 'ATP', WTA: 'WTA', CHALLENGER: 'Challenger' };
+  const byTour     = { ATP: [], WTA: [], CHALLENGER: [] };
+
+  for (const g of games) {
+    const tour = tennisTour(g.sport);
+    if (!byTour[tour]) byTour[tour] = [];
+    byTour[tour].push(g);
+  }
+
+  // Within each tour, group by tournament label, sort alphabetically
+  function renderTourGroup(tour) {
+    const tourGames = byTour[tour];
+    if (!tourGames || !tourGames.length) return '';
+
+    // Group by tournament
+    const byTournament = new Map();
+    for (const g of tourGames) {
+      const label = tennisTournamentLabel(g.sport);
+      if (!byTournament.has(label)) byTournament.set(label, []);
+      byTournament.get(label).push(g);
+    }
+
+    // Sort tournaments alphabetically
+    const sorted = [...byTournament.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+    const passCount = tourGames.filter(g => g.passes_filter === true || g.passes_filter === 'true').length;
+
+    return `
+<div class="tennis-tour-group">
+  <div class="tennis-tour-header">
+    <span class="tennis-tour-label">${tourLabels[tour]}</span>
+    ${passCount > 0 ? `<span class="tennis-tour-pass">${passCount} pass filter</span>` : ''}
+    <span class="tennis-tour-count">${tourGames.length} match${tourGames.length !== 1 ? 'es' : ''}</span>
+  </div>
+  ${sorted.map(([tournamentName, tGames]) => `
+    <div class="tennis-tournament-group">
+      <div class="tennis-tournament-label">${tournamentName}</div>
+      ${tGames.map(renderGameCard).join('')}
+    </div>`).join('')}
+</div>`;
+  }
+
   const passCount = games.filter(g => g.passes_filter === true || g.passes_filter === 'true').length;
   const passNote  = passCount > 0
     ? `<span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--green);letter-spacing:0.04em;">${passCount} pass filter</span>`
     : '';
 
   return `
-<section class="sport-section" id="section-${family.toLowerCase()}">
+<section class="sport-section" id="section-tennis">
   <div class="sport-section-header">
-    <div class="sport-accent ${cfg.cls}"></div>
+    <div class="sport-accent tennis"></div>
+    <span class="sport-section-title">${cfg.icon} ${cfg.display}</span>
+    ${passNote}
+    <span class="sport-section-count">${games.length} match${games.length !== 1 ? 'es' : ''}</span>
+  </div>
+  ${tourOrder.map(renderTourGroup).join('')}
+</section>`;
+}
+
+// ── Soccer section with league sub-groups ─────────────────────────────────────
+function soccerLeagueLabel(sport) {
+  const leagueMap = {
+    'EPL': 'English Premier League', 'SOCCER-EPL': 'English Premier League',
+    'BUNDESLIGA': 'Bundesliga', 'SOCCER-BUNDESLIGA': 'Bundesliga',
+    'SERIE_A': 'Serie A', 'SERIE A': 'Serie A',
+    'LIGUE_1': 'Ligue 1', 'LIGUE 1': 'Ligue 1', 'LIGUE_ONE': 'Ligue 1',
+    'LA_LIGA': 'La Liga', 'LA LIGA': 'La Liga',
+    'MLS': 'MLS',
+    'UCL': 'UEFA Champions League', 'UEFA_CHAMPS': 'UEFA Champions League',
+    'UEL': 'UEFA Europa League', 'UEFA_EUROPA': 'UEFA Europa League',
+  };
+  const s = (sport || '').toUpperCase().replace(/SOCCER[_-]?/,'').trim();
+  for (const [k, v] of Object.entries(leagueMap)) {
+    if (s.includes(k)) return v;
+  }
+  return sport || 'Soccer';
+}
+
+function renderSoccerSection(games) {
+  const cfg = sportCfg('SOCCER');
+
+  const byLeague = new Map();
+  for (const g of games) {
+    const label = soccerLeagueLabel(g.sport);
+    if (!byLeague.has(label)) byLeague.set(label, []);
+    byLeague.get(label).push(g);
+  }
+  const sorted = [...byLeague.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+
+  const passCount = games.filter(g => g.passes_filter === true || g.passes_filter === 'true').length;
+  const passNote  = passCount > 0
+    ? `<span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--green);letter-spacing:0.04em;">${passCount} pass filter</span>`
+    : '';
+
+  return `
+<section class="sport-section" id="section-soccer">
+  <div class="sport-section-header">
+    <div class="sport-accent soccer"></div>
     <span class="sport-section-title">${cfg.icon} ${cfg.display}</span>
     ${passNote}
     <span class="sport-section-count">${games.length} game${games.length !== 1 ? 's' : ''}</span>
   </div>
-  ${games.map(renderGameCard).join('')}
+  ${sorted.map(([leagueName, lGames]) => `
+    <div class="tennis-tournament-group">
+      <div class="tennis-tournament-label">${leagueName}</div>
+      ${lGames.map(renderGameCard).join('')}
+    </div>`).join('')}
 </section>`;
 }
 
-// ── Build sport pills ─────────────────────────────────────────────────────────
-function buildSportPills(familyOrder) {
-  const container = document.getElementById('sport-pills');
-  container.innerHTML = familyOrder.map(f => {
-    const cfg = sportCfg(f);
-    return `<a class="sport-pill ${cfg.cls}" href="#section-${f.toLowerCase()}">${cfg.icon} ${cfg.display}</a>`;
-  }).join('');
-}
-
 // ── Main render ───────────────────────────────────────────────────────────────
+// Fixed canonical order — only sections with data are shown.
+// Anchors are built dynamically from whatever is present.
+const SPORT_ORDER = ['MLB', 'NBA', 'NCAAB', 'NHL', 'SOCCER', 'TENNIS'];
+
 function renderAll(data) {
   if (!data || !data.length) {
     document.getElementById('main-content').innerHTML =
@@ -657,7 +787,7 @@ function renderAll(data) {
 
   allGames = data;
 
-  // Group by sport family, preserve order of first appearance
+  // Group by sport family
   const familyMap = new Map();
   for (const g of data) {
     const f = sportFamily(g.sport);
@@ -676,28 +806,36 @@ function renderAll(data) {
     });
   }
 
-  const familyOrder = [...familyMap.keys()];
+  // Only include sports that have data — in fixed canonical order
+  const activeFamilies = SPORT_ORDER.filter(f => familyMap.has(f) && familyMap.get(f).length > 0);
 
   // Summary bar
   const totalGames = data.length;
   const totalPass  = data.filter(g => g.passes_filter === true || g.passes_filter === 'true').length;
   document.getElementById('stat-games').textContent   = totalGames;
   document.getElementById('stat-pass').textContent    = totalPass;
-  document.getElementById('stat-sports').textContent  = familyOrder.length;
+  document.getElementById('stat-sports').textContent  = activeFamilies.length;
   document.getElementById('stat-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit',hour12:true}) + ' ET';
   document.getElementById('summary-bar').style.display = 'flex';
 
-  // Sport pills
-  buildSportPills(familyOrder);
+  // Sport pills — only for active families
+  buildSportPills(activeFamilies);
 
-  // Render content
+  // Render sections
+  const sections = activeFamilies.map(f => {
+    const games = familyMap.get(f);
+    if (f === 'TENNIS') return renderTennisSection(games);
+    if (f === 'SOCCER') return renderSoccerSection(games);
+    return renderSportSection(f, games);
+  });
+
   const html = [
     `<div class="run-note">
       Market data refreshes each morning after the engine run. Best-book odds and model probabilities as of today's fetch.
       Picks that clear both the EV gate and model edge gate are marked <span style="color:var(--green)">✓ Passes</span>.
       <a href="/edgevault.html">Learn how the filter works →</a>
     </div>`,
-    ...familyOrder.map(f => renderSportSection(f, familyMap.get(f)))
+    ...sections
   ].join('');
 
   document.getElementById('main-content').innerHTML = html;
