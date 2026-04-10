@@ -1022,8 +1022,9 @@ mobileMenu.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => mobileMenu.classList.remove('open'));
 });
 
-// JSON loader
-async function loadJSON(path) {
+// JSON loader — fetch first, fall back to inline data if fetch fails
+async function loadJSON(path, inlineData) {
+  if (inlineData !== null && inlineData !== undefined) return inlineData;
   try {
     const r = await fetch(path);
     if (!r.ok) throw new Error();
@@ -1192,8 +1193,8 @@ function buildConvictionCards(manifest) {
 
 async function init() {
   const [manifest, paper] = await Promise.all([
-    loadJSON('data/pick_manifest.json'),
-    loadJSON('data/paper_log.json'),
+    loadJSON(MANIFEST_URL, INLINE_MANIFEST),
+    loadJSON(PAPER_URL,    INLINE_PAPER),
   ]);
 
   // Stats bar — active pick count from manifest
@@ -1349,6 +1350,16 @@ async function init() {
     </div>`;
   grid.insertAdjacentHTML('beforebegin', toggleHTML);
 }
+
+// ── Inline data — injected by R on each Aim run ──────────────────────────────
+// Fallback when fetch() fails (local file://, CORS, network issues).
+// R replaces these via gsub() in SureBetAim.R injection block.
+var INLINE_MANIFEST = null;  // injected by R
+var INLINE_PAPER    = null;  // injected by R
+
+// Raw GitHub URLs — patched by R (idempotent, only fires once)
+var MANIFEST_URL = 'data/pick_manifest.json';  // patched by R
+var PAPER_URL    = 'data/paper_log.json';       // patched by R
 
 // Module-scope state for odds toggle — outside init() so setOddsFormat can reach them
 let showDecimal = false;

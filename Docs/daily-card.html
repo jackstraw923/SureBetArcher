@@ -192,7 +192,7 @@
   .table-wrapper { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.8rem; table-layout: fixed; }
   /* Fixed column widths — prevents sport pill width variation from pushing Risk$ off screen */
-  col.col-sport  { width: 130px; }
+  col.col-sport  { width: 150px; }
   col.col-date   { width: 88px; }
   col.col-time   { width: 80px; }
   col.col-match  { width: auto; }  /* flex — takes remaining space */
@@ -568,7 +568,22 @@ function sportPill(sport) {
   function shortLabel(raw) {
     // Strip known prefixes like "ATP - " or "CHA - "
     let trimmed = raw.replace(/^(ATP|WTA|CHA)\s*[-–]\s*/i, '').trim();
-    // Take first two words max
+    // Known long names — map to short display label
+    const knownShort = {
+      'monte carlo masters': 'Monte Carlo',
+      'monte carlo':         'Monte Carlo',
+      'indian wells masters':'Indian Wells',
+      'miami open':          'Miami',
+      'roland garros':       'Roland Garros',
+      'french open':         'French Open',
+      'us open':             'US Open',
+      'australian open':     'Australian Open',
+    };
+    const key = trimmed.toLowerCase();
+    for (const [k, v] of Object.entries(knownShort)) {
+      if (key.startsWith(k)) return v;
+    }
+    // Default: first two words
     const words = trimmed.split(/\s+/);
     return words.slice(0, 2).join(' ');
   }
@@ -691,9 +706,18 @@ function renderPicks(picks) {
       ? pick.replace(/\([^)]*\)/g, '').replace(/^\d+_/, '').trim()
       : pick;
 
+    // Format date as MM/DD/YYYY
+    function fmtDate(d) {
+      if (!d) return '—';
+      // Handle YYYY-MM-DD or YYYY/MM/DD
+      const m = String(d).match(/^(\d{4})[-/](\d{2})[-/](\d{2})/);
+      if (m) return `${m[2]}/${m[3]}/${m[1]}`;
+      return d;
+    }
+
     return `<tr>
       <td>${sportPill(sport)}</td>
-      <td class="muted">${date}</td>
+      <td class="muted">${fmtDate(date)}</td>
       <td class="muted">${time}</td>
       <td class="primary">${awayDisplay} <span style="color:var(--muted)">vs</span> ${homeDisplay}</td>
       <td class="muted">${betType}</td>
