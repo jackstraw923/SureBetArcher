@@ -621,6 +621,7 @@
       <div class="sidebar-section-label">Library</div>
 
       <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">Articles</div>
+      <button class="sidebar-item" data-panel="article-path-to-cup">The Path to the Cup <span class="item-badge" style="color:var(--gold);border-color:rgba(240,180,41,0.4);">Playoff</span></button>
       <button class="sidebar-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
       <button class="sidebar-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
       <button class="sidebar-item" data-panel="articles">
@@ -933,6 +934,64 @@
     <div class="ad-slot ad-slot-mid" id="ad-slot-mid">
       <div class="ad-slot-inner">
         <!-- AD PLACEHOLDER — insert ad code here -->
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Article — The Path to the Cup
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-article-path-to-cup">
+      <div class="panel-eyebrow">Library · Articles · Playoff Strategy</div>
+      <h1 class="panel-title">The Path to the Cup</h1>
+      <p class="panel-sub">Why bracket simulations reveal what series odds never can — the full probability of surviving an entire playoff campaign.</p>
+      <div class="article-meta">ArcVest Research · April 2026 · 4 min read</div>
+
+      <div class="article-body">
+
+        <p>A team can be favored in the series right in front of it and still be a long shot to win the title. That is not a contradiction. It is how path-dependent probability works.</p>
+
+        <p>If a team has a 60% chance to win its current series, that sounds strong in isolation. But a championship future is not one bet. It is a chain of conditional events. To lift the trophy, that same team might need to survive three or four consecutive rounds against increasingly strong opponents. Even before we account for matchup quality, injuries, rest asymmetry, or home-ice/home-court dynamics, the math compounds quickly.</p>
+
+        <h3>The Compounding Problem</h3>
+
+        <p>Here is the intuition. Suppose a team has a 60% chance in Round 1, then 45% in Round 2, 35% in Round 3, and 20% in the Final. Its title probability is not 60%. It is the product of the whole path.</p>
+
+        <div class="formula">
+0.60 × 0.45 × 0.35 × 0.20 = 1.89% championship probability
+
+A team can look live in the present and still be priced
+correctly as a distant long shot in the futures market.
+        </div>
+
+        <p>That is why single-series odds are incomplete. They tell you the probability of surviving the next gate. They do not tell you how difficult the road becomes after that gate opens.</p>
+
+        <h3>What Bracket Simulation Solves</h3>
+
+        <p>Bracket simulation solves the compounding problem by mapping every plausible route through the field and aggregating the probability of each route. Instead of asking, "Can this team win tonight's war?" the model asks, "What is the full probability distribution of surviving the entire campaign?"</p>
+
+        <p>This matters because the market often prices the next series more efficiently than the entire path. A club with a favorable opening matchup may look attractive in series odds, but if the likely semifinal and final opponents are elite, its title path can still be thin. The reverse is also true: a team with a merely decent Round 1 price can carry more title value if the surrounding quadrant is soft.</p>
+
+        <div class="callout">
+          <strong>The Quadrant Effect:</strong> Two teams can have identical Round 1 win probabilities and dramatically different championship equity — depending entirely on who they would face if they advanced. Bracket position is a hidden variable that series odds ignore entirely.
+        </div>
+
+        <h3>Path-Pricing vs. Headline-Pricing</h3>
+
+        <p>ArcVest's view is that futures should be path-priced, not headline-priced. The right question is never just whether a team is favored now. The right question is whether the market has fully accounted for the sequence of opponents it would need to beat next.</p>
+
+        <p>This is the analytical gap that bracket simulation addresses. By running tens of thousands of simulated tournaments and tracking which teams survive each round, the model generates a full championship probability distribution — not a single series price, but a complete map of every path to the title and its likelihood.</p>
+
+        <p style="font-size:0.75rem;color:var(--muted);margin-top:2rem;font-style:italic;">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal.</p>
+
+      </div>
+
+      <!-- Cross-link callout to Tournaments page -->
+      <div style="margin-top:2.5rem;padding:1.25rem 1.5rem;background:rgba(240,180,41,0.05);border:1px solid rgba(240,180,41,0.2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;">Live Simulation Data</div>
+          <div style="font-size:0.85rem;color:var(--muted);font-weight:300;line-height:1.6;max-width:460px;">See the path-probability model running on live NBA and NHL bracket data. Championship equity, round-by-round survival rates, and quadrant analysis — updated as the postseason unfolds.</div>
+        </div>
+        <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.4rem;border:1px solid var(--gold);color:var(--gold);text-decoration:none;border-radius:4px;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='var(--bg)';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">View Tournaments →</a>
       </div>
     </div>
 
