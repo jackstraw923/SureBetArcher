@@ -232,6 +232,23 @@
   .sp-soccer{ border-color: rgba(45,212,191,0.4);  color: #2dd4bf; background: rgba(45,212,191,0.08); }
   .sp-tennis{ border-color: rgba(251,146,60,0.4);  color: #fb923c; background: rgba(251,146,60,0.08); }
   .sp-cha   { border-color: rgba(251,146,60,0.3);  color: #fb923c; background: rgba(251,146,60,0.06); }
+  .sp-rd    { border-color: rgba(138,100,32,0.5);  color: #8a6420; background: rgba(138,100,32,0.08); }
+
+  /* ── R&D disclaimer banner — shown when 910 picks are in the slate ── */
+  .rd-disclaimer {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.65rem 1rem;
+    background: rgba(138,100,32,0.06);
+    border: 1px solid rgba(138,100,32,0.2);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: #8a6420;
+    letter-spacing: 0.03em;
+    line-height: 1.6;
+  }
+  .rd-disclaimer.visible { display: block; }
 
   /* ── EV display — plain colored text, no dots ── */
   .ev-val { font-family: var(--font-mono); font-size: 0.78rem; }
@@ -452,6 +469,10 @@
             <tr><td colspan="11" class="loading"><div class="spinner"></div> Loading trades...</td></tr>
           </tbody>
         </table>
+      </div>
+      <!-- R&D disclaimer — shown when 910 picks are in the slate -->
+      <div class="rd-disclaimer" id="rd-disclaimer">
+        ⓘ &nbsp;Research signals are included for informational purposes. ArcVest is actively collecting data on these market segments. These signals are <strong>not</strong> part of our advisory allocation — trade at your own discretion. Research in progress.
       </div>
     </div>
   </div>
@@ -694,6 +715,8 @@ function renderPicks(picks) {
     const ev      = p.EV    || p.bet_ev     || null;
     const kelly   = p.Kelly || p.scaled_kelly || null;
     const risk    = p['Risk $'] || p.risk_dollar || null;
+    const status  = p.status || p.Status || '';
+    const isRD    = status === '910';
     const evNum   = parseFloat(ev) || 0;
     const evPct   = Math.abs(evNum) < 1 ? evNum * 100 : evNum;
     const isTennis = isTennisOrChallenger(sport);
@@ -715,8 +738,13 @@ function renderPicks(picks) {
       return d;
     }
 
-    return `<tr>
-      <td>${sportPill(sport)}</td>
+    // Sport pill: R&D picks get the muted amber sp-rd badge appended
+    const pillHTML = isRD
+      ? sportPill(sport) + `<span class="sport-pill-badge sp-rd" style="margin-left:0.3rem;">R&amp;D</span>`
+      : sportPill(sport);
+
+    return `<tr${isRD ? ' style="opacity:0.78;"' : ''}>
+      <td>${pillHTML}</td>
       <td class="muted">${fmtDate(date)}</td>
       <td class="muted">${time}</td>
       <td class="primary">${awayDisplay} <span style="color:var(--muted)">vs</span> ${homeDisplay}</td>
@@ -729,6 +757,13 @@ function renderPicks(picks) {
       <td class="${parseFloat(risk)>2?'gold':'muted'}">${fmt.dollar(risk)}</td>
     </tr>`;
   }).join('');
+
+  // Show R&D disclaimer if any 910 picks are in the current slate
+  const disclaimerEl = document.getElementById('rd-disclaimer');
+  if (disclaimerEl) {
+    const hasRD = picks.some(p => (p.status || p.Status || '') === '910');
+    disclaimerEl.classList.toggle('visible', hasRD);
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────

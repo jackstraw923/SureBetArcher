@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scrollbar-gutter: stable;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — You're on the list</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #080b12; --bg2: #0e1220; --border: #1a2238;
@@ -22,10 +22,15 @@
       background: rgba(8,11,18,0.92);
       border-bottom: 1px solid rgba(26,34,56,0.6);
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-logo svg { width: 24px; height: 24px; }
-    .nav-logo span { font-family: var(--font-head); font-size: 1.5rem; color: var(--text); letter-spacing: 0.03em; }
-    .nav-logo span em { color: var(--gold); font-style: normal; }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-wordmark { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.55rem; letter-spacing: -0.02em; color: #e8eaf0; line-height: 1; }
+    .nav-wordmark em { color: #c9a84c; font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 2rem; }
+    .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 1.2rem; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; border-radius: 4px; white-space: nowrap; }
+    .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    @media (max-width: 900px) { .nav-links { display: none; } .nav-cta { display: none; } }
 
     .main {
       flex: 1;
@@ -134,11 +139,9 @@
     footer {
       background: var(--bg2);
       border-top: 1px solid var(--border);
-      padding: 1.2rem 2.5rem;
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: 0.62rem;
-      color: var(--muted);
+      padding: 2rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
     }
 
     @media (max-width: 600px) {
@@ -151,13 +154,16 @@
 
 <nav>
   <a class="nav-logo" href="/">
-    <svg viewBox="0 0 26 26" fill="none">
-      <circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/>
-      <path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/>
-      <circle cx="13" cy="13" r="2.5" fill="#080b12"/>
-    </svg>
-    <span>Arc<em>Vest</em></span>
+    <span class="nav-wordmark">Arc<em>Vest</em></span>
   </a>
+  <div class="nav-links">
+    <a href="/scorecard.html">Scorecard</a>
+    <a href="/daily-card.html">Daily Card</a>
+    <a href="/odds.html">Odds</a>
+    <a href="/tournaments.html">Tournaments</a>
+    <a href="/edgevault.html">EdgeVault</a>
+  </div>
+  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
 </nav>
 
 <main class="main">
@@ -189,7 +195,23 @@
 </main>
 
 <footer>
-  ArcVest / Mountain Engineering · arcvest.io
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.02em;color:#8e9ab5;">Arc<span style="color:#c9a84c">Vest</span></div>
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+    <a href="/" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Home</a>
+    <a href="/scorecard.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Scorecard</a>
+    <a href="/daily-card.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Daily Card</a>
+    <a href="/odds.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Odds</a>
+    <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Tournaments</a>
+    <a href="/edgevault.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">EdgeVault</a>
+  </div>
+  <div style="width:100%;display:flex;gap:1.5rem;padding-bottom:0.75rem;">
+    <a href="/about.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">About</a>
+    <a href="/privacy.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Privacy Policy</a>
+    <a href="/terms.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Terms of Service</a>
+  </div>
+  <div style="width:100%;font-size:0.68rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;line-height:1.5;">
+    For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io
+  </div>
 </footer>
 
 </body>

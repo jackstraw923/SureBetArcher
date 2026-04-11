@@ -564,11 +564,16 @@ function renderGameCard(g) {
   // For totals: home = Over, away = Under; labels differ
   const isTotal  = g.market_type === 'totals';
   const isSpread = g.market_type === 'spreads';
+  const betLine  = g.bet_line != null ? parseFloat(g.bet_line) : null;
+  const lineStr  = betLine != null ? ` ${betLine > 0 ? '+' : ''}${betLine}` : '';
   let homeLabel = g.home_team || '—';
   let awayLabel = g.away_team || '—';
   if (isTotal) {
-    homeLabel = 'Over';
-    awayLabel = 'Under';
+    homeLabel = betLine != null ? `Over ${betLine}` : 'Over';
+    awayLabel = betLine != null ? `Under ${betLine}` : 'Under';
+  } else if (isSpread) {
+    homeLabel = g.home_team + (betLine != null ? ` ${betLine > 0 ? '+' : ''}${betLine}` : '');
+    awayLabel = g.away_team + (betLine != null ? ` ${betLine >= 0 ? '-' : '+'}${Math.abs(betLine)}` : '');
   }
 
   const homeEV  = formatEV(g.home_ev);
