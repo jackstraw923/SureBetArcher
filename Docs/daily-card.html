@@ -659,7 +659,14 @@ function buildSportFilters() {
     if (s.includes('ATP'))   return 'ATP';
     if (s.includes('WTA'))   return 'WTA';
     return s.split(' ')[0];
-  }))].filter(Boolean).sort();
+  }))].filter(Boolean).sort((a, b) => {
+    // Custom sort: MLB → NBA → NCAAB → NHL → SOCCER → TENNIS (ATP/WTA/CHA grouped)
+    const order = {'MLB':0,'NBA':1,'NCAAB':2,'NHL':3,'NCAAW':4,'SOCCER':5,'ATP':6,'WTA':6,'CHA':6};
+    const ao = order[a] !== undefined ? order[a] : 7;
+    const bo = order[b] !== undefined ? order[b] : 7;
+    if (ao !== bo) return ao - bo;
+    return a.localeCompare(b);  // alphabetical within same group
+  });
 
   const bar = document.getElementById('sport-filters');
   bar.innerHTML =

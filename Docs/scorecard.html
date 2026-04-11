@@ -755,7 +755,7 @@ function signClass(v) {
 
 function signPrefix(v) {
   if (v == null) return '';
-  return v > 0 ? '+' : '';
+  return v > 0 ? '+' : v < 0 ? '−' : '';
 }
 
 function sportBadge(sport) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scrollbar-gutter: stable;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +14,10 @@
       --font-mono: 'DM Mono', monospace;
       --font-body: 'Outfit', sans-serif;
     }
+    html { scrollbar-gutter: stable; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; scrollbar-gutter: stable; }
 
     nav {
       position: sticky; top: 0; z-index: 100;
@@ -32,6 +34,8 @@
     .nav-links a:hover { color: var(--text); }
     .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
     .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; }
+    .nav-cta { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 1.2rem; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; border-radius: 4px; transition: all 0.2s; }
+    .nav-cta:hover { background: var(--gold); color: var(--bg); }
     .nav-mobile-menu { display: none; position: fixed; top: 57px; left: 0; right: 0; background: rgba(8,11,18,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); padding: 1.5rem 2.5rem; flex-direction: column; gap: 1.2rem; z-index: 99; }
     .nav-mobile-menu.open { display: flex; }
     .nav-mobile-menu a { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4); }
@@ -86,6 +90,7 @@
   <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
+  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
 </nav>
 
 <div class="nav-mobile-menu" id="mobile-menu">
@@ -95,6 +100,7 @@
   <a href="/odds.html">Odds</a>
   <a href="/tournaments.html">Tournaments</a>
   <a href="/edgevault.html">EdgeVault</a>
+  <a href="/membership.html" style="color:var(--gold);">Login / Sign Up</a>
 </div>
 
 <main class="main">

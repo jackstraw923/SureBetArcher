@@ -1,0 +1,14 @@
+# netlify.toml — ArcVest / Mountain Engineering
+# Build configuration and deployment rules
+#
+# IGNORE RULE: Skip Netlify build when only Docs/data/ JSON files changed.
+# Morning engine runs push JSON data files (market.json, daily_picks.json, etc.)
+# multiple times per day. These do not require a UI rebuild — the HTML pages
+# fetch JSON client-side at runtime via raw GitHub URLs.
+# Only HTML/CSS/JS changes to the UI layer should trigger a deployment.
+
+[build]
+  ignore = "git diff --quiet HEAD^ HEAD -- . ':(exclude)Docs/data/'"
+
+# Future: add [context.deploy-preview] and [context.branch-deploy] rules
+# when dev branch strategy is implemented before subscriber launch.

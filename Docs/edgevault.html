@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — EdgeVault</title>
-  <meta name="description" content="EdgeVault by ArcVest — free tools and educational content for quantitative sports bettors. No-vig calculator, odds converter, hedge calculator, and deep-dive articles.">
+  <meta name="description" content="EdgeVault by ArcVest — free tools and educational content for quantitative sports traders. No-vig calculator, odds converter, hedge calculator, and deep-dive articles.">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -22,12 +22,15 @@
       --font-body: 'Outfit', sans-serif;
       --nav-w:     260px;
     }
+    html { scrollbar-gutter: stable; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-body);
       overflow-x: hidden;
+      scrollbar-gutter: stable;
     }
 
     /* ── Top nav ── */
@@ -573,7 +576,7 @@
   <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
-  <a class="nav-cta" href="/#waitlist">Get Daily Trades</a>
+  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
 </nav>
 
 <!-- Mobile menu -->
@@ -583,7 +586,7 @@
   <a href="/odds.html">Odds</a>
   <a href="/tournaments.html">Tournaments</a>
   <a href="/edgevault.html" style="color:var(--gold);">EdgeVault</a>
-  <a href="/#waitlist" style="color:var(--gold);">Get Daily Trades — Free</a>
+  <a href="/membership.html" style="color:var(--gold);">Login / Sign Up</a>
 </div>
 
 <!-- Layout -->
@@ -622,6 +625,7 @@
 
       <div class="sidebar-section-label" style="font-size:0.55rem;margin-top:1rem;padding-left:0.25rem;">Articles</div>
       <button class="sidebar-item" data-panel="article-path-to-cup">The Path to the Cup <span class="item-badge" style="color:var(--gold);border-color:rgba(240,180,41,0.4);">Playoff</span></button>
+      <button class="sidebar-item" data-panel="article-bounded-overlay">The Bounded Overlay <span class="item-badge" style="color:var(--gold);border-color:rgba(240,180,41,0.4);">Playoff</span></button>
       <button class="sidebar-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
       <button class="sidebar-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
       <button class="sidebar-item" data-panel="articles">
@@ -923,7 +927,7 @@
             <span class="tool-result-val green" id="hg-floor">—</span>
           </div>
         </div>
-        <p class="tool-note">Hedging reduces upside in exchange for certainty. Whether to hedge depends on your bankroll position, the odds movement, and your edge conviction. A hedge that eliminates all upside on a +EV original bet may not be optimal long-run.</p>
+        <p class="tool-note">Hedging reduces upside in exchange for certainty. Whether to hedge depends on your portfolio position, the odds movement, and your edge conviction. A hedge that eliminates all upside on a +EV original trade may not be optimal long-run.</p>
       </div>
     </div>
 
@@ -934,6 +938,167 @@
     <div class="ad-slot ad-slot-mid" id="ad-slot-mid">
       <div class="ad-slot-inner">
         <!-- AD PLACEHOLDER — insert ad code here -->
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANEL: Article — The Bounded Overlay
+    ═══════════════════════════════════════════ -->
+    <div class="panel" id="panel-article-bounded-overlay">
+      <div class="panel-eyebrow">Library · Articles · Playoff Strategy</div>
+      <h1 class="panel-title">The Bounded Overlay</h1>
+      <p class="panel-sub">Blending full-season strength with recent momentum — and why the circuit breaker matters as much as the blend.</p>
+      <div class="article-meta">ArcVest Research · April 2026 · 6 min read</div>
+
+      <div class="article-body">
+
+        <p>Playoff strength isn't full-season average or hot streak — it's a calibrated blend. ArcVest uses 75% full-season Pythagorean strength and 25% "Last 15" games for NBA playoffs, with 85/15 for NHL. This isn't arbitrary. It's tuned to playoff evidence while guarding against recency bias.</p>
+
+        <h3>Why Full Season Stays Dominant</h3>
+
+        <p>Full-season strength remains dominant because playoffs reward sustained quality. The NBA Pythagorean exponent (14.3) and NHL's PythagenPuck coefficient (0.458) derive win expectancy from points and goals scored and allowed across 82 games. That captures roster depth, coaching quality, and matchup-adjusted performance better than any short window. But late-season noise — load management, tanking decisions, clinch rest — distorts the full-season average. Enter the Last 15 overlay.</p>
+
+        <h3>The Last 15 as Turbocharger</h3>
+
+        <p>The Last 15 acts as a turbocharger, not a replacement. Recent Pythagorean strength is computed from the team's own most recent 15 completed games: sum points for and against over that window, apply the exponent. For NBA, where load management inflates regular-season variance, 25% recent weight acknowledges momentum without overreacting. NHL's cleaner late-season incentives justify just 15% — hockey's physical toll shows in shorter meaningful streaks.</p>
+
+        <div class="formula">
+R<sub>playoff</sub> = 0.75 · R<sub>season</sub> + 0.25 · R<sub>last15</sub>  &nbsp;&nbsp;(NBA)
+R<sub>playoff</sub> = 0.85 · R<sub>season</sub> + 0.15 · R<sub>last15</sub>  &nbsp;&nbsp;(NHL)
+        </div>
+
+        <h3>The ±8% Circuit Breaker</h3>
+
+        <p>Unchecked, a 15-game heater could swing strength 20% or more — chasing noise rather than signal. The ±8% shift cap is the circuit breaker. Compute the deviation δ = R<sub>last15</sub> − R<sub>season</sub>, clamp it to [−0.08, +0.08], then apply the weighted blend to the clamped value. This bounds the turbocharger while letting genuine signal through.</p>
+
+        <div class="callout">
+          <strong>The Shield in Action:</strong> A tanking team's meaningless 15-game skid or a rested star's artificial late-season hot streak both get rejected by the cap. The circuit breaker enforces discipline — meaningful momentum gets through, noise gets filtered out.
+        </div>
+
+        <h3>Blend Behavior Over the Season</h3>
+
+        <p>The chart below shows how each blend behaves as the season progresses, using a representative team with 0.500 full-season strength (NBA) and 0.520 (NHL). The orange Last 15 line is highly volatile — it's what you'd get if you only trusted recent form. The green Capped Blend is what ArcVest actually uses: anchored to season baseline, turbo-charged by recency, clipped against outliers.</p>
+
+      </div>
+
+      <!-- Inline SVG Chart — Playoff Strength Blends -->
+      <div style="margin:2rem 0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.5rem 1rem 1rem;">
+        <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:1rem;">Playoff Strength Blends Over Season Progress</div>
+        <svg viewBox="0 0 860 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible;">
+          <defs>
+            <clipPath id="clip-nba"><rect x="70" y="10" width="320" height="200"/></clipPath>
+            <clipPath id="clip-nhl"><rect x="470" y="10" width="320" height="200"/></clipPath>
+          </defs>
+
+          <!-- NBA Panel Background -->
+          <rect x="70" y="10" width="320" height="200" fill="rgba(14,18,32,0.6)" rx="4"/>
+          <!-- NHL Panel Background -->
+          <rect x="470" y="10" width="320" height="200" fill="rgba(14,18,32,0.6)" rx="4"/>
+
+          <!-- Grid lines NBA -->
+          <line x1="70" y1="50" x2="390" y2="50" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="70" y1="85" x2="390" y2="85" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="70" y1="120" x2="390" y2="120" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="70" y1="155" x2="390" y2="155" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="70" y1="190" x2="390" y2="190" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="150" y1="10" x2="150" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="230" y1="10" x2="230" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="310" y1="10" x2="310" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+
+          <!-- Grid lines NHL -->
+          <line x1="470" y1="50" x2="790" y2="50" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="470" y1="85" x2="790" y2="85" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="470" y1="120" x2="790" y2="120" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="470" y1="155" x2="790" y2="155" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="470" y1="190" x2="790" y2="190" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="550" y1="10" x2="550" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="630" y1="10" x2="630" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+          <line x1="710" y1="10" x2="710" y2="210" stroke="#1a2238" stroke-width="0.5"/>
+
+          <!-- NBA panel label -->
+          <text x="230" y="8" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8" fill="#6b7794" letter-spacing="1">NBA BLEND: 75/25</text>
+
+          <!-- NHL panel label -->
+          <text x="630" y="8" text-anchor="middle" font-family="'DM Mono',monospace" font-size="8" fill="#6b7794" letter-spacing="1">NHL BLEND: 85/15</text>
+
+          <!-- NBA curves -->
+          <!-- Full Season (flat at 0.500) — cyan dashed -->
+          <path d="M 70.0,135.7 L 390.0,135.7" stroke="#00bcd4" stroke-width="1.5" stroke-dasharray="4,3" fill="none" clip-path="url(#clip-nba)"/>
+          <!-- Last 15 — orange -->
+          <path d="M 70.0,56.3 L 73.2,52.9 L 76.5,49.7 L 79.7,46.6 L 82.9,43.7 L 86.2,40.8 L 89.4,38.0 L 92.6,35.4 L 95.9,32.8 L 99.1,30.4 L 102.3,28.1 L 105.6,25.9 L 108.8,23.8 L 112.0,21.8 L 115.3,20.0 L 118.5,18.3 L 121.7,16.7 L 124.9,15.2 L 128.2,13.8 L 131.4,12.6 L 134.6,11.5 L 137.9,10.5 L 141.1,9.6 L 144.3,8.9 L 147.6,8.3 L 150.8,7.8 L 154.0,7.5 L 157.3,7.2 L 160.5,7.1 L 163.7,7.2 L 167.0,7.3 L 170.2,7.6 L 173.4,8.0 L 176.7,8.6 L 179.9,9.2 L 183.1,10.0 L 186.4,10.9 L 189.6,11.9 L 192.8,13.1 L 196.1,14.4 L 199.3,15.8 L 202.5,17.3 L 205.8,19.0 L 209.0,20.8 L 212.2,22.7 L 215.5,24.7 L 218.7,26.8 L 221.9,29.0 L 225.2,31.4 L 228.4,33.9 L 231.6,36.5 L 234.8,39.2 L 238.1,42.0 L 241.3,44.9 L 244.5,48.0 L 247.8,51.1 L 251.0,54.4 L 254.2,57.7 L 257.5,61.2 L 260.7,64.7 L 263.9,68.4 L 267.2,72.1 L 270.4,75.9 L 273.6,79.9 L 276.9,83.9 L 280.1,88.0 L 283.3,92.2 L 286.6,96.5 L 289.8,100.9 L 293.0,105.3 L 296.3,109.9 L 299.5,114.5 L 302.7,119.1 L 306.0,123.9 L 309.2,128.7 L 312.4,133.6 L 315.7,138.6 L 318.9,143.6 L 322.1,148.6 L 325.4,153.8 L 328.6,159.0 L 331.8,164.2 L 335.1,169.5 L 338.3,174.8 L 341.5,180.2 L 344.7,185.6 L 348.0,191.1" stroke="#f0b429" stroke-width="1.5" fill="none" clip-path="url(#clip-nba)"/>
+          <!-- Capped Blend — green -->
+          <path d="M 70.0,115.8 L 73.2,115.0 L 76.5,114.2 L 79.7,113.4 L 82.9,112.7 L 86.2,112.0 L 89.4,111.3 L 92.6,110.6 L 95.9,110.0 L 99.1,109.4 L 102.3,108.8 L 105.6,108.3 L 108.8,107.7 L 112.0,107.2 L 115.3,106.8 L 118.5,106.4 L 121.7,106.0 L 124.9,105.6 L 128.2,105.2 L 131.4,104.9 L 134.6,104.7 L 137.9,104.4 L 141.1,104.2 L 144.3,104.0 L 147.6,103.9 L 150.8,103.7 L 154.0,103.7 L 157.3,103.6 L 160.5,103.6 L 163.7,103.6 L 167.0,103.6 L 170.2,103.7 L 173.4,103.8 L 176.7,103.9 L 179.9,104.1 L 183.1,104.3 L 186.4,104.5 L 189.6,104.8 L 192.8,105.1 L 196.1,105.4 L 199.3,105.7 L 202.5,106.1 L 205.8,106.5 L 209.0,107.0 L 212.2,107.4 L 215.5,108.0 L 218.7,108.5 L 221.9,109.0 L 225.2,109.6 L 228.4,110.3 L 231.6,110.9 L 234.8,111.6 L 238.1,112.3 L 241.3,113.0 L 244.5,113.8 L 247.8,114.6 L 251.0,115.4 L 254.2,116.2 L 257.5,117.1 L 260.7,118.0 L 263.9,118.9 L 267.2,119.8 L 270.4,120.8 L 273.6,121.8 L 276.9,122.8 L 280.1,123.8 L 283.3,124.8 L 286.6,125.9 L 289.8,127.0 L 293.0,128.1 L 296.3,129.3 L 299.5,130.4 L 302.7,131.6 L 306.0,132.8 L 309.2,134.0 L 312.4,135.2 L 315.7,136.4 L 318.9,137.7 L 322.1,138.9 L 325.4,140.2 L 328.6,141.5 L 331.8,142.8 L 335.1,144.2 L 338.3,145.5 L 341.5,146.8 L 344.7,148.2 L 348.0,149.6 L 351.2,150.9 L 354.4,152.3 L 357.7,153.7 L 360.9,155.1 L 364.1,156.5 L 367.4,157.9 L 370.6,159.3 L 373.8,160.7 L 377.1,162.2 L 380.3,163.6 L 383.5,165.0 L 386.8,166.4 L 390.0,167.9" stroke="#10b981" stroke-width="2" fill="none" clip-path="url(#clip-nba)"/>
+
+          <!-- NHL curves -->
+          <!-- Full Season (flat at 0.520) — gold dashed -->
+          <path d="M 470.0,84.3 L 790.0,84.3" stroke="#f0b429" stroke-width="1.5" stroke-dasharray="4,3" fill="none" clip-path="url(#clip-nhl)"/>
+          <!-- Last 15 — orange -->
+          <path d="M 470.0,60.2 L 473.2,59.6 L 476.5,59.1 L 479.7,58.8 L 482.9,58.6 L 486.2,58.6 L 489.4,58.7 L 492.6,58.9 L 495.9,59.3 L 499.1,59.9 L 502.3,60.6 L 505.6,61.4 L 508.8,62.3 L 512.0,63.4 L 515.3,64.7 L 518.5,66.0 L 521.7,67.6 L 524.9,69.2 L 528.2,71.0 L 531.4,72.9 L 534.6,74.9 L 537.9,77.0 L 541.1,79.3 L 544.3,81.7 L 547.6,84.2 L 550.8,86.8 L 554.0,89.6 L 557.3,92.4 L 560.5,95.4 L 563.7,98.4 L 567.0,101.6 L 570.2,104.8 L 573.4,108.1 L 576.7,111.6 L 579.9,115.1 L 583.1,118.7 L 586.4,122.3 L 589.6,126.1 L 592.8,129.9 L 596.1,133.7 L 599.3,137.7 L 602.5,141.6 L 605.8,145.7 L 609.0,149.7 L 612.2,153.9 L 615.5,158.0 L 618.7,162.2 L 621.9,166.4 L 625.2,170.7 L 628.4,174.9 L 631.6,179.2 L 634.8,183.5 L 638.1,187.8" stroke="#f59e0b" stroke-width="1.5" fill="none" clip-path="url(#clip-nhl)"/>
+          <!-- Capped Blend — green -->
+          <path d="M 470.0,80.7 L 473.2,80.6 L 476.5,80.5 L 479.7,80.5 L 482.9,80.4 L 486.2,80.4 L 489.4,80.4 L 492.6,80.5 L 495.9,80.5 L 499.1,80.6 L 502.3,80.7 L 505.6,80.9 L 508.8,81.0 L 512.0,81.2 L 515.3,81.3 L 518.5,81.6 L 521.7,81.8 L 524.9,82.0 L 528.2,82.3 L 531.4,82.6 L 534.6,82.9 L 537.9,83.2 L 541.1,83.5 L 544.3,83.9 L 547.6,84.3 L 550.8,84.7 L 554.0,85.1 L 557.3,85.5 L 560.5,85.9 L 563.7,86.4 L 567.0,86.9 L 570.2,87.4 L 573.4,87.9 L 576.7,88.4 L 579.9,88.9 L 583.1,89.4 L 586.4,90.0 L 589.6,90.6 L 592.8,91.1 L 596.1,91.7 L 599.3,92.3 L 602.5,92.9 L 605.8,93.5 L 609.0,94.1 L 612.2,94.7 L 615.5,95.3 L 618.7,96.0 L 621.9,96.6 L 625.2,97.2 L 628.4,97.9 L 631.6,98.5 L 634.8,99.2 L 638.1,99.8 L 641.3,100.4 L 644.5,101.1 L 647.8,101.7 L 651.0,102.4 L 654.2,103.0 L 657.5,103.6 L 660.7,104.3 L 663.9,104.9 L 667.2,105.5 L 670.4,106.1 L 673.6,106.7 L 676.9,107.3 L 680.1,107.9 L 683.3,108.5 L 686.6,109.0 L 689.8,109.6 L 693.0,110.1 L 696.3,110.7 L 699.5,111.2 L 702.7,111.7 L 706.0,112.2 L 709.2,112.7 L 712.4,113.2 L 715.7,113.6 L 718.9,114.0 L 722.1,114.5 L 725.4,114.9 L 728.6,115.1 L 790.0,115.1" stroke="#10b981" stroke-width="2" fill="none" clip-path="url(#clip-nhl)"/>
+
+          <!-- Axes -->
+          <line x1="70" y1="10" x2="70" y2="210" stroke="#242d45" stroke-width="1"/>
+          <line x1="70" y1="210" x2="390" y2="210" stroke="#242d45" stroke-width="1"/>
+          <line x1="470" y1="10" x2="470" y2="210" stroke="#242d45" stroke-width="1"/>
+          <line x1="470" y1="210" x2="790" y2="210" stroke="#242d45" stroke-width="1"/>
+
+          <!-- X axis labels NBA -->
+          <text x="150" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.4</text>
+          <text x="230" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.6</text>
+          <text x="310" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.8</text>
+          <text x="390" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">1.0</text>
+
+          <!-- X axis labels NHL -->
+          <text x="550" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.4</text>
+          <text x="630" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.6</text>
+          <text x="710" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">0.8</text>
+          <text x="790" y="222" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#4a526b">1.0</text>
+
+          <!-- X axis title -->
+          <text x="230" y="232" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#6b7794" letter-spacing="0.5">Season Progress</text>
+          <text x="630" y="232" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7.5" fill="#6b7794" letter-spacing="0.5">Season Progress</text>
+
+          <!-- Legend -->
+          <line x1="420" y1="30" x2="440" y2="30" stroke="#00bcd4" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="443" y="33" font-family="'DM Mono',monospace" font-size="7.5" fill="#6b7794">Full Season</text>
+          <line x1="420" y1="48" x2="440" y2="48" stroke="#f0b429" stroke-width="1.5"/>
+          <text x="443" y="51" font-family="'DM Mono',monospace" font-size="7.5" fill="#6b7794">Last 15</text>
+          <line x1="420" y1="66" x2="440" y2="66" stroke="#10b981" stroke-width="2"/>
+          <text x="443" y="69" font-family="'DM Mono',monospace" font-size="7.5" fill="#6b7794">Capped Blend</text>
+        </svg>
+      </div>
+
+      <div class="article-body">
+
+        <h3>Why These Ratios</h3>
+
+        <p>The weights aren't guesses. NBA evidence shows recent form predicts approximately 25% of playoff variance after controlling for season strength — load management and injury status create meaningful late-season shifts. NHL data is more stable; full-season goal metrics hold about 85% predictive weight. Backtests confirm that uncapped blends overfit to streaks, while capped versions track playoff outcomes better.</p>
+
+        <p>Season progress matters too. Early playoff rounds pull more heavily from the season baseline, where rosters are stable. Deeper rounds amplify the recent-form signal as injuries accumulate and matchup-specific adjustments become more significant. The blend adapts implicitly as the Last 15 window rolls forward through the bracket.</p>
+
+        <h3>Tunable by Design</h3>
+
+        <p>The implementation stays entirely in the model layer. Target computes the blend during strength construction, feeding series simulations directly. All parameters live in Config as named constants — no recoding required to adjust the blend:</p>
+
+        <div class="formula">
+NBA_PLAYOFF_BLEND_W    = 0.75   # 75% season / 25% recent
+NHL_PLAYOFF_BLEND_W    = 0.85   # 85% season / 15% recent
+RECENT_FORM_N_GAMES    = 15     # rolling window size
+MAX_RECENT_FORM_SHIFT  = 0.08   # ±8% circuit breaker cap
+        </div>
+
+        <p>This bounded approach embodies ArcVest's philosophy: math over narrative. Full season anchors reality. Recent form turbocharges relevance. The cap enforces discipline. Playoff edges emerge from that balance — not from chasing streaks.</p>
+
+      </div>
+
+      <!-- Cross-link callout to Tournaments page -->
+      <div style="margin-top:2.5rem;padding:1.25rem 1.5rem;background:rgba(240,180,41,0.05);border:1px solid rgba(240,180,41,0.2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;">Live Simulation Data</div>
+          <div style="font-size:0.85rem;color:var(--muted);font-weight:300;line-height:1.6;max-width:460px;">See the Bounded Overlay model running on live NBA and NHL bracket data. Blended team strengths, series win probabilities, and championship equity — updated each morning.</div>
+        </div>
+        <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.4rem;border:1px solid var(--gold);color:var(--gold);text-decoration:none;border-radius:4px;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='var(--gold)';this.style.color='var(--bg)';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">View Tournaments →</a>
       </div>
     </div>
 
@@ -1030,13 +1195,13 @@ A trade must have Edge > 0 to pass Gate 2.
         <p>This ensures the model actually disagrees with the market's fair probability — not just the vig-inflated line. A trade can have positive EV but negative edge if the book's fair odds are stronger than the model. That trade gets filtered out.</p>
 
         <h3>Why Both Gates?</h3>
-        <p>EV alone can be gamed by betting huge underdogs — technically positive EV but high variance. Edge alone doesn't account for the actual profit magnitude. Together, they ensure every logged trade is both <strong>mathematically profitable in expectation</strong> and <strong>based on genuine model disagreement with the market</strong>.</p>
+        <p>EV alone can be gamed by trading huge underdogs — technically positive EV but high variance. Edge alone doesn't account for the actual profit magnitude. Together, they ensure every logged trade is both <strong>mathematically profitable in expectation</strong> and <strong>based on genuine model disagreement with the market</strong>.</p>
         <div class="callout">
           <strong>In practice:</strong> On a typical day, several hundred raw candidates enter the pipeline. After the two-gate filter, 40–80 survive. Those are the trades. Every single one cleared both bars independently.
         </div>
 
         <h3>What Comes Next: Kelly Sizing</h3>
-        <p>After filtering, each trade receives a <strong>quarter Kelly</strong> stake — a conservative position size derived from the EV and odds. All trades are then scaled uniformly so total daily risk stays within 10% of bankroll. No single position dominates the portfolio. That's the final step before publication.</p>
+        <p>After filtering, each trade receives a <strong>quarter Kelly</strong> stake — a conservative position size derived from the EV and odds. All trades are then scaled uniformly so total daily risk stays within 10% of portfolio. No single position dominates the portfolio. That's the final step before publication.</p>
       </div>
     </div>
 
@@ -1130,7 +1295,7 @@ A trade must have Edge > 0 to pass Gate 2.
     <div class="panel" id="panel-articles">
       <div class="panel-eyebrow">Library · Articles</div>
       <h1 class="panel-title">Articles</h1>
-      <p class="panel-sub">Accessible, SEO-friendly reads for the disciplined bettor who wants a systematic edge without full quant immersion. 800–1,200 words each.</p>
+      <p class="panel-sub">Accessible, SEO-friendly reads for the disciplined trader who wants a systematic edge without full quant immersion. 800–1,200 words each.</p>
       <div class="coming-panel">
         <div class="coming-panel-icon">📰</div>
         <div class="coming-panel-title">Articles Coming Soon</div>
@@ -1151,11 +1316,11 @@ A trade must have Edge > 0 to pass Gate 2.
         <div class="soon-card">
           <div class="soon-badge">Week 3</div>
           <div class="soon-title">Line Shopping Is Free Money: How to Beat the Books Legally</div>
-          <div class="soon-desc">One half-point better odds compounds to 10%+ ROI over a season. The most underused edge available to any bettor.</div>
+          <div class="soon-desc">One half-point better odds compounds to 10%+ ROI over a season. The most underused edge available to any trader.</div>
         </div>
         <div class="soon-card">
           <div class="soon-badge">Week 3</div>
-          <div class="soon-title">Closing Line Value (CLV): The Sharp Bettor's Secret Metric</div>
+          <div class="soon-title">Closing Line Value (CLV): The Sharp Trader's Secret Metric</div>
           <div class="soon-desc">Beating the closing line is more predictive of long-term profitability than wins. What CLV is and why ArcVest tracks it on every trade.</div>
         </div>
       </div>
@@ -1202,8 +1367,8 @@ A trade must have Edge > 0 to pass Gate 2.
         </div>
         <div class="soon-card">
           <div class="soon-badge">Coming Soon</div>
-          <div class="soon-title">Setting Your Bankroll Size</div>
-          <div class="soon-desc">How to apply ArcVest's Kelly sizing to your real bankroll, what happens when you deviate, and why the 10% daily cap matters.</div>
+          <div class="soon-title">Setting Your Portfolio Size</div>
+          <div class="soon-desc">How to apply ArcVest's Kelly sizing to your real portfolio, what happens when you deviate, and why the 10% daily cap matters.</div>
         </div>
       </div>
     </div>
