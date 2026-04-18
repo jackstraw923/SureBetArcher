@@ -13,7 +13,6 @@
       --bg3:       #141929;
       --border:    #1a2238;
       --gold:      #f0b429;
-      --gold2:     #e07b00;
       --text:      #eceef4;
       --muted:     #6b7794;
       --green:     #10b981;
@@ -23,14 +22,19 @@
       --font-head: 'Bebas Neue', sans-serif;
       --font-mono: 'DM Mono', monospace;
       --font-body: 'Outfit', sans-serif;
-      --nav-w:     260px;
+      --nav-w:     240px;
     }
+
     html { scrollbar-gutter: stable; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; scrollbar-gutter: stable; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body); overflow-x: hidden;
+      scrollbar-gutter: stable;
+    }
 
     /* ── Top nav ── */
     .topnav {
@@ -56,123 +60,124 @@
     .nav-mobile-menu a { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid rgba(26,34,56,0.4); }
     .nav-mobile-menu a:hover { color: var(--text); }
 
-    /* ── Layout ── */
-    .layout { display: flex; padding-top: 57px; min-height: 100vh; }
+    /* ── Page layout — sidebar + main ── */
+    .page-wrap {
+      display: flex;
+      padding-top: 57px;
+      min-height: 100vh;
+    }
 
     /* ── Sidebar ── */
     .sidebar {
-      width: var(--nav-w); flex-shrink: 0;
-      position: fixed; top: 57px; left: 0; bottom: 0;
+      width: var(--nav-w);
+      flex-shrink: 0;
+      position: fixed;
+      top: 57px; left: 0; bottom: 0;
       overflow-y: auto;
       background: var(--bg2);
       border-right: 1px solid var(--border);
-      padding: 2rem 0 4rem;
+      padding: 1.75rem 0 4rem;
       z-index: 100;
     }
-    .sidebar::-webkit-scrollbar { width: 4px; }
-    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar { width: 3px; }
     .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    .sidebar-brand { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
-    .sidebar-brand-name { font-family: var(--font-head); font-size: 1.6rem; letter-spacing: 0.05em; color: var(--text); line-height: 1; }
-    .sidebar-brand-name em { color: var(--gold); font-style: normal; }
-    .sidebar-brand-sub { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 0.3rem; }
+    .sb-brand { padding: 0 1.25rem 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; }
+    .sb-brand-name { font-family: var(--font-head); font-size: 1.5rem; letter-spacing: 0.05em; color: var(--text); line-height: 1; }
+    .sb-brand-name em { color: var(--gold); font-style: normal; }
+    .sb-brand-sub { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
 
-    .sidebar-section { padding: 0 1.5rem; margin-bottom: 0.5rem; }
-    .sidebar-section-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; margin-top: 1.5rem; padding-left: 0.25rem; }
-    .sidebar-item {
+    .sb-section { padding: 0 1.25rem; }
+    .sb-section-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.4rem; padding-left: 0.25rem; }
+    .sb-item {
       display: flex; align-items: center; justify-content: space-between;
-      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em;
-      color: var(--muted); text-decoration: none;
-      padding: 0.45rem 0.75rem; border-radius: 4px; margin-bottom: 0.15rem;
-      transition: background 0.15s, color 0.15s;
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.04em;
+      color: var(--muted); padding: 0.42rem 0.65rem; border-radius: 4px;
+      margin-bottom: 0.12rem; transition: background 0.15s, color 0.15s;
       cursor: pointer; border: none; background: none; width: 100%; text-align: left;
     }
-    .sidebar-item:hover { background: rgba(240,180,41,0.06); color: var(--text); }
-    .sidebar-item.active { background: rgba(240,180,41,0.1); color: var(--gold); border-left: 2px solid var(--gold); padding-left: calc(0.75rem - 2px); }
-    .sidebar-badge { font-size: 0.55rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.15rem 0.4rem; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
-    .badge-live { color: var(--green); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
-    .badge-done { color: var(--muted); border-color: var(--border); }
-    .badge-soon { color: var(--gold); border-color: rgba(240,180,41,0.3); background: rgba(240,180,41,0.05); }
+    .sb-item:hover { background: rgba(240,180,41,0.06); color: var(--text); }
+    .sb-item.active { background: rgba(240,180,41,0.1); color: var(--gold); border-left: 2px solid var(--gold); padding-left: calc(0.65rem - 2px); }
+    .sb-badge { font-size: 0.54rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.12rem 0.38rem; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
+    .b-live { color: var(--green); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+    .b-done { color: var(--muted); border-color: var(--border); opacity: 0.7; }
+    .b-soon { color: var(--gold); border-color: rgba(240,180,41,0.3); background: rgba(240,180,41,0.05); }
 
-    /* ── Main ── */
-    .main { margin-left: var(--nav-w); flex: 1; padding: 3rem 3rem 5rem; max-width: 1100px; }
+    /* ── Main content ── */
+    .main-content {
+      /* Key: margin-left pushes past sidebar on desktop */
+      margin-left: var(--nav-w);
+      flex: 1;
+      min-width: 0;
+      padding: 2.5rem 2.5rem 5rem;
+      /* Match scorecard: max-width keeps content readable at large viewports */
+      max-width: calc(1600px + var(--nav-w));
+    }
 
     /* ── Panels ── */
     .panel { display: none; }
     .panel.active { display: block; }
 
-    .panel-eyebrow { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
-    .panel-title { font-family: var(--font-head); font-size: clamp(2rem, 4vw, 3rem); letter-spacing: 0.03em; color: var(--text); margin-bottom: 0.5rem; line-height: 1.05; }
-    .panel-sub { color: var(--muted); font-size: 0.88rem; font-weight: 300; line-height: 1.7; margin-bottom: 2rem; max-width: 640px; }
+    /* Panel header */
+    .p-eyebrow { font-family: var(--font-mono); font-size: 0.63rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.6rem; }
+    .p-title { font-family: var(--font-head); font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: 0.03em; color: var(--text); margin-bottom: 0.4rem; line-height: 1.05; }
+    .p-sub { color: var(--muted); font-size: 0.86rem; font-weight: 300; line-height: 1.7; margin-bottom: 1.5rem; max-width: 680px; }
 
-    /* ── Meta pills row ── */
-    .panel-meta { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-    .meta-pill { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; padding: 0.25rem 0.65rem; border-radius: 3px; border: 1px solid var(--border); background: var(--bg3); color: var(--muted); }
-    .meta-pill.live { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.07); }
-    .meta-pill.gold { color: var(--gold); border-color: rgba(240,180,41,0.25); background: rgba(240,180,41,0.05); }
-    .meta-pill.done { color: var(--muted); opacity: 0.6; }
+    .p-meta { display: flex; gap: 0.55rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .mp { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 0.22rem 0.6rem; border-radius: 3px; border: 1px solid var(--border); background: var(--bg3); color: var(--muted); }
+    .mp.live { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.07); }
+    .mp.gold { color: var(--gold); border-color: rgba(240,180,41,0.25); background: rgba(240,180,41,0.05); }
 
-    /* ── Championship probability bars ── */
-    .prob-section { margin-bottom: 2.5rem; }
-    .prob-section-title { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
-    .prob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-    .prob-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; }
-    .prob-rank { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted); min-width: 1.2rem; }
-    .prob-name { font-size: 0.82rem; color: var(--text); flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .prob-bar-wrap { width: 70px; flex-shrink: 0; }
-    .prob-bar-bg { height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
-    .prob-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
-    .prob-val { font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold); min-width: 38px; text-align: right; flex-shrink: 0; }
-
-    /* ── Bracket tree ── */
-    .bracket-wrap {
-      overflow-x: auto;
-      margin-bottom: 2.5rem;
-      padding-bottom: 1rem;
-    }
-    .bracket-container {
-      display: flex;
-      gap: 0;
-      min-width: 860px;
-    }
-
-    /* Conference label */
-    .conf-block {
-      flex: 1;
-      min-width: 380px;
-    }
-    .conf-label {
+    /* Section header within panel */
+    .section-head {
       font-family: var(--font-mono);
       font-size: 0.6rem;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 1rem;
-      padding-left: 0.25rem;
+      margin: 2.5rem 0 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Stacked bracket ── */
+    .conference-block { margin-bottom: 2rem; }
+    .conf-title {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      padding-left: 2px;
     }
 
-    /* Round columns */
-    .rounds {
+    /* Bracket scroll wrapper */
+    .bracket-scroll { overflow-x: auto; padding-bottom: 0.75rem; }
+
+    /* Bracket tree — horizontal flow */
+    .bracket-tree {
       display: flex;
       align-items: stretch;
       gap: 0;
+      min-width: 780px;
     }
-    .round-col {
+
+    /* Round column */
+    .r-col {
       display: flex;
       flex-direction: column;
       justify-content: space-around;
+      flex-shrink: 0;
     }
-    .round-col.r1 { width: 148px; flex-shrink: 0; }
-    .round-col.r2 { width: 148px; flex-shrink: 0; }
-    .round-col.r3 { width: 148px; flex-shrink: 0; }
+    .r-col.r1 { width: 190px; }
+    .r-col.r2 { width: 190px; }
+    .r-col.r3 { width: 190px; }
+    .r-col.rfinal { width: 160px; justify-content: center; }
 
     /* Connector column */
-    .connector-col {
-      width: 20px;
-      flex-shrink: 0;
-      position: relative;
-    }
+    .r-conn { width: 24px; flex-shrink: 0; position: relative; }
+    .r-conn svg { width: 24px; height: 100%; display: block; }
 
     /* Matchup card */
     .matchup {
@@ -180,33 +185,58 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       overflow: hidden;
-      margin: 4px 0;
+      margin: 6px 0;
       transition: border-color 0.2s;
     }
     .matchup:hover { border-color: rgba(240,180,41,0.3); }
 
-    .matchup-team {
+    /* Matchup header — series label / game info */
+    .matchup-header {
+      padding: 0.3rem 0.65rem;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .mh-label {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .mh-time {
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Team row */
+    .mt {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.4rem 0.6rem;
-      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 0.65rem;
+      border-bottom: 1px solid rgba(26,34,56,0.6);
       transition: background 0.15s;
     }
-    .matchup-team:last-child { border-bottom: none; }
-    .matchup-team.winner { background: rgba(240,180,41,0.06); }
-    .matchup-team.winner .team-name { color: var(--gold); }
+    .mt:last-child { border-bottom: none; }
+    .mt.winner { background: rgba(240,180,41,0.05); }
+    .mt.winner .mt-name { color: var(--gold); font-weight: 600; }
 
-    .team-seed {
+    .mt-seed {
       font-family: var(--font-mono);
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       color: var(--muted);
       min-width: 14px;
       text-align: center;
       flex-shrink: 0;
     }
-    .team-name {
-      font-size: 0.75rem;
+    .mt-name {
+      font-size: 0.8rem;
       font-weight: 500;
       color: var(--text);
       flex: 1;
@@ -214,97 +244,72 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .team-prob {
+    .mt-odds {
       font-family: var(--font-mono);
       font-size: 0.6rem;
       color: var(--muted);
       flex-shrink: 0;
+      min-width: 36px;
+      text-align: right;
     }
+    .mt-odds.fav { color: var(--gold); }
 
-    /* TBD matchup */
-    .matchup-tbd .team-name { color: var(--muted); font-style: italic; }
-    .matchup-tbd .team-seed { opacity: 0.4; }
+    /* TBD styling */
+    .matchup.tbd .mt-name { color: var(--muted); font-style: italic; font-weight: 300; }
+    .matchup.tbd .mt-seed { opacity: 0.3; }
+    .matchup.tbd .matchup-header { opacity: 0.5; }
 
-    /* Championship center */
-    .bracket-center {
-      width: 120px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0 8px;
-    }
+    /* Championship box */
     .champ-box {
-      background: linear-gradient(135deg, rgba(240,180,41,0.08), rgba(240,180,41,0.03));
-      border: 1px solid rgba(240,180,41,0.25);
+      background: linear-gradient(135deg, rgba(240,180,41,0.09) 0%, rgba(240,180,41,0.03) 100%);
+      border: 1px solid rgba(240,180,41,0.28);
       border-radius: 8px;
-      padding: 1rem 0.75rem;
+      padding: 1.25rem 0.75rem;
       text-align: center;
       width: 100%;
     }
-    .champ-label {
-      font-family: var(--font-mono);
-      font-size: 0.55rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.75rem;
-    }
-    .champ-trophy { font-size: 1.5rem; margin-bottom: 0.5rem; display: block; }
-    .champ-team {
-      font-family: var(--font-head);
-      font-size: 0.95rem;
-      letter-spacing: 0.06em;
-      color: var(--text);
-      line-height: 1.2;
-    }
-    .champ-prob {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--gold);
-      margin-top: 0.35rem;
-    }
+    .champ-label { font-family: var(--font-mono); font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+    .champ-trophy { font-size: 1.6rem; display: block; margin-bottom: 0.5rem; }
+    .champ-tbd { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); line-height: 1.6; }
 
-    /* SVG connectors */
-    .connector-svg { width: 100%; height: 100%; overflow: visible; }
-
-    /* Round labels */
-    .round-labels {
+    /* Round column labels */
+    .bracket-labels {
       display: flex;
-      margin-bottom: 0.75rem;
-      min-width: 860px;
+      min-width: 780px;
+      margin-bottom: 0.6rem;
     }
-    .round-label-cell {
-      font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-align: center;
+    .bl { font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
+
+    /* ── Probability bars ── */
+    .prob-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
+    .prob-row {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.5rem 0.8rem;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+    }
+    .pr-rank { font-family: var(--font-mono); font-size: 0.58rem; color: var(--muted); min-width: 1rem; flex-shrink: 0; }
+    .pr-name { font-size: 0.82rem; font-weight: 500; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pr-bar-bg { width: 72px; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+    .pr-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
+    .pr-val { font-family: var(--font-mono); font-size: 0.66rem; color: var(--gold); min-width: 36px; text-align: right; flex-shrink: 0; }
 
     /* ── Model note ── */
     .model-note {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--gold);
-      border-radius: 6px;
-      padding: 1rem 1.5rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 2rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-left: 3px solid var(--gold); border-radius: 6px;
+      padding: 0.9rem 1.25rem; font-size: 0.76rem; color: var(--muted);
+      line-height: 1.7; margin-top: 2rem;
     }
     .model-note strong { color: var(--text); }
 
-    /* ── Archive completed panel ── */
-    .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-    .archive-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; opacity: 0.7; }
-    .archive-sport { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
-    .archive-name { font-family: var(--font-head); font-size: 1.3rem; letter-spacing: 0.04em; color: var(--text); line-height: 1.1; margin-bottom: 0.5rem; }
-    .archive-winner { font-size: 0.78rem; color: var(--muted); font-weight: 300; }
-    .archive-winner strong { color: var(--gold); }
+    /* ── Archive panel ── */
+    .archive-note { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem; }
+    .archive-note p { font-size: 0.84rem; color: var(--muted); line-height: 1.7; }
 
     /* ── Footer ── */
     footer {
@@ -312,32 +317,35 @@
       background: var(--bg2); border-top: 1px solid var(--border);
       padding: 2rem 2.5rem;
       display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem; margin-top: 2rem;
+      flex-wrap: wrap; gap: 1rem;
     }
     .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.55rem; letter-spacing: -0.02em; color: #8e9ab5; }
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
       .sidebar { display: none; }
-      .main { margin-left: 0; padding: 2rem 1.5rem 4rem; max-width: 100%; }
+      .sidebar.open { display: block; z-index: 150; }
+      .main-content { margin-left: 0; padding: 2rem 1.25rem 4rem; }
       footer { margin-left: 0; padding: 1.5rem; }
-      .nav-links { display: none; }
+      .nav-links, .nav-cta { display: none; }
       .nav-hamburger { display: flex; }
       .topnav { padding: 1rem 1.5rem; }
-      .sidebar.open { display: block; z-index: 150; }
-      .sidebar-toggle-btn {
-        display: flex; align-items: center; gap: 0.5rem;
-        font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--gold); background: rgba(240,180,41,0.08); border: 1px solid rgba(240,180,41,0.2);
-        border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer; margin-bottom: 1.5rem;
-      }
-      .prob-grid { grid-template-columns: 1fr; }
+      .sidebar-toggle-btn { display: flex !important; }
     }
-    @media (min-width: 901px) { .sidebar-toggle-btn { display: none; } }
+
+    /* Mobile sidebar toggle button */
+    .sidebar-toggle-btn {
+      display: none;
+      align-items: center; gap: 0.5rem;
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gold); background: rgba(240,180,41,0.08); border: 1px solid rgba(240,180,41,0.2);
+      border-radius: 4px; padding: 0.45rem 0.9rem; cursor: pointer; margin-bottom: 1.75rem;
+    }
   </style>
 </head>
 <body>
 
+<!-- Top nav -->
 <nav class="topnav">
   <a class="nav-logo" href="/"><span class="wordmark">Arc<em>Vest</em></span></a>
   <div class="nav-links">
@@ -363,648 +371,574 @@
   <a href="/membership.html" style="color:var(--gold);">Login / Sign Up</a>
 </div>
 
-<div class="layout">
+<div class="page-wrap">
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-name">Bracket<em>Sim</em></div>
-      <div class="sidebar-brand-sub">50,000 Monte Carlo Runs</div>
+    <div class="sb-brand">
+      <div class="sb-brand-name">Bracket<em>Sim</em></div>
+      <div class="sb-brand-sub">50,000 Monte Carlo Runs</div>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-label">Current — 2026</div>
-      <button class="sidebar-item active" data-panel="nhl">
-        NHL Playoffs
-        <span class="sidebar-badge badge-live">● Live</span>
+    <div class="sb-section">
+      <div class="sb-section-label">Current — 2026</div>
+      <button class="sb-item active" data-panel="nhl">
+        NHL Playoffs <span class="sb-badge b-live">● Live</span>
       </button>
-      <button class="sidebar-item" data-panel="nba">
-        NBA Playoffs
-        <span class="sidebar-badge badge-live">● Live</span>
-      </button>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-section-label">Archive — 2026</div>
-      <button class="sidebar-item" data-panel="ncaab">
-        March Madness (M)
-        <span class="sidebar-badge badge-done">Final</span>
-      </button>
-      <button class="sidebar-item" data-panel="ncaaw">
-        March Madness (W)
-        <span class="sidebar-badge badge-done">Final</span>
-      </button>
-      <button class="sidebar-item" data-panel="atp-miami">
-        ATP Miami Open
-        <span class="sidebar-badge badge-done">Final</span>
-      </button>
-      <button class="sidebar-item" data-panel="wta-miami">
-        WTA Miami Open
-        <span class="sidebar-badge badge-done">Final</span>
+      <button class="sb-item" data-panel="nba">
+        NBA Playoffs <span class="sb-badge b-live">● Live</span>
       </button>
     </div>
 
-    <div class="sidebar-section">
-      <div class="sidebar-section-label">Coming Soon</div>
-      <button class="sidebar-item" data-panel="coming">
-        ATP Madrid Open
-        <span class="sidebar-badge badge-soon">Apr</span>
+    <div class="sb-section">
+      <div class="sb-section-label">Archive — 2026</div>
+      <button class="sb-item" data-panel="ncaab">
+        March Madness (M) <span class="sb-badge b-done">Final</span>
       </button>
-      <button class="sidebar-item" data-panel="coming">
-        Roland Garros
-        <span class="sidebar-badge badge-soon">May</span>
+      <button class="sb-item" data-panel="ncaaw">
+        March Madness (W) <span class="sb-badge b-done">Final</span>
+      </button>
+      <button class="sb-item" data-panel="atp-miami">
+        ATP Miami Open <span class="sb-badge b-done">Final</span>
+      </button>
+      <button class="sb-item" data-panel="wta-miami">
+        WTA Miami Open <span class="sb-badge b-done">Final</span>
+      </button>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-section-label">Coming Soon</div>
+      <button class="sb-item" data-panel="coming">
+        ATP Madrid Open <span class="sb-badge b-soon">Apr</span>
+      </button>
+      <button class="sb-item" data-panel="coming">
+        Roland Garros <span class="sb-badge b-soon">May</span>
       </button>
     </div>
   </aside>
 
-  <!-- Main -->
-  <main class="main">
+  <!-- Main content -->
+  <div class="main-content">
 
     <button class="sidebar-toggle-btn" id="sidebar-toggle">☰ &nbsp;Browse Tournaments</button>
 
-    <!-- ═══════════════════════════════════
-         PANEL: NHL Playoffs 2026
-    ═══════════════════════════════════ -->
+    <!-- ═══════════════════════════
+         NHL Playoffs 2026
+    ═══════════════════════════ -->
     <div class="panel active" id="panel-nhl">
-      <div class="panel-eyebrow">NHL · 2026 Stanley Cup Playoffs</div>
-      <h1 class="panel-title">Stanley Cup Playoffs</h1>
-      <p class="panel-sub">50,000 bracket simulations using PythagenPuck blended strength (85% season / 15% last-15, ±8% circuit breaker). Championship probabilities update each morning as series results are processed.</p>
-      <div class="panel-meta">
-        <span class="meta-pill live">● Live — Round 1</span>
-        <span class="meta-pill gold">16 teams</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">PythagenPuck</span>
-        <span class="meta-pill">Best-of-7</span>
-        <span class="meta-pill" id="nhl-updated">Updated today</span>
+      <div class="p-eyebrow">NHL · 2026 Stanley Cup Playoffs</div>
+      <h1 class="p-title">Stanley Cup Playoffs</h1>
+      <p class="p-sub">50,000 bracket simulations using PythagenPuck blended strength (85% season / 15% last-15, ±8% circuit breaker). Championship probabilities update each morning as series results are processed.</p>
+      <div class="p-meta">
+        <span class="mp live">● Live — Round 1</span>
+        <span class="mp gold">16 teams</span>
+        <span class="mp">50k sims</span>
+        <span class="mp">PythagenPuck</span>
+        <span class="mp">Best-of-7</span>
+        <span class="mp" id="nhl-updated">—</span>
       </div>
 
-      <!-- Championship probability bars -->
-      <div class="prob-section">
-        <div class="prob-section-title">Championship Probability — Top 8</div>
-        <div class="prob-grid" id="nhl-probs">
-          <!-- Populated by JS from sim JSON, fallback static below -->
-          <div class="prob-row"><span class="prob-rank">1</span><span class="prob-name">Colorado Avalanche</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:72%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">2</span><span class="prob-name">Dallas Stars</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:58%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">3</span><span class="prob-name">Vegas Golden Knights</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:50%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">4</span><span class="prob-name">Buffalo Sabres</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:44%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">5</span><span class="prob-name">Tampa Bay Lightning</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:36%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">6</span><span class="prob-name">Carolina Hurricanes</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:30%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">7</span><span class="prob-name">Edmonton Oilers</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:22%"></div></div></div><span class="prob-val">—</span></div>
-          <div class="prob-row"><span class="prob-rank">8</span><span class="prob-name">Pittsburgh Penguins</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:16%"></div></div></div><span class="prob-val">—</span></div>
+      <!-- BRACKET -->
+      <div class="section-head">Full Bracket</div>
+
+      <!-- Western Conference -->
+      <div class="conference-block">
+        <div class="conf-title">Western Conference</div>
+        <div class="bracket-scroll">
+          <div class="bracket-labels">
+            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:160px">Stanley Cup</div>
+          </div>
+          <div class="bracket-tree" style="align-items:center;">
+
+            <!-- R1 West -->
+            <div class="r-col r1">
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 19</span>
+                  <span class="mh-time">3:00 PM ET · TNT</span>
+                </div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Colorado Avalanche</span><span class="mt-odds fav">−250</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">LA Kings</span><span class="mt-odds">+200</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 18</span>
+                  <span class="mh-time">5:30 PM ET · ESPN</span>
+                </div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Dallas Stars</span><span class="mt-odds fav">−120</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Minnesota Wild</span><span class="mt-odds">+100</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 19</span>
+                  <span class="mh-time">10:00 PM ET · ESPN</span>
+                </div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Vegas Golden Knights</span><span class="mt-odds fav">−155</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Utah Mammoth</span><span class="mt-odds">+130</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 20</span>
+                  <span class="mh-time">10:00 PM ET · ESPN2</span>
+                </div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Edmonton Oilers</span><span class="mt-odds fav">−170</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Anaheim Ducks</span><span class="mt-odds">+145</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R1→R2 West -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- R2 West -->
+            <div class="r-col r2">
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R2→R3 West -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- R3 West — Conf Final -->
+            <div class="r-col r3">
+              <div class="matchup tbd">
+                <div class="matchup-header"><span class="mh-label">Conf. Final · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R3→Final -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,50 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- Stanley Cup Final -->
+            <div class="r-col rfinal">
+              <div class="champ-box">
+                <div class="champ-label">Stanley Cup Final<br>Jun 3 · TBD</div>
+                <span class="champ-trophy">🏒</span>
+                <div class="champ-tbd">TBD<br>vs<br>TBD</div>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <p style="font-size:0.72rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Probabilities load from <code style="font-size:0.68rem;">/data/nhl_playoff_sim.json</code> each morning. Shown as relative bars until sim data is available.</p>
       </div>
 
-      <!-- Full bracket tree -->
-      <div class="prob-section-title" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Full Bracket</div>
+      <!-- Eastern Conference -->
+      <div class="conference-block">
+        <div class="conf-title">Eastern Conference</div>
+        <div class="bracket-scroll">
+          <div class="bracket-labels">
+            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:160px">Stanley Cup</div>
+          </div>
+          <div class="bracket-tree" style="align-items:center;">
 
-      <div class="bracket-wrap">
-        <!-- Round labels -->
-        <div class="round-labels">
-          <div class="round-label-cell" style="width:148px">Round 1</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Semis</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Final</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:120px">Stanley Cup</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Final</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Semis</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Round 1</div>
+            <!-- R1 East -->
+            <div class="r-col r1">
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 19</span>
+                  <span class="mh-time">7:30 PM ET · ESPN</span>
+                </div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Buffalo Sabres</span><span class="mt-odds fav">−155</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Boston Bruins</span><span class="mt-odds">+130</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 19</span>
+                  <span class="mh-time">5:45 PM ET · TNT</span>
+                </div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Tampa Bay Lightning</span><span class="mt-odds fav">−185</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Montreal Canadiens</span><span class="mt-odds">+155</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 18</span>
+                  <span class="mh-time">3:00 PM ET · ESPN</span>
+                </div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Carolina Hurricanes</span><span class="mt-odds fav">−148</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Ottawa Senators</span><span class="mt-odds">+124</span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header">
+                  <span class="mh-label">Game 1 · Apr 18</span>
+                  <span class="mh-time">8:00 PM ET · ESPN</span>
+                </div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Pittsburgh Penguins</span><span class="mt-odds fav">−148</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Philadelphia Flyers</span><span class="mt-odds">+124</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R1→R2 East -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- R2 East -->
+            <div class="r-col r2">
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R2→R3 East -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- R3 East — Conf Final -->
+            <div class="r-col r3">
+              <div class="matchup tbd">
+                <div class="matchup-header"><span class="mh-label">Conf. Final · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <!-- Connector R3→Final -->
+            <div class="r-conn">
+              <svg viewBox="0 0 24 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,50 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- Stanley Cup Final reference -->
+            <div class="r-col rfinal">
+              <div class="champ-box" style="opacity:0.4;">
+                <div class="champ-label">→ Stanley Cup Final</div>
+                <div class="champ-tbd" style="font-size:0.65rem;margin-top:0.5rem;">East winner advances</div>
+              </div>
+            </div>
+
+          </div>
         </div>
+      </div>
 
-        <div class="bracket-container">
-
-          <!-- WEST: Round 1 -->
-          <div class="round-col r1" style="justify-content:space-around;padding:4px 0;">
-            <!-- W1 vs W4 -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">1</span>
-                <span class="team-name">Avalanche</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">4</span>
-                <span class="team-name">Kings</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- W2 vs W3 -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">2</span>
-                <span class="team-name">Stars</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">3</span>
-                <span class="team-name">Wild</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- W1P vs W4P -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">1</span>
-                <span class="team-name">Golden Knights</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">4</span>
-                <span class="team-name">Mammoth</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- W2P vs W3P -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">2</span>
-                <span class="team-name">Oilers</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">3</span>
-                <span class="team-name">Ducks</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connector W1→W2 -->
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <!-- Top pair bracket -->
-              <path d="M 0,50 H 10 V 100 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,150 H 10 V 100 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <!-- Bottom pair bracket -->
-              <path d="M 0,250 H 10 V 300 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,350 H 10 V 300 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- WEST: Round 2 -->
-          <div class="round-col r2" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connector W2→W3 -->
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,130 H 10 V 200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,270 H 10 V 200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- WEST: Conf Final -->
-          <div class="round-col r3" style="justify-content:center;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:auto;margin-bottom:auto;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connector West→Center -->
-          <div class="connector-col">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- Championship center -->
-          <div class="bracket-center">
-            <div class="champ-box">
-              <div class="champ-label">Stanley Cup Final</div>
-              <span class="champ-trophy">🏒</span>
-              <div class="champ-team" style="color:var(--muted);font-size:0.8rem;font-family:var(--font-mono);">TBD<br>vs<br>TBD</div>
-            </div>
-          </div>
-
-          <!-- Connector Center→East -->
-          <div class="connector-col">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- EAST: Conf Final -->
-          <div class="round-col r3" style="justify-content:center;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:auto;margin-bottom:auto;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connector E3→E2 -->
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 20,130 H 10 V 200 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,270 H 10 V 200 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- EAST: Round 2 -->
-          <div class="round-col r2" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">—</span>
-                <span class="team-name">TBD</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Connector E2→E1 -->
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 20,50 H 10 V 100 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,150 H 10 V 100 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,250 H 10 V 300 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,350 H 10 V 300 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- EAST: Round 1 -->
-          <div class="round-col r1" style="justify-content:space-around;padding:4px 0;">
-            <!-- E1 vs E4 -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">1</span>
-                <span class="team-name">Sabres</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">4</span>
-                <span class="team-name">Bruins</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- E2 vs E3 -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">2</span>
-                <span class="team-name">Lightning</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">3</span>
-                <span class="team-name">Canadiens</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- E1M vs E4M -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">1</span>
-                <span class="team-name">Hurricanes</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">4</span>
-                <span class="team-name">Senators</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-            <!-- E2M vs E3M -->
-            <div class="matchup">
-              <div class="matchup-team">
-                <span class="team-seed">2</span>
-                <span class="team-name">Penguins</span>
-                <span class="team-prob"></span>
-              </div>
-              <div class="matchup-team">
-                <span class="team-seed">3</span>
-                <span class="team-name">Flyers</span>
-                <span class="team-prob"></span>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /bracket-container -->
-      </div><!-- /bracket-wrap -->
+      <!-- Championship probability bars — below bracket -->
+      <div class="section-head">Championship Probability</div>
+      <div class="prob-grid" id="nhl-probs">
+        <div class="prob-row"><span class="pr-rank">1</span><span class="pr-name">Colorado Avalanche</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:80%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">2</span><span class="pr-name">Vegas Golden Knights</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:65%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">3</span><span class="pr-name">Dallas Stars</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:58%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">4</span><span class="pr-name">Buffalo Sabres</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:50%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">5</span><span class="pr-name">Tampa Bay Lightning</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:40%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">6</span><span class="pr-name">Carolina Hurricanes</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:35%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">7</span><span class="pr-name">Edmonton Oilers</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:28%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">8</span><span class="pr-name">Pittsburgh Penguins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:20%"></div></div><span class="pr-val">—</span></div>
+      </div>
+      <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Loads from <code style="font-size:0.66rem;">/data/nhl_playoff_sim.json</code> each morning. Relative bars shown until sim data is available.</p>
 
       <div class="model-note">
-        <strong>How NHL probabilities are calculated:</strong> PythagenPuck blended team strength (k=0.175/goal, σ=2.26) drives 50,000 best-of-7 series simulations. Each matchup uses home-ice advantage and the 85/15 season-to-recent blend with a ±8% circuit breaker to guard against late-season noise. Championship probability is the fraction of simulations in which each team lifts the Cup.
+        <strong>Model:</strong> PythagenPuck (k=0.175/goal, σ=2.26). 85/15 season-to-recent blend, ±8% circuit breaker. 50,000 best-of-7 series simulations with home-ice advantage. Championship probability = fraction of simulations in which each team lifts the Cup.
       </div>
-    </div>
+    </div><!-- /panel-nhl -->
 
-    <!-- ═══════════════════════════════════
-         PANEL: NBA Playoffs 2026
-    ═══════════════════════════════════ -->
+
+    <!-- ═══════════════════════════
+         NBA Playoffs 2026
+    ═══════════════════════════ -->
     <div class="panel" id="panel-nba">
-      <div class="panel-eyebrow">NBA · 2026 Playoffs</div>
-      <h1 class="panel-title">NBA Playoffs</h1>
-      <p class="panel-sub">50,000 bracket simulations using PythagenPat blended strength (75% season / 25% last-15, ±8% circuit breaker). Championship probabilities update each morning as series results are processed.</p>
-      <div class="panel-meta">
-        <span class="meta-pill live">● Live — Round 1</span>
-        <span class="meta-pill gold">16 teams</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">PythagenPat</span>
-        <span class="meta-pill">Best-of-7</span>
-        <span class="meta-pill" id="nba-updated">Updated today</span>
+      <div class="p-eyebrow">NBA · 2026 Playoffs</div>
+      <h1 class="p-title">NBA Playoffs</h1>
+      <p class="p-sub">50,000 bracket simulations using PythagenPat blended strength (75% season / 25% last-15, ±8% circuit breaker). Championship probabilities update each morning as series results are processed.</p>
+      <div class="p-meta">
+        <span class="mp live">● Live — Round 1</span>
+        <span class="mp gold">16 teams</span>
+        <span class="mp">50k sims</span>
+        <span class="mp">PythagenPat</span>
+        <span class="mp">Best-of-7</span>
+        <span class="mp" id="nba-updated">—</span>
       </div>
 
-      <div class="prob-section">
-        <div class="prob-section-title">Championship Probability — Top 8</div>
-        <div class="prob-grid" id="nba-probs">
-          <div class="prob-row"><span class="prob-rank">1</span><span class="prob-name">Loading…</span><div class="prob-bar-wrap"><div class="prob-bar-bg"><div class="prob-bar-fill" style="width:0%"></div></div></div><span class="prob-val">—</span></div>
-        </div>
-        <p style="font-size:0.72rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Probabilities load from <code style="font-size:0.68rem;">/data/nba_playoff_sim.json</code> each morning. Bracket seeds update after tonight's Play-In concludes.</p>
-      </div>
+      <div class="section-head">Full Bracket</div>
 
-      <!-- NBA bracket — West seeds confirmed, East 8-seed TBD -->
-      <div class="prob-section-title" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Full Bracket</div>
-
-      <div class="bracket-wrap">
-        <div class="round-labels">
-          <div class="round-label-cell" style="width:148px">Round 1</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Semis</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Final</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:120px">NBA Finals</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Final</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Conf. Semis</div>
-          <div class="round-label-cell" style="width:20px"></div>
-          <div class="round-label-cell" style="width:148px">Round 1</div>
-        </div>
-
-        <div class="bracket-container">
-
-          <!-- WEST R1 — seeds known from regular season -->
-          <div class="round-col r1" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">1</span><span class="team-name">OKC Thunder</span></div>
-              <div class="matchup-team"><span class="team-seed">8</span><span class="team-name">Portland</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">4</span><span class="team-name">Houston</span></div>
-              <div class="matchup-team"><span class="team-seed">5</span><span class="team-name">LA Lakers</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">3</span><span class="team-name">Golden State</span></div>
-              <div class="matchup-team"><span class="team-seed">6</span><span class="team-name">Minnesota</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">2</span><span class="team-name">San Antonio</span></div>
-              <div class="matchup-team"><span class="team-seed">7</span><span class="team-name">Phoenix Suns</span></div>
-            </div>
+      <!-- Western Conference -->
+      <div class="conference-block">
+        <div class="conf-title">Western Conference</div>
+        <div class="bracket-scroll">
+          <div class="bracket-labels">
+            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:160px">NBA Finals</div>
           </div>
+          <div class="bracket-tree" style="align-items:center;">
 
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,50 H 10 V 100 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,150 H 10 V 100 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,250 H 10 V 300 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,350 H 10 V 300 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <div class="round-col r2" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
+            <div class="r-col r1">
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">OKC Thunder</span><span class="mt-odds fav"></span></div>
+                <div class="mt"><span class="mt-seed">8</span><span class="mt-name">Portland Trail Blazers</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Houston Rockets</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">5</span><span class="mt-name">LA Lakers</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Golden State Warriors</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">6</span><span class="mt-name">Minnesota T-Wolves</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">San Antonio Spurs</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">7</span><span class="mt-name">Phoenix Suns</span><span class="mt-odds"></span></div>
+              </div>
             </div>
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
+
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
             </div>
-          </div>
 
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,130 H 10 V 200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 0,270 H 10 V 200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <div class="round-col r3" style="justify-content:center;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:auto;margin-bottom:auto;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
+            <div class="r-col r2">
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
             </div>
-          </div>
 
-          <div class="connector-col">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <div class="bracket-center">
-            <div class="champ-box">
-              <div class="champ-label">NBA Finals</div>
-              <span class="champ-trophy">🏀</span>
-              <div class="champ-team" style="color:var(--muted);font-size:0.8rem;font-family:var(--font-mono);">TBD<br>vs<br>TBD</div>
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
             </div>
-          </div>
 
-          <div class="connector-col">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 0,200 H 20" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
+            <div class="r-col r3">
+              <div class="matchup tbd">
+                <div class="matchup-header"><span class="mh-label">Conf. Final · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
 
-          <div class="round-col r3" style="justify-content:center;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:auto;margin-bottom:auto;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
+            <div class="r-conn">
+              <svg viewBox="0 0 24 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,50 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
             </div>
-          </div>
 
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 20,130 H 10 V 200 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,270 H 10 V 200 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
+            <div class="r-col rfinal">
+              <div class="champ-box">
+                <div class="champ-label">NBA Finals<br>Jun 3 · TBD</div>
+                <span class="champ-trophy">🏀</span>
+                <div class="champ-tbd">TBD<br>vs<br>TBD</div>
+              </div>
+            </div>
 
-          <div class="round-col r2" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-            </div>
-            <div class="matchup matchup-tbd" style="margin-top:60px;">
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-              <div class="matchup-team"><span class="team-seed">—</span><span class="team-name">TBD</span></div>
-            </div>
           </div>
-
-          <div class="connector-col" style="height:auto;">
-            <svg class="connector-svg" viewBox="0 0 20 400" preserveAspectRatio="none">
-              <path d="M 20,50 H 10 V 100 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,150 H 10 V 100 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,250 H 10 V 300 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-              <path d="M 20,350 H 10 V 300 H 0" stroke="#1a2238" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-
-          <!-- EAST R1 — confirmed seeds (Magic won, Hornets won) -->
-          <div class="round-col r1" style="justify-content:space-around;padding:4px 0;">
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">1</span><span class="team-name">Detroit</span></div>
-              <div class="matchup-team"><span class="team-seed">8</span><span class="team-name">Charlotte</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">4</span><span class="team-name">Cleveland</span></div>
-              <div class="matchup-team"><span class="team-seed">5</span><span class="team-name">Miami</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">3</span><span class="team-name">New York</span></div>
-              <div class="matchup-team"><span class="team-seed">6</span><span class="team-name">Indiana</span></div>
-            </div>
-            <div class="matchup">
-              <div class="matchup-team"><span class="team-seed">2</span><span class="team-name">Boston</span></div>
-              <div class="matchup-team"><span class="team-seed">7</span><span class="team-name">Philadelphia</span></div>
-            </div>
-          </div>
-
         </div>
       </div>
+
+      <!-- Eastern Conference -->
+      <div class="conference-block">
+        <div class="conf-title">Eastern Conference</div>
+        <div class="bracket-scroll">
+          <div class="bracket-labels">
+            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:24px"></div>
+            <div class="bl" style="width:160px">NBA Finals</div>
+          </div>
+          <div class="bracket-tree" style="align-items:center;">
+
+            <div class="r-col r1">
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Detroit Pistons</span><span class="mt-odds fav"></span></div>
+                <div class="mt"><span class="mt-seed">8</span><span class="mt-name">Charlotte Hornets</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Cleveland Cavaliers</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">5</span><span class="mt-name">Miami Heat</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">New York Knicks</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">6</span><span class="mt-name">Indiana Pacers</span><span class="mt-odds"></span></div>
+              </div>
+              <div class="matchup">
+                <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Boston Celtics</span><span class="mt-odds"></span></div>
+                <div class="mt"><span class="mt-seed">7</span><span class="mt-name">Philadelphia 76ers</span><span class="mt-odds"></span></div>
+              </div>
+            </div>
+
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <div class="r-col r2">
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+              <div class="matchup tbd" style="margin-top:50px;">
+                <div class="matchup-header"><span class="mh-label">Round 2 · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <div class="r-conn">
+              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <div class="r-col r3">
+              <div class="matchup tbd">
+                <div class="matchup-header"><span class="mh-label">Conf. Final · TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+                <div class="mt"><span class="mt-seed">—</span><span class="mt-name">TBD</span></div>
+              </div>
+            </div>
+
+            <div class="r-conn">
+              <svg viewBox="0 0 24 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,50 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+
+            <div class="r-col rfinal">
+              <div class="champ-box" style="opacity:0.4;">
+                <div class="champ-label">→ NBA Finals</div>
+                <div class="champ-tbd" style="font-size:0.65rem;margin-top:0.5rem;">East winner advances</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Championship probabilities — below bracket -->
+      <div class="section-head">Championship Probability</div>
+      <div class="prob-grid" id="nba-probs">
+        <div class="prob-row"><span class="pr-rank">1</span><span class="pr-name">Loading…</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:0%"></div></div><span class="pr-val">—</span></div>
+      </div>
+      <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Loads from <code style="font-size:0.66rem;">/data/nba_playoff_sim.json</code> each morning.</p>
 
       <div class="model-note">
-        <strong>How NBA probabilities are calculated:</strong> PythagenPat blended team strength (exp=16.5, calibrated on 2,306 games) drives 50,000 best-of-7 series simulations. Home-court advantage (+5.0pp) and the 75/25 season-to-recent blend with ±8% circuit breaker are applied to each matchup. Championship probability is the fraction of simulations in which each team wins the Finals. NBA totals are gated off — moneyline and spread only.
+        <strong>Model:</strong> PythagenPat (exp=16.5, calibrated 2,306 games). 75/25 season-to-recent blend, ±8% circuit breaker. Home-court advantage +5.0pp. 50,000 best-of-7 series simulations. Championship probability = fraction of simulations in which each team wins the Finals. NBA totals gated off — moneyline and spread only.
       </div>
-    </div>
+    </div><!-- /panel-nba -->
 
-    <!-- ═══════════════════════════════════
-         PANEL: NCAAB Archive
-    ═══════════════════════════════════ -->
+
+    <!-- ═══════════════════════════
+         Archive panels
+    ═══════════════════════════ -->
     <div class="panel" id="panel-ncaab">
-      <div class="panel-eyebrow">NCAA Men's Basketball · Archive</div>
-      <h1 class="panel-title">March Madness 2026</h1>
-      <p class="panel-sub">Tournament complete. Final bracket and championship probabilities archived below.</p>
-      <div class="panel-meta">
-        <span class="meta-pill done">● Completed</span>
-        <span class="meta-pill">68 teams</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">Pythagorean</span>
-      </div>
-      <div class="model-note" style="margin-top:1rem;">
-        <strong>Archive:</strong> Sim data from the final morning run before the championship game is preserved in <code style="font-size:0.72rem;">/data/ncaab_march_sim_final.json</code>. Full bracket results available on the archived bracket page.
-      </div>
+      <div class="p-eyebrow">NCAA Men's Basketball · Archive</div>
+      <h1 class="p-title">March Madness 2026</h1>
+      <div class="p-meta"><span class="mp">● Completed</span><span class="mp">68 teams</span><span class="mp">50k sims</span><span class="mp">Pythagorean</span></div>
+      <div class="archive-note"><p>Tournament complete. Sim data from the final morning run is preserved in <code>/data/ncaab_march_sim_final.json</code>.</p></div>
     </div>
 
-    <!-- ═══════════════════════════════════
-         PANEL: NCAAW Archive
-    ═══════════════════════════════════ -->
     <div class="panel" id="panel-ncaaw">
-      <div class="panel-eyebrow">NCAA Women's Basketball · Archive</div>
-      <h1 class="panel-title">March Madness 2026 (W)</h1>
-      <p class="panel-sub">Tournament complete. Final bracket and championship probabilities archived below.</p>
-      <div class="panel-meta">
-        <span class="meta-pill done">● Completed</span>
-        <span class="meta-pill">68 teams</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">Pythagorean</span>
-      </div>
-      <div class="model-note" style="margin-top:1rem;">
-        <strong>Archive:</strong> Sim data from the final morning run before the championship game is preserved in <code style="font-size:0.72rem;">/data/ncaaw_march_sim_final.json</code>.
-      </div>
+      <div class="p-eyebrow">NCAA Women's Basketball · Archive</div>
+      <h1 class="p-title">March Madness 2026 (W)</h1>
+      <div class="p-meta"><span class="mp">● Completed</span><span class="mp">68 teams</span><span class="mp">50k sims</span><span class="mp">Pythagorean</span></div>
+      <div class="archive-note"><p>Tournament complete. Sim data preserved in <code>/data/ncaaw_march_sim_final.json</code>.</p></div>
     </div>
 
-    <!-- ═══════════════════════════════════
-         PANEL: ATP Miami Archive
-    ═══════════════════════════════════ -->
     <div class="panel" id="panel-atp-miami">
-      <div class="panel-eyebrow">ATP Masters 1000 · Archive</div>
-      <h1 class="panel-title">Miami Open 2026</h1>
-      <p class="panel-sub">Tournament complete. Final draw simulation and championship probabilities archived.</p>
-      <div class="panel-meta">
-        <span class="meta-pill done">● Completed</span>
-        <span class="meta-pill">96 players</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">Sackmann Elo</span>
-        <span class="meta-pill">Hard Court</span>
-      </div>
-      <div class="model-note" style="margin-top:1rem;">
-        <strong>Archive:</strong> Final sim snapshot preserved in <code style="font-size:0.72rem;">/data/atp_miami_sim_final.json</code>.
-      </div>
+      <div class="p-eyebrow">ATP Masters 1000 · Archive</div>
+      <h1 class="p-title">Miami Open 2026</h1>
+      <div class="p-meta"><span class="mp">● Completed</span><span class="mp">96 players</span><span class="mp">50k sims</span><span class="mp">Sackmann Elo</span></div>
+      <div class="archive-note"><p>Tournament complete. Final sim snapshot preserved in <code>/data/atp_miami_sim_final.json</code>.</p></div>
     </div>
 
-    <!-- ═══════════════════════════════════
-         PANEL: WTA Miami Archive
-    ═══════════════════════════════════ -->
     <div class="panel" id="panel-wta-miami">
-      <div class="panel-eyebrow">WTA 1000 · Archive</div>
-      <h1 class="panel-title">WTA Miami Open 2026</h1>
-      <p class="panel-sub">Tournament complete. Final draw simulation and championship probabilities archived.</p>
-      <div class="panel-meta">
-        <span class="meta-pill done">● Completed</span>
-        <span class="meta-pill">96 players</span>
-        <span class="meta-pill">50k sims</span>
-        <span class="meta-pill">Sackmann Elo</span>
-        <span class="meta-pill">Hard Court</span>
-      </div>
-      <div class="model-note" style="margin-top:1rem;">
-        <strong>Archive:</strong> Final sim snapshot preserved in <code style="font-size:0.72rem;">/data/wta_miami_sim_final.json</code>.
-      </div>
+      <div class="p-eyebrow">WTA 1000 · Archive</div>
+      <h1 class="p-title">WTA Miami Open 2026</h1>
+      <div class="p-meta"><span class="mp">● Completed</span><span class="mp">96 players</span><span class="mp">50k sims</span><span class="mp">Sackmann Elo</span></div>
+      <div class="archive-note"><p>Tournament complete. Final sim snapshot preserved in <code>/data/wta_miami_sim_final.json</code>.</p></div>
     </div>
 
-    <!-- ═══════════════════════════════════
-         PANEL: Coming Soon
-    ═══════════════════════════════════ -->
     <div class="panel" id="panel-coming">
-      <div class="panel-eyebrow">Coming Soon</div>
-      <h1 class="panel-title">Draw Not Yet Available</h1>
-      <p class="panel-sub">This tournament's draw hasn't been posted yet. Check back when the field is announced — the sim will go live within 24 hours of draw release.</p>
-      <div class="model-note">
-        <strong>When does it go live?</strong> Draws are typically posted 1–2 days before first round play. The simulation runs overnight after draw release and appears here the following morning.
-      </div>
+      <div class="p-eyebrow">Coming Soon</div>
+      <h1 class="p-title">Draw Not Yet Available</h1>
+      <p class="p-sub">This tournament's draw hasn't been posted yet. The sim will go live within 24 hours of draw release.</p>
     </div>
 
-  </main>
-</div>
+  </div><!-- /main-content -->
+</div><!-- /page-wrap -->
 
 <!-- Footer -->
 <footer>
@@ -1028,7 +962,7 @@
 </footer>
 
 <script>
-// ── Nav hamburger ─────────────────────────────────────────
+// ── Nav ───────────────────────────────────────────────────
 document.getElementById('hamburger').addEventListener('click', () => {
   document.getElementById('mobile-menu').classList.toggle('open');
 });
@@ -1037,22 +971,20 @@ document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
 });
 
 // ── Panel switching ───────────────────────────────────────
-const sidebarItems = document.querySelectorAll('.sidebar-item[data-panel]');
-const panels       = document.querySelectorAll('.panel');
+const sbItems = document.querySelectorAll('.sb-item[data-panel]');
+const panels  = document.querySelectorAll('.panel');
 
 function showPanel(id) {
   panels.forEach(p => p.classList.remove('active'));
-  sidebarItems.forEach(i => i.classList.remove('active'));
+  sbItems.forEach(i => i.classList.remove('active'));
   const target = document.getElementById('panel-' + id);
   if (target) target.classList.add('active');
-  sidebarItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
+  sbItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
   document.getElementById('sidebar').classList.remove('open');
   window.scrollTo(0, 0);
 }
 
-sidebarItems.forEach(item => {
-  item.addEventListener('click', () => showPanel(item.dataset.panel));
-});
+sbItems.forEach(item => item.addEventListener('click', () => showPanel(item.dataset.panel)));
 
 document.getElementById('sidebar-toggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
@@ -1061,47 +993,35 @@ document.getElementById('sidebar-toggle').addEventListener('click', () => {
 const hash = window.location.hash.replace('#', '');
 if (hash) showPanel(hash);
 
-// ── Load sim JSON and populate probability bars ───────────
-async function loadSimData(jsonPath, containerId, maxItems = 8) {
-  try {
-    const resp = await fetch(jsonPath);
-    if (!resp.ok) return;
-    const data = await resp.json();
-
-    // Expected format: [{team: "...", prob: 12.4}, ...]
-    // sorted descending by prob
-    const teams = (data.teams || data).slice(0, maxItems);
-    const maxProb = teams[0]?.prob || 1;
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    container.innerHTML = teams.map((t, i) => `
-      <div class="prob-row">
-        <span class="prob-rank">${i + 1}</span>
-        <span class="prob-name">${t.team}</span>
-        <div class="prob-bar-wrap">
-          <div class="prob-bar-bg">
-            <div class="prob-bar-fill" style="width:${Math.round((t.prob / maxProb) * 100)}%"></div>
-          </div>
-        </div>
-        <span class="prob-val">${t.prob.toFixed(1)}%</span>
-      </div>
-    `).join('');
-  } catch (e) {
-    // Fail silently — static fallback bars remain
-  }
-}
-
-// ── Update timestamps ─────────────────────────────────────
+// ── Timestamps ───────────────────────────────────────────
 const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 ['nhl-updated', 'nba-updated'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.textContent = 'Updated ' + today;
 });
 
-// ── Load sim data on page load ────────────────────────────
-loadSimData('/data/nhl_playoff_sim.json', 'nhl-probs');
-loadSimData('/data/nba_playoff_sim.json', 'nba-probs');
+// ── Load sim JSON ─────────────────────────────────────────
+async function loadSim(path, containerId) {
+  try {
+    const r = await fetch(path);
+    if (!r.ok) return;
+    const data = await r.json();
+    const teams = (data.teams || data).slice(0, 16);
+    const maxP  = teams[0]?.prob || 1;
+    const el    = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = teams.map((t, i) => `
+      <div class="prob-row">
+        <span class="pr-rank">${i + 1}</span>
+        <span class="pr-name">${t.team}</span>
+        <div class="pr-bar-bg"><div class="pr-bar-fill" style="width:${Math.round((t.prob / maxP) * 100)}%"></div></div>
+        <span class="pr-val">${t.prob.toFixed(1)}%</span>
+      </div>`).join('');
+  } catch(e) { /* fail silently — static bars remain */ }
+}
+
+loadSim('/data/nhl_playoff_sim.json', 'nhl-probs');
+loadSim('/data/nba_playoff_sim.json', 'nba-probs');
 </script>
 </body>
 </html>
