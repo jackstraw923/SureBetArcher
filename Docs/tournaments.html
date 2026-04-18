@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ArcVest — Tournaments</title>
   <meta name="description" content="ArcVest bracket simulations — 50,000 Monte Carlo runs per tournament. NBA and NHL playoff championship probabilities updated each morning.">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=optional" rel="stylesheet">
   <style>
     :root {
       --bg:        #080b12;
@@ -220,9 +221,9 @@
       text-transform: uppercase;
       color: var(--muted);
       opacity: 0.6;
-      min-width: 60px;
+      min-width: 52px;
       text-align: center;
-      flex-shrink: 0;
+      flex-shrink: 1;
     }
     .mcl-col.adv { color: var(--teal); min-width: 48px; }
     .mcl-odds { min-width: 36px; text-align: right; }
@@ -263,7 +264,7 @@
       flex-shrink: 0;
     }
     .mt-name {
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       font-weight: 500;
       color: var(--text);
       flex: 1;
@@ -275,11 +276,11 @@
     /* Odds cells — Spread / Total / ML each a 2-line stack: point on top, price below */
     .mt-cell {
       font-family: var(--font-mono);
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       color: var(--muted);
-      min-width: 60px;
+      min-width: 52px;
       text-align: center;
-      flex-shrink: 0;
+      flex-shrink: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -664,11 +665,11 @@
 
             <!-- Connector R1→R2 West -->
             <div class="r-conn">
-              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              <svg viewBox="0 0 24 640" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,82  H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,241 H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,559 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -689,8 +690,8 @@
             <!-- Connector R2→R3 West -->
             <div class="r-conn">
               <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,170 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -780,11 +781,11 @@
 
             <!-- Connector R1→R2 East -->
             <div class="r-conn">
-              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              <svg viewBox="0 0 24 640" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,82  H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,241 H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,559 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -805,8 +806,8 @@
             <!-- Connector R2→R3 East -->
             <div class="r-conn">
               <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,170 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -924,11 +925,11 @@
             </div>
 
             <div class="r-conn">
-              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              <svg viewBox="0 0 24 640" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,82  H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,241 H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,559 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -947,8 +948,8 @@
 
             <div class="r-conn">
               <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,170 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -1017,11 +1018,11 @@
             </div>
 
             <div class="r-conn">
-              <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,65 H 12 V 130 H 24"  stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,195 H 12 V 130 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,325 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,455 H 12 V 390 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+              <svg viewBox="0 0 24 640" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 0,82  H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,241 H 12 V 161 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,559 H 12 V 479 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
@@ -1040,8 +1041,8 @@
 
             <div class="r-conn">
               <svg viewBox="0 0 24 520" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0,165 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
-                <path d="M 0,355 H 12 V 260 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,170 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
+                <path d="M 0,400 H 12 V 285 H 24" stroke="#1a2238" stroke-width="1" fill="none"/>
               </svg>
             </div>
 
