@@ -22,7 +22,7 @@
       --font-head: 'Bebas Neue', sans-serif;
       --font-mono: 'DM Mono', monospace;
       --font-body: 'Outfit', sans-serif;
-      --nav-w:     240px;
+      --nav-w:     250px;
     }
 
     html { scrollbar-gutter: stable; }
@@ -65,6 +65,7 @@
       display: flex;
       padding-top: 57px;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     /* ── Sidebar ── */
@@ -105,13 +106,11 @@
 
     /* ── Main content ── */
     .main-content {
-      /* Key: margin-left pushes past sidebar on desktop */
       margin-left: var(--nav-w);
       flex: 1;
       min-width: 0;
+      overflow-x: hidden;
       padding: 2.5rem 2.5rem 5rem;
-      /* Match scorecard: max-width keeps content readable at large viewports */
-      max-width: calc(1600px + var(--nav-w));
     }
 
     /* ── Panels ── */
@@ -152,15 +151,15 @@
       padding-left: 2px;
     }
 
-    /* Bracket scroll wrapper */
-    .bracket-scroll { overflow-x: auto; padding-bottom: 0.75rem; }
+    /* Bracket scroll wrapper — contains horizontal overflow, prevents page bleed */
+    .bracket-scroll { overflow-x: auto; overflow-y: visible; padding-bottom: 0.75rem; max-width: 100%; }
 
     /* Bracket tree — horizontal flow */
     .bracket-tree {
       display: flex;
       align-items: stretch;
       gap: 0;
-      min-width: 780px;
+      /* min-width set inline per instance so it stays inside scroll wrapper */
     }
 
     /* Round column */
@@ -170,10 +169,10 @@
       justify-content: space-around;
       flex-shrink: 0;
     }
-    .r-col.r1 { width: 190px; }
-    .r-col.r2 { width: 190px; }
-    .r-col.r3 { width: 190px; }
-    .r-col.rfinal { width: 160px; justify-content: center; }
+    .r-col.r1 { width: 220px; }
+    .r-col.r2 { width: 220px; }
+    .r-col.r3 { width: 220px; }
+    .r-col.rfinal { width: 190px; justify-content: center; }
 
     /* Connector column */
     .r-conn { width: 24px; flex-shrink: 0; position: relative; }
@@ -192,7 +191,7 @@
 
     /* Matchup header — series label / game info */
     .matchup-header {
-      padding: 0.3rem 0.65rem;
+      padding: 0.38rem 0.8rem;
       background: var(--bg3);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -200,16 +199,34 @@
       justify-content: space-between;
       gap: 0.5rem;
     }
+    .matchup-col-labels {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.2rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .mcl-spacer { flex: 1; }
+    .mcl-odds, .mcl-sim {
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+    .mcl-odds { min-width: 36px; text-align: right; }
+    .mcl-sim { min-width: 32px; text-align: right; color: var(--teal); }
     .mh-label {
       font-family: var(--font-mono);
-      font-size: 0.56rem;
+      font-size: 0.62rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
     }
     .mh-time {
       font-family: var(--font-mono);
-      font-size: 0.56rem;
+      font-size: 0.62rem;
       color: var(--muted);
       white-space: nowrap;
     }
@@ -219,7 +236,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.45rem 0.65rem;
+      padding: 0.55rem 0.8rem;
       border-bottom: 1px solid rgba(26,34,56,0.6);
       transition: background 0.15s;
     }
@@ -229,14 +246,14 @@
 
     .mt-seed {
       font-family: var(--font-mono);
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       color: var(--muted);
       min-width: 14px;
       text-align: center;
       flex-shrink: 0;
     }
     .mt-name {
-      font-size: 0.8rem;
+      font-size: 0.88rem;
       font-weight: 500;
       color: var(--text);
       flex: 1;
@@ -246,13 +263,14 @@
     }
     .mt-odds {
       font-family: var(--font-mono);
-      font-size: 0.6rem;
+      font-size: 0.68rem;
       color: var(--muted);
       flex-shrink: 0;
       min-width: 36px;
       text-align: right;
     }
     .mt-odds.fav { color: var(--gold); }
+    .mt-sim { font-family: var(--font-mono); font-size: 0.58rem; color: var(--teal); flex-shrink: 0; min-width: 32px; text-align: right; }
 
     /* TBD styling */
     .matchup.tbd .mt-name { color: var(--muted); font-style: italic; font-weight: 300; }
@@ -264,18 +282,17 @@
       background: linear-gradient(135deg, rgba(240,180,41,0.09) 0%, rgba(240,180,41,0.03) 100%);
       border: 1px solid rgba(240,180,41,0.28);
       border-radius: 8px;
-      padding: 1.25rem 0.75rem;
+      padding: 1.5rem 1rem;
       text-align: center;
       width: 100%;
     }
     .champ-label { font-family: var(--font-mono); font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
-    .champ-trophy { font-size: 1.6rem; display: block; margin-bottom: 0.5rem; }
-    .champ-tbd { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); line-height: 1.6; }
+    .champ-trophy { font-size: 2rem; display: block; margin-bottom: 0.6rem; }
+    .champ-tbd { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); line-height: 1.7; }
 
     /* Round column labels */
     .bracket-labels {
       display: flex;
-      min-width: 780px;
       margin-bottom: 0.6rem;
     }
     .bl { font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
@@ -446,15 +463,15 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:220px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:220px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:220px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:160px">Stanley Cup</div>
+            <div class="bl" style="width:190px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;">
+          <div class="bracket-tree" style="align-items:center;min-width:880px;">
 
             <!-- R1 West -->
             <div class="r-col r1">
@@ -463,32 +480,36 @@
                   <span class="mh-label">Game 1 · Apr 19</span>
                   <span class="mh-time">3:00 PM ET · TNT</span>
                 </div>
-                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Colorado Avalanche</span><span class="mt-odds fav">−250</span></div>
-                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">LA Kings</span><span class="mt-odds">+200</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Colorado Avalanche</span><span class="mt-odds fav" title="Series price">−250</span><span class="mt-sim" style="color:var(--teal);" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">LA Kings</span><span class="mt-odds" title="Series price">+200</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 18</span>
                   <span class="mh-time">5:30 PM ET · ESPN</span>
                 </div>
-                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Dallas Stars</span><span class="mt-odds fav">−120</span></div>
-                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Minnesota Wild</span><span class="mt-odds">+100</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Dallas Stars</span><span class="mt-odds fav" title="Series price">−120</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Minnesota Wild</span><span class="mt-odds" title="Series price">+100</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 19</span>
                   <span class="mh-time">10:00 PM ET · ESPN</span>
                 </div>
-                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Vegas Golden Knights</span><span class="mt-odds fav">−155</span></div>
-                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Utah Mammoth</span><span class="mt-odds">+130</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Vegas Golden Knights</span><span class="mt-odds fav" title="Series price">−155</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Utah Mammoth</span><span class="mt-odds" title="Series price">+130</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 20</span>
                   <span class="mh-time">10:00 PM ET · ESPN2</span>
                 </div>
-                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Edmonton Oilers</span><span class="mt-odds fav">−170</span></div>
-                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Anaheim Ducks</span><span class="mt-odds">+145</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Edmonton Oilers</span><span class="mt-odds fav" title="Series price">−170</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Anaheim Ducks</span><span class="mt-odds" title="Series price">+145</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
             </div>
 
@@ -558,15 +579,15 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:220px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:220px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:220px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:160px">Stanley Cup</div>
+            <div class="bl" style="width:190px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;">
+          <div class="bracket-tree" style="align-items:center;min-width:880px;">
 
             <!-- R1 East -->
             <div class="r-col r1">
@@ -575,32 +596,36 @@
                   <span class="mh-label">Game 1 · Apr 19</span>
                   <span class="mh-time">7:30 PM ET · ESPN</span>
                 </div>
-                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Buffalo Sabres</span><span class="mt-odds fav">−155</span></div>
-                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Boston Bruins</span><span class="mt-odds">+130</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Buffalo Sabres</span><span class="mt-odds fav" title="Series price">−155</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Boston Bruins</span><span class="mt-odds" title="Series price">+130</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 19</span>
                   <span class="mh-time">5:45 PM ET · TNT</span>
                 </div>
-                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Tampa Bay Lightning</span><span class="mt-odds fav">−185</span></div>
-                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Montreal Canadiens</span><span class="mt-odds">+155</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Tampa Bay Lightning</span><span class="mt-odds fav" title="Series price">−185</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Montreal Canadiens</span><span class="mt-odds" title="Series price">+155</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 18</span>
                   <span class="mh-time">3:00 PM ET · ESPN</span>
                 </div>
-                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Carolina Hurricanes</span><span class="mt-odds fav">−148</span></div>
-                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Ottawa Senators</span><span class="mt-odds">+124</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Carolina Hurricanes</span><span class="mt-odds fav" title="Series price">−148</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">4</span><span class="mt-name">Ottawa Senators</span><span class="mt-odds" title="Series price">+124</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 18</span>
                   <span class="mh-time">8:00 PM ET · ESPN</span>
                 </div>
-                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Pittsburgh Penguins</span><span class="mt-odds fav">−148</span></div>
-                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Philadelphia Flyers</span><span class="mt-odds">+124</span></div>
+                <div class="matchup-col-labels"><span class="mcl-spacer"></span><span class="mcl-odds">Price</span><span class="mcl-sim">Sim%</span></div>
+                <div class="mt"><span class="mt-seed">2</span><span class="mt-name">Pittsburgh Penguins</span><span class="mt-odds fav" title="Series price">−148</span><span class="mt-sim" title="Sim win %">—</span></div>
+                <div class="mt"><span class="mt-seed">3</span><span class="mt-name">Philadelphia Flyers</span><span class="mt-odds" title="Series price">+124</span><span class="mt-sim" title="Sim win %">—</span></div>
               </div>
             </div>
 
@@ -671,10 +696,18 @@
         <div class="prob-row"><span class="pr-rank">2</span><span class="pr-name">Vegas Golden Knights</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:65%"></div></div><span class="pr-val">—</span></div>
         <div class="prob-row"><span class="pr-rank">3</span><span class="pr-name">Dallas Stars</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:58%"></div></div><span class="pr-val">—</span></div>
         <div class="prob-row"><span class="pr-rank">4</span><span class="pr-name">Buffalo Sabres</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:50%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">5</span><span class="pr-name">Tampa Bay Lightning</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:40%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">5</span><span class="pr-name">Tampa Bay Lightning</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:42%"></div></div><span class="pr-val">—</span></div>
         <div class="prob-row"><span class="pr-rank">6</span><span class="pr-name">Carolina Hurricanes</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:35%"></div></div><span class="pr-val">—</span></div>
         <div class="prob-row"><span class="pr-rank">7</span><span class="pr-name">Edmonton Oilers</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:28%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">8</span><span class="pr-name">Pittsburgh Penguins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:20%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">8</span><span class="pr-name">Pittsburgh Penguins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:22%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">9</span><span class="pr-name">LA Kings</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:16%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">10</span><span class="pr-name">Minnesota Wild</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:12%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">11</span><span class="pr-name">Utah Mammoth</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:10%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">12</span><span class="pr-name">Boston Bruins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:8%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">13</span><span class="pr-name">Montreal Canadiens</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:6%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">14</span><span class="pr-name">Ottawa Senators</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:4%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">15</span><span class="pr-name">Philadelphia Flyers</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:3%"></div></div><span class="pr-val">—</span></div>
+        <div class="prob-row"><span class="pr-rank">16</span><span class="pr-name">Anaheim Ducks</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:2%"></div></div><span class="pr-val">—</span></div>
       </div>
       <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Loads from <code style="font-size:0.66rem;">/data/nhl_playoff_sim.json</code> each morning. Relative bars shown until sim data is available.</p>
 
@@ -707,15 +740,15 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:220px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:220px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:220px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:160px">NBA Finals</div>
+            <div class="bl" style="width:190px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;">
+          <div class="bracket-tree" style="align-items:center;min-width:880px;">
 
             <div class="r-col r1">
               <div class="matchup">
@@ -800,15 +833,15 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:190px">Round 1</div>
+            <div class="bl" style="width:220px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Semis</div>
+            <div class="bl" style="width:220px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Conf. Final</div>
+            <div class="bl" style="width:220px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:160px">NBA Finals</div>
+            <div class="bl" style="width:190px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;">
+          <div class="bracket-tree" style="align-items:center;min-width:880px;">
 
             <div class="r-col r1">
               <div class="matchup">
@@ -1017,7 +1050,24 @@ async function loadSim(path, containerId) {
         <div class="pr-bar-bg"><div class="pr-bar-fill" style="width:${Math.round((t.prob / maxP) * 100)}%"></div></div>
         <span class="pr-val">${t.prob.toFixed(1)}%</span>
       </div>`).join('');
-  } catch(e) { /* fail silently — static bars remain */ }
+
+    // Populate series win % in bracket cards if data.series exists
+    // Expected format: data.series = [{home:"Team A", away:"Team B", home_win_pct:62.4, away_win_pct:37.6}, ...]
+    if (data.series) {
+      data.series.forEach(s => {
+        document.querySelectorAll('.mt-sim').forEach(el => {
+          const nameEl = el.parentElement?.querySelector('.mt-name');
+          if (!nameEl) return;
+          const name = nameEl.textContent.trim();
+          if (name === s.home || name.includes(s.home.split(' ').pop())) {
+            el.textContent = s.home_win_pct.toFixed(0) + '%';
+          } else if (name === s.away || name.includes(s.away.split(' ').pop())) {
+            el.textContent = s.away_win_pct.toFixed(0) + '%';
+          }
+        });
+      });
+    }
+  } catch(e) { /* fail silently */ }
 }
 
 loadSim('/data/nhl_playoff_sim.json', 'nhl-probs');
