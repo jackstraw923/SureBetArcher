@@ -65,20 +65,20 @@
       display: flex;
       padding-top: 57px;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     /* ── Sidebar ── */
     .sidebar {
       width: var(--nav-w);
       flex-shrink: 0;
-      position: fixed;
-      top: 57px; left: 0; bottom: 0;
+      position: sticky;
+      top: 57px;
+      height: calc(100vh - 57px);
       overflow-y: auto;
       background: var(--bg2);
       border-right: 1px solid var(--border);
       padding: 1.75rem 0 4rem;
-      z-index: 100;
+      align-self: flex-start;
     }
     .sidebar::-webkit-scrollbar { width: 3px; }
     .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -106,7 +106,6 @@
 
     /* ── Main content ── */
     .main-content {
-      margin-left: var(--nav-w);
       flex: 1;
       min-width: 0;
       overflow-x: hidden;
@@ -169,10 +168,10 @@
       justify-content: space-around;
       flex-shrink: 0;
     }
-    .r-col.r1 { width: 220px; }
-    .r-col.r2 { width: 220px; }
-    .r-col.r3 { width: 220px; }
-    .r-col.rfinal { width: 190px; justify-content: center; }
+    .r-col.r1 { width: 280px; }
+    .r-col.r2 { width: 280px; }
+    .r-col.r3 { width: 280px; }
+    .r-col.rfinal { width: 200px; justify-content: center; }
 
     /* Connector column */
     .r-conn { width: 24px; flex-shrink: 0; position: relative; }
@@ -300,10 +299,11 @@
     /* ── Probability bars ── */
     .prob-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 0.5rem;
       margin-top: 1rem;
     }
+    @media (max-width: 1100px) { .prob-grid { grid-template-columns: repeat(2, 1fr); } }
     .prob-row {
       display: flex; align-items: center; gap: 0.7rem;
       padding: 0.5rem 0.8rem;
@@ -330,7 +330,7 @@
 
     /* ── Footer ── */
     footer {
-      margin-left: var(--nav-w);
+      margin-left: 0;
       background: var(--bg2); border-top: 1px solid var(--border);
       padding: 2rem 2.5rem;
       display: flex; align-items: center; justify-content: space-between;
@@ -340,14 +340,15 @@
 
     /* ── Responsive ── */
     @media (max-width: 900px) {
-      .sidebar { display: none; }
-      .sidebar.open { display: block; z-index: 150; }
-      .main-content { margin-left: 0; padding: 2rem 1.25rem 4rem; }
-      footer { margin-left: 0; padding: 1.5rem; }
+      .sidebar { display: none; height: auto; position: relative; top: auto; }
+      .sidebar.open { display: block; position: fixed; top: 57px; left: 0; bottom: 0; z-index: 150; width: var(--nav-w); }
+      .main-content { padding: 2rem 1.25rem 4rem; }
+      footer { padding: 1.5rem; }
       .nav-links, .nav-cta { display: none; }
       .nav-hamburger { display: flex; }
       .topnav { padding: 1rem 1.5rem; }
       .sidebar-toggle-btn { display: flex !important; }
+      .prob-grid { grid-template-columns: repeat(2, 1fr) !important; }
     }
 
     /* Mobile sidebar toggle button */
@@ -463,15 +464,15 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:220px">Round 1</div>
+            <div class="bl" style="width:280px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Semis</div>
+            <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Final</div>
+            <div class="bl" style="width:280px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Stanley Cup</div>
+            <div class="bl" style="width:200px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:880px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
 
             <!-- R1 West -->
             <div class="r-col r1">
@@ -579,15 +580,15 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:220px">Round 1</div>
+            <div class="bl" style="width:280px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Semis</div>
+            <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Final</div>
+            <div class="bl" style="width:280px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">Stanley Cup</div>
+            <div class="bl" style="width:200px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:880px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
 
             <!-- R1 East -->
             <div class="r-col r1">
@@ -740,15 +741,15 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:220px">Round 1</div>
+            <div class="bl" style="width:280px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Semis</div>
+            <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Final</div>
+            <div class="bl" style="width:280px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">NBA Finals</div>
+            <div class="bl" style="width:200px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:880px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
 
             <div class="r-col r1">
               <div class="matchup">
@@ -833,15 +834,15 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:220px">Round 1</div>
+            <div class="bl" style="width:280px">Round 1</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Semis</div>
+            <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:220px">Conf. Final</div>
+            <div class="bl" style="width:280px">Conf. Final</div>
             <div class="bl" style="width:24px"></div>
-            <div class="bl" style="width:190px">NBA Finals</div>
+            <div class="bl" style="width:200px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:880px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
 
             <div class="r-col r1">
               <div class="matchup">
