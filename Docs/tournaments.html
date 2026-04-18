@@ -167,7 +167,7 @@
       justify-content: space-around;
       flex-shrink: 0;
     }
-    .r-col.r1 { width: 280px; }
+    .r-col.r1 { width: 380px; }
     .r-col.r2 { width: 280px; }
     .r-col.r3 { width: 280px; }
     .r-col.rfinal { width: 200px; justify-content: center; }
@@ -200,8 +200,8 @@
     .matchup-col-labels {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.2rem 0.8rem;
+      gap: 0.35rem;
+      padding: 0.2rem 0.6rem;
       border-bottom: 1px solid var(--border);
     }
     .mcl-spacer { flex: 1; }
@@ -213,6 +213,18 @@
       color: var(--muted);
       opacity: 0.6;
     }
+    .mcl-col {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.6;
+      min-width: 60px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .mcl-col.adv { color: var(--teal); min-width: 48px; }
     .mcl-odds { min-width: 36px; text-align: right; }
     .mcl-sim { min-width: 32px; text-align: right; color: var(--teal); }
     .mh-label {
@@ -229,12 +241,12 @@
       white-space: nowrap;
     }
 
-    /* Team row */
+    /* Team row — DraftKings-style 4-column: Spread | Total | ML | Advance */
     .mt {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.55rem 0.8rem;
+      gap: 0.35rem;
+      padding: 0.5rem 0.6rem;
       border-bottom: 1px solid rgba(26,34,56,0.6);
       transition: background 0.15s;
     }
@@ -244,21 +256,62 @@
 
     .mt-seed {
       font-family: var(--font-mono);
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       color: var(--muted);
       min-width: 14px;
       text-align: center;
       flex-shrink: 0;
     }
     .mt-name {
-      font-size: 0.88rem;
+      font-size: 0.8rem;
       font-weight: 500;
       color: var(--text);
       flex: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      min-width: 0;
     }
+    /* Odds cells — Spread / Total / ML each a 2-line stack: point on top, price below */
+    .mt-cell {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      color: var(--muted);
+      min-width: 60px;
+      text-align: center;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.15;
+    }
+    .mt-cell .cell-point {
+      color: var(--text);
+      font-size: 0.7rem;
+    }
+    .mt-cell .cell-price {
+      color: var(--muted);
+      font-size: 0.58rem;
+      opacity: 0.75;
+    }
+    .mt-cell.ml { min-width: 48px; }
+    .mt-cell.ml .cell-point { display: none; }
+    .mt-cell.ml .cell-price {
+      color: var(--text);
+      font-size: 0.72rem;
+      opacity: 1;
+    }
+    .mt-cell.adv {
+      min-width: 48px;
+      color: var(--teal);
+    }
+    .mt-cell.adv .cell-price {
+      color: var(--teal);
+      font-size: 0.72rem;
+      opacity: 1;
+    }
+    .mt-cell.adv .cell-point { display: none; }
+    .mt-cell.fav .cell-price { color: var(--gold); }
     .mt-odds {
       font-family: var(--font-mono);
       font-size: 0.68rem;
@@ -295,7 +348,7 @@
     }
     .bl { font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
 
-    /* ── Probability bars ── */
+    /* ── Probability bars — original (kept for backward compat) ── */
     .prob-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -313,6 +366,94 @@
     .pr-bar-bg { width: 72px; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
     .pr-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
     .pr-val { font-family: var(--font-mono); font-size: 0.66rem; color: var(--gold); min-width: 36px; text-align: right; flex-shrink: 0; }
+
+    /* ── Probability table — sim vs market vs edge ── */
+    .prob-table {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden; margin-top: 1rem;
+    }
+    .prob-table-head, .prob-trow {
+      display: grid;
+      grid-template-columns: 32px 1fr 120px 72px 72px 72px;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 1rem;
+    }
+    .prob-table-head {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .prob-trow { border-bottom: 1px solid rgba(26,34,56,0.4); }
+    .prob-trow:last-child { border-bottom: none; }
+    .prob-trow:hover { background: rgba(240,180,41,0.03); }
+    .pt-rank { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); text-align: center; }
+    .pt-team { font-size: 0.88rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pt-bar-wrap { display: flex; align-items: center; gap: 0.5rem; }
+    .pt-bar-bg { flex: 1; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+    .pt-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.6s ease; }
+    .pt-sim, .pt-market, .pt-edge {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: right;
+    }
+    .pt-sim { color: var(--gold); }
+    .pt-market { color: var(--muted); }
+    .pt-edge.pos { color: var(--green); }
+    .pt-edge.neg { color: var(--red); }
+    .pt-edge.neutral { color: var(--muted); }
+    @media (max-width: 900px) {
+      .prob-table-head, .prob-trow {
+        grid-template-columns: 28px 1fr 0 60px 60px 60px;
+        padding: 0.5rem 0.7rem;
+        gap: 0.4rem;
+      }
+      .pt-bar-wrap, .pt-bar-wrap-head { display: none; }
+    }
+
+    /* ── Odds format toggle ── */
+    .odds-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.18rem;
+      margin-left: 0.75rem;
+    }
+    .odds-toggle-btn {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      padding: 0.28rem 0.65rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .odds-toggle-btn:hover { color: var(--text); }
+    .odds-toggle-btn.active {
+      background: rgba(240,180,41,0.12);
+      color: var(--gold);
+    }
+    .book-attribution {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      opacity: 0.7;
+    }
+    .book-attribution strong { color: var(--text); opacity: 1; }
 
     /* ── Model note ── */
     .model-note {
@@ -455,6 +596,14 @@
         <span class="mp" id="nhl-updated">—</span>
       </div>
 
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-top:1rem;">
+        <p class="book-attribution" style="margin:0;">Game odds — <strong>Fanatics Sportsbook</strong>. Series win % and Advance (no-vig fair ML) derived from ArcVest sim.</p>
+        <div class="odds-toggle" data-odds-toggle>
+          <button class="odds-toggle-btn active" data-format="american">American</button>
+          <button class="odds-toggle-btn" data-format="decimal">Decimal</button>
+        </div>
+      </div>
+
       <!-- BRACKET -->
       <div class="section-head">Full Bracket</div>
 
@@ -463,7 +612,7 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:280px">Round 1</div>
+            <div class="bl" style="width:380px">Round 1</div>
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
@@ -471,10 +620,10 @@
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:200px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1260px;">
 
             <!-- R1 West -->
-            <div class="r-col r1">
+            <div class="r-col r1" data-sport="nhl" data-conf="WEST">
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 19</span>
@@ -579,7 +728,7 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:280px">Round 1</div>
+            <div class="bl" style="width:380px">Round 1</div>
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
@@ -587,10 +736,10 @@
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:200px">Stanley Cup</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1260px;">
 
             <!-- R1 East -->
-            <div class="r-col r1">
+            <div class="r-col r1" data-sport="nhl" data-conf="EAST">
               <div class="matchup">
                 <div class="matchup-header">
                   <span class="mh-label">Game 1 · Apr 19</span>
@@ -691,25 +840,18 @@
 
       <!-- Championship probability bars — below bracket -->
       <div class="section-head">Championship Probability</div>
-      <div class="prob-grid" id="nhl-probs">
-        <div class="prob-row"><span class="pr-rank">1</span><span class="pr-name">Colorado Avalanche</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:80%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">2</span><span class="pr-name">Vegas Golden Knights</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:65%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">3</span><span class="pr-name">Dallas Stars</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:58%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">4</span><span class="pr-name">Buffalo Sabres</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:50%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">5</span><span class="pr-name">Tampa Bay Lightning</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:42%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">6</span><span class="pr-name">Carolina Hurricanes</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:35%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">7</span><span class="pr-name">Edmonton Oilers</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:28%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">8</span><span class="pr-name">Pittsburgh Penguins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:22%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">9</span><span class="pr-name">LA Kings</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:16%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">10</span><span class="pr-name">Minnesota Wild</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:12%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">11</span><span class="pr-name">Utah Mammoth</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:10%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">12</span><span class="pr-name">Boston Bruins</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:8%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">13</span><span class="pr-name">Montreal Canadiens</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:6%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">14</span><span class="pr-name">Ottawa Senators</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:4%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">15</span><span class="pr-name">Philadelphia Flyers</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:3%"></div></div><span class="pr-val">—</span></div>
-        <div class="prob-row"><span class="pr-rank">16</span><span class="pr-name">Anaheim Ducks</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:2%"></div></div><span class="pr-val">—</span></div>
+      <div class="prob-table" id="nhl-probs">
+        <div class="prob-table-head">
+          <div class="pt-rank">#</div>
+          <div class="pt-team">Team</div>
+          <div class="pt-bar-wrap-head">Sim</div>
+          <div class="pt-sim">Sim</div>
+          <div class="pt-market">Mkt</div>
+          <div class="pt-edge">Edge</div>
+        </div>
+        <div class="prob-trow"><div class="pt-rank">—</div><div class="pt-team" style="color:var(--muted);font-style:italic;">Loading simulation data…</div><div></div><div></div><div></div><div></div></div>
       </div>
-      <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Loads from <code style="font-size:0.66rem;">/data/nhl_playoff_sim.json</code> each morning. Relative bars shown until sim data is available.</p>
+      <p class="book-attribution">Championship market — median devigged across Fanatics, DraftKings, FanDuel, BetMGM, BetRivers, BetOnline. Sim% = ArcVest 50,000-sim Monte Carlo. Edge = Sim − Market (percentage points).</p>
 
       <div class="model-note">
         <strong>Model:</strong> PythagenPuck (k=0.175/goal, σ=2.26). 85/15 season-to-recent blend, ±8% circuit breaker. 50,000 best-of-7 series simulations with home-ice advantage. Championship probability = fraction of simulations in which each team lifts the Cup.
@@ -733,6 +875,14 @@
         <span class="mp" id="nba-updated">—</span>
       </div>
 
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-top:1rem;">
+        <p class="book-attribution" style="margin:0;">Game odds — <strong>Fanatics Sportsbook</strong>. Series win % and Advance (no-vig fair ML) derived from ArcVest sim.</p>
+        <div class="odds-toggle" data-odds-toggle>
+          <button class="odds-toggle-btn active" data-format="american">American</button>
+          <button class="odds-toggle-btn" data-format="decimal">Decimal</button>
+        </div>
+      </div>
+
       <div class="section-head">Full Bracket</div>
 
       <!-- Western Conference -->
@@ -740,7 +890,7 @@
         <div class="conf-title">Western Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:280px">Round 1</div>
+            <div class="bl" style="width:380px">Round 1</div>
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
@@ -748,9 +898,9 @@
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:200px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1260px;">
 
-            <div class="r-col r1">
+            <div class="r-col r1" data-sport="nba" data-conf="WEST">
               <div class="matchup">
                 <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
                 <div class="mt"><span class="mt-seed">1</span><span class="mt-name">OKC Thunder</span><span class="mt-odds fav"></span></div>
@@ -833,7 +983,7 @@
         <div class="conf-title">Eastern Conference</div>
         <div class="bracket-scroll">
           <div class="bracket-labels">
-            <div class="bl" style="width:280px">Round 1</div>
+            <div class="bl" style="width:380px">Round 1</div>
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:280px">Conf. Semis</div>
             <div class="bl" style="width:24px"></div>
@@ -841,9 +991,9 @@
             <div class="bl" style="width:24px"></div>
             <div class="bl" style="width:200px">NBA Finals</div>
           </div>
-          <div class="bracket-tree" style="align-items:center;min-width:1160px;">
+          <div class="bracket-tree" style="align-items:center;min-width:1260px;">
 
-            <div class="r-col r1">
+            <div class="r-col r1" data-sport="nba" data-conf="EAST">
               <div class="matchup">
                 <div class="matchup-header"><span class="mh-label">Game 1 · Apr 19</span><span class="mh-time">TBD</span></div>
                 <div class="mt"><span class="mt-seed">1</span><span class="mt-name">Detroit Pistons</span><span class="mt-odds fav"></span></div>
@@ -922,10 +1072,18 @@
 
       <!-- Championship probabilities — below bracket -->
       <div class="section-head">Championship Probability</div>
-      <div class="prob-grid" id="nba-probs">
-        <div class="prob-row"><span class="pr-rank">1</span><span class="pr-name">Loading…</span><div class="pr-bar-bg"><div class="pr-bar-fill" style="width:0%"></div></div><span class="pr-val">—</span></div>
+      <div class="prob-table" id="nba-probs">
+        <div class="prob-table-head">
+          <div class="pt-rank">#</div>
+          <div class="pt-team">Team</div>
+          <div class="pt-bar-wrap-head">Sim</div>
+          <div class="pt-sim">Sim</div>
+          <div class="pt-market">Mkt</div>
+          <div class="pt-edge">Edge</div>
+        </div>
+        <div class="prob-trow"><div class="pt-rank">—</div><div class="pt-team" style="color:var(--muted);font-style:italic;">Loading simulation data…</div><div></div><div></div><div></div><div></div></div>
       </div>
-      <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;font-style:italic;">Loads from <code style="font-size:0.66rem;">/data/nba_playoff_sim.json</code> each morning.</p>
+      <p class="book-attribution">Championship market — median devigged across Fanatics, DraftKings, FanDuel, BetMGM, BetRivers, BetOnline. Sim% = ArcVest 50,000-sim Monte Carlo. Edge = Sim − Market (percentage points).</p>
 
       <div class="model-note">
         <strong>Model:</strong> PythagenPat (exp=16.5, calibrated 2,306 games). 75/25 season-to-recent blend, ±8% circuit breaker. Home-court advantage +5.0pp. 50,000 best-of-7 series simulations. Championship probability = fraction of simulations in which each team wins the Finals. NBA totals gated off — moneyline and spread only.
@@ -995,6 +1153,12 @@
 </footer>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════
+// Tournaments.html — data-driven bracket + probability + odds toggle
+// Consumes: /data/bracket_nba.json, /data/bracket_nhl.json
+// Schema: see ArcVest_Tournaments.R write_bracket_json()
+// ═══════════════════════════════════════════════════════════════════
+
 // ── Nav ───────────────────────────────────────────────────
 document.getElementById('hamburger').addEventListener('click', () => {
   document.getElementById('mobile-menu').classList.toggle('open');
@@ -1026,52 +1190,324 @@ document.getElementById('sidebar-toggle').addEventListener('click', () => {
 const hash = window.location.hash.replace('#', '');
 if (hash) showPanel(hash);
 
-// ── Timestamps ───────────────────────────────────────────
-const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-['nhl-updated', 'nba-updated'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.textContent = 'Updated ' + today;
-});
+// ═══════════════════════════════════════════════════════════
+// Odds format toggle — American / Decimal, localStorage-persisted
+// ═══════════════════════════════════════════════════════════
+const ODDS_FORMAT_KEY = 'arcvest_odds_format';
 
-// ── Load sim JSON ─────────────────────────────────────────
-async function loadSim(path, containerId) {
-  try {
-    const r = await fetch(path);
-    if (!r.ok) return;
-    const data = await r.json();
-    const teams = (data.teams || data).slice(0, 16);
-    const maxP  = teams[0]?.prob || 1;
-    const el    = document.getElementById(containerId);
-    if (!el) return;
-    el.innerHTML = teams.map((t, i) => `
-      <div class="prob-row">
-        <span class="pr-rank">${i + 1}</span>
-        <span class="pr-name">${t.team}</span>
-        <div class="pr-bar-bg"><div class="pr-bar-fill" style="width:${Math.round((t.prob / maxP) * 100)}%"></div></div>
-        <span class="pr-val">${t.prob.toFixed(1)}%</span>
-      </div>`).join('');
-
-    // Populate series win % in bracket cards if data.series exists
-    // Expected format: data.series = [{home:"Team A", away:"Team B", home_win_pct:62.4, away_win_pct:37.6}, ...]
-    if (data.series) {
-      data.series.forEach(s => {
-        document.querySelectorAll('.mt-sim').forEach(el => {
-          const nameEl = el.parentElement?.querySelector('.mt-name');
-          if (!nameEl) return;
-          const name = nameEl.textContent.trim();
-          if (name === s.home || name.includes(s.home.split(' ').pop())) {
-            el.textContent = s.home_win_pct.toFixed(0) + '%';
-          } else if (name === s.away || name.includes(s.away.split(' ').pop())) {
-            el.textContent = s.away_win_pct.toFixed(0) + '%';
-          }
-        });
-      });
-    }
-  } catch(e) { /* fail silently */ }
+function getOddsFormat() {
+  return localStorage.getItem(ODDS_FORMAT_KEY) || 'american';
 }
 
-loadSim('/data/nhl_playoff_sim.json', 'nhl-probs');
-loadSim('/data/nba_playoff_sim.json', 'nba-probs');
+function setOddsFormat(fmt) {
+  localStorage.setItem(ODDS_FORMAT_KEY, fmt);
+  // Update all toggle UIs
+  document.querySelectorAll('[data-odds-toggle] .odds-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.format === fmt);
+  });
+  // Re-render all bracket data with new format
+  applyOddsFormat();
+}
+
+// Attach toggle click handlers
+document.querySelectorAll('[data-odds-toggle] .odds-toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => setOddsFormat(btn.dataset.format));
+});
+
+// Initialize UI state from storage
+document.querySelectorAll('[data-odds-toggle] .odds-toggle-btn').forEach(btn => {
+  btn.classList.toggle('active', btn.dataset.format === getOddsFormat());
+});
+
+// ═══════════════════════════════════════════════════════════
+// Odds math
+// ═══════════════════════════════════════════════════════════
+
+// American → Decimal conversion
+function americanToDecimal(am) {
+  if (am == null || isNaN(am)) return null;
+  am = Number(am);
+  if (am > 0) return 1 + am / 100;
+  if (am < 0) return 1 + 100 / Math.abs(am);
+  return null;
+}
+
+// Format American odds for display (+220, -150, em-dash for null)
+function fmtAmerican(am) {
+  if (am == null || isNaN(am)) return '—';
+  am = Math.round(Number(am));
+  return am > 0 ? `+${am}` : `${am}`;
+}
+
+// Format Decimal odds for display (2.20, 1.67, em-dash for null)
+function fmtDecimal(am) {
+  if (am == null || isNaN(am)) return '—';
+  const dec = americanToDecimal(am);
+  if (dec == null) return '—';
+  return dec.toFixed(2);
+}
+
+// Format odds according to current user preference
+function fmtOdds(am) {
+  return getOddsFormat() === 'decimal' ? fmtDecimal(am) : fmtAmerican(am);
+}
+
+// Format a spread point (-1.5, +1.5) — always displayed in units, not converted
+function fmtSpreadPoint(pt) {
+  if (pt == null || isNaN(pt)) return '—';
+  const n = Number(pt);
+  return n > 0 ? `+${n}` : `${n}`;
+}
+
+// Format a total point (O 6.0 / U 6.0) — always units
+function fmtTotalPoint(pt) {
+  if (pt == null || isNaN(pt)) return '—';
+  return Number(pt).toString();
+}
+
+// No-vig American odds from a sim win probability (0-1)
+// p >= 0.5 → negative American (favorite); p < 0.5 → positive American (dog)
+function probToAmericanNoVig(p) {
+  if (p == null || isNaN(p) || p <= 0 || p >= 1) return null;
+  if (p >= 0.5) return Math.round(-100 * p / (1 - p));
+  return Math.round(100 * (1 - p) / p);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Data store — loaded bracket JSONs cached for re-rendering on toggle
+// ═══════════════════════════════════════════════════════════
+const bracketData = { nhl: null, nba: null };
+
+function applyOddsFormat() {
+  if (bracketData.nhl) renderBracket('nhl', bracketData.nhl);
+  if (bracketData.nba) renderBracket('nba', bracketData.nba);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Rendering — matchup cards, probability table
+// ═══════════════════════════════════════════════════════════
+
+// Build one team row (<div class="mt">) with 4-cell odds layout
+function renderTeamRow(seed, teamName, ng, isFav, simProb) {
+  // ng may be null (no Fanatics odds). isFav: true if this team is the series favorite.
+  // simProb: sim series win probability (0-1) for no-vig Advance cell.
+  const favClass = isFav ? 'fav' : '';
+  let spreadPt = '—', spreadPrice = '', totalLabel = '—', totalPrice = '', mlPrice = '—';
+
+  if (ng) {
+    // Identify whether this row is the home or away team to pick the right fields
+    const isHome = teamName === ng.home_team;
+    if (isHome) {
+      spreadPt    = fmtSpreadPoint(ng.home_spread_point);
+      spreadPrice = fmtOdds(ng.home_spread_price);
+      mlPrice     = fmtOdds(ng.home_ml);
+    } else {
+      spreadPt    = fmtSpreadPoint(ng.away_spread_point);
+      spreadPrice = fmtOdds(ng.away_spread_price);
+      mlPrice     = fmtOdds(ng.away_ml);
+    }
+    // Total — home row shows Over, away row shows Under (market convention varies,
+    // we just give them different sides so the card displays both prices).
+    if (ng.total_point != null) {
+      if (isHome) {
+        totalLabel  = `O ${fmtTotalPoint(ng.total_point)}`;
+        totalPrice  = fmtOdds(ng.over_price);
+      } else {
+        totalLabel  = `U ${fmtTotalPoint(ng.total_point)}`;
+        totalPrice  = fmtOdds(ng.under_price);
+      }
+    }
+  }
+
+  const advPrice = simProb != null ? fmtOdds(probToAmericanNoVig(simProb)) : '—';
+
+  return `
+    <div class="mt ${isFav ? '' : ''}">
+      <span class="mt-seed">${seed}</span>
+      <span class="mt-name">${teamName}</span>
+      <span class="mt-cell ${favClass}">
+        <span class="cell-point">${spreadPt}</span>
+        <span class="cell-price">${spreadPrice}</span>
+      </span>
+      <span class="mt-cell">
+        <span class="cell-point">${totalLabel}</span>
+        <span class="cell-price">${totalPrice}</span>
+      </span>
+      <span class="mt-cell ml ${favClass}">
+        <span class="cell-price">${mlPrice}</span>
+      </span>
+      <span class="mt-cell adv ${favClass}">
+        <span class="cell-price">${advPrice}</span>
+      </span>
+    </div>`;
+}
+
+// Build one matchup card from a series entry
+function renderMatchupCard(series) {
+  const ng = series.next_game;
+  const simProbA = series.swp_a;
+  const simProbB = series.swp_b;
+  const favTeam  = series.fav_team;
+
+  // Determine display order: away on top, home on bottom (market convention).
+  // If no next_game, fall back to seed order (higher seed on bottom as Game 1 home).
+  let topTeam, topSeed, topSim, bottomTeam, bottomSeed, bottomSim;
+  if (ng && ng.home_team && ng.away_team) {
+    // away on top
+    const awayIsA = ng.away_team === series.team_a;
+    topTeam   = ng.away_team;
+    topSeed   = awayIsA ? series.seed_a : series.seed_b;
+    topSim    = awayIsA ? simProbA : simProbB;
+    bottomTeam= ng.home_team;
+    bottomSeed= awayIsA ? series.seed_b : series.seed_a;
+    bottomSim = awayIsA ? simProbB : simProbA;
+  } else {
+    // Fallback: no Fanatics game data. Use seed logic — in NBA/NHL, higher seed
+    // (lower seed number, e.g., 1) hosts Game 1, lower seed (higher number, e.g., 8)
+    // visits. Visitor on top = team with higher seed number.
+    const aIsVisitor = series.seed_a > series.seed_b;
+    topTeam    = aIsVisitor ? series.team_a : series.team_b;
+    topSeed    = aIsVisitor ? series.seed_a : series.seed_b;
+    topSim     = aIsVisitor ? simProbA : simProbB;
+    bottomTeam = aIsVisitor ? series.team_b : series.team_a;
+    bottomSeed = aIsVisitor ? series.seed_b : series.seed_a;
+    bottomSim  = aIsVisitor ? simProbB : simProbA;
+  }
+
+  const topIsFav    = favTeam === topTeam;
+  const bottomIsFav = favTeam === bottomTeam;
+
+  // Header: game date + time if available, else TBD
+  let headerLabel = 'Game 1 · TBD';
+  let headerTime  = '';
+  if (ng && ng.commence_time) {
+    const dt = new Date(ng.commence_time);
+    const dateStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+    const timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York' });
+    headerLabel = `Game 1 · ${dateStr}`;
+    headerTime  = `${timeStr} ET`;
+  }
+
+  return `
+    <div class="matchup">
+      <div class="matchup-header">
+        <span class="mh-label">${headerLabel}</span>
+        <span class="mh-time">${headerTime || 'TBD'}</span>
+      </div>
+      <div class="matchup-col-labels">
+        <span class="mcl-spacer"></span>
+        <span class="mcl-col">Spread</span>
+        <span class="mcl-col">Total</span>
+        <span class="mcl-col">ML</span>
+        <span class="mcl-col adv">Advance</span>
+      </div>
+      ${renderTeamRow(topSeed, topTeam, ng, topIsFav, topSim)}
+      ${renderTeamRow(bottomSeed, bottomTeam, ng, bottomIsFav, bottomSim)}
+    </div>`;
+}
+
+// Render R1 matchup cards for one (sport, conference) pair
+function renderConferenceR1(sport, conf, seriesList) {
+  const container = document.querySelector(`.r-col.r1[data-sport="${sport}"][data-conf="${conf}"]`);
+  if (!container) return;
+  // Filter series to this conference, sort by seed_a ascending (1v8 at top, 2v7 next, ...)
+  const confSeries = seriesList
+    .filter(s => s.conference === conf)
+    .sort((a, b) => Math.min(a.seed_a, a.seed_b) - Math.min(b.seed_a, b.seed_b));
+  container.innerHTML = confSeries.map(renderMatchupCard).join('');
+}
+
+// Render the Championship Probability table
+function renderProbTable(sport, payload) {
+  const el = document.getElementById(`${sport}-probs`);
+  if (!el) return;
+
+  // Build a map: team → market_devigged_prob from champion_market
+  const marketMap = new Map();
+  (payload.champion_market || []).forEach(m => {
+    if (m && m.team != null) marketMap.set(m.team, m.market_devigged_prob);
+  });
+
+  // Teams sorted by sim champ prob descending
+  const teams = (payload.teams || [])
+    .slice()
+    .sort((a, b) => (b.champ_prob ?? 0) - (a.champ_prob ?? 0));
+
+  const maxSim = Math.max(...teams.map(t => t.champ_prob ?? 0), 0.01);
+
+  const header = `
+    <div class="prob-table-head">
+      <div class="pt-rank">#</div>
+      <div class="pt-team">Team</div>
+      <div class="pt-bar-wrap-head"></div>
+      <div class="pt-sim">Sim %</div>
+      <div class="pt-market">Mkt %</div>
+      <div class="pt-edge">Edge</div>
+    </div>`;
+
+  const rows = teams.map((t, i) => {
+    const simPct   = (t.champ_prob_pct ?? (t.champ_prob != null ? t.champ_prob * 100 : null));
+    const marketP  = marketMap.get(t.team);
+    const marketPct = marketP != null ? marketP * 100 : null;
+    let edgePct   = null;
+    if (simPct != null && marketPct != null) edgePct = simPct - marketPct;
+    const edgeCls = edgePct == null ? 'neutral' : (edgePct > 0.5 ? 'pos' : edgePct < -0.5 ? 'neg' : 'neutral');
+    const barPct  = t.champ_prob != null ? Math.round((t.champ_prob / maxSim) * 100) : 0;
+    return `
+      <div class="prob-trow">
+        <div class="pt-rank">${i + 1}</div>
+        <div class="pt-team">${t.team}</div>
+        <div class="pt-bar-wrap">
+          <div class="pt-bar-bg"><div class="pt-bar-fill" style="width:${barPct}%"></div></div>
+        </div>
+        <div class="pt-sim">${simPct != null ? simPct.toFixed(1) + '%' : '—'}</div>
+        <div class="pt-market">${marketPct != null ? marketPct.toFixed(1) + '%' : '—'}</div>
+        <div class="pt-edge ${edgeCls}">${edgePct != null ? (edgePct > 0 ? '+' : '') + edgePct.toFixed(1) + ' pp' : '—'}</div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = header + rows;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Full bracket rendering
+// ═══════════════════════════════════════════════════════════
+function renderBracket(sport, payload) {
+  renderProbTable(sport, payload);
+  // R1 matchups per conference
+  const series = payload.series || [];
+  renderConferenceR1(sport, 'WEST', series);
+  renderConferenceR1(sport, 'EAST', series);
+
+  // Updated timestamp
+  const updatedEl = document.getElementById(`${sport}-updated`);
+  if (updatedEl && payload.sim_date) {
+    updatedEl.textContent = `Updated ${payload.sim_date}`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// Fetch
+// ═══════════════════════════════════════════════════════════
+async function loadBracket(sport) {
+  const path = `data/bracket_${sport}.json`;
+  try {
+    const r = await fetch(path);
+    if (!r.ok) {
+      console.warn(`Bracket fetch failed: ${path} (${r.status})`);
+      return;
+    }
+    const data = await r.json();
+    bracketData[sport] = data;
+    renderBracket(sport, data);
+  } catch (e) {
+    console.warn(`Bracket load error (${sport}):`, e);
+  }
+}
+
+// Kick off fetches
+loadBracket('nhl');
+loadBracket('nba');
 </script>
 </body>
 </html>
