@@ -1,218 +1,155 @@
 <!DOCTYPE html>
-<html lang="en" style="scrollbar-gutter: stable;">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ArcVest — You're on the list</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+  <title>ArcVest — Thank You</title>
+  <meta name="description" content="You're in. Welcome to ArcVest.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="arcvest.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
-    :root {
-      --bg: #080b12; --bg2: #0e1220; --border: #1a2238;
-      --gold: #f0b429; --text: #eceef4; --muted: #6b7794; --green: #10b981;
-      --font-head: 'Bebas Neue', sans-serif;
-      --font-mono: 'DM Mono', monospace;
-      --font-body: 'Outfit', sans-serif;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; flex-direction: column; }
-
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 2.5rem;
-      background: rgba(8,11,18,0.92);
-      border-bottom: 1px solid rgba(26,34,56,0.6);
-    }
-    .nav-logo { display: flex; align-items: center; text-decoration: none; }
-    .nav-wordmark { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.55rem; letter-spacing: -0.02em; color: #e8eaf0; line-height: 1; min-width: 7.5rem; }
-    .nav-wordmark em { color: #c9a84c; font-style: normal; }
-    .nav-links { display: flex; align-items: center; gap: 2rem; }
-    .nav-links a { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 1.2rem; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; border-radius: 4px; white-space: nowrap; }
-    .nav-cta:hover { background: var(--gold); color: var(--bg); }
-    @media (max-width: 900px) { .nav-links { display: none; } .nav-cta { display: none; } }
-
-    .main {
-      flex: 1;
+    .thankyou-wrap {
+      min-height: calc(100vh - var(--nav-height));
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4rem 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .main::before {
-      content: '';
-      position: absolute;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(240,180,41,0.06) 0%, transparent 70%);
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      padding: var(--nav-height) var(--page-padding-x) var(--space-8);
     }
 
-    .card {
-      position: relative;
-      background: var(--bg2);
+    .thankyou-card {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 3.5rem;
-      max-width: 560px;
-      width: 100%;
+      border-top: 2px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8) var(--space-7);
       text-align: center;
-      border-top: 3px solid var(--gold);
+      max-width: 540px;
+      width: 100%;
     }
-    .check-icon {
-      width: 52px; height: 52px;
-      background: rgba(16,185,129,0.1);
-      border: 1px solid rgba(16,185,129,0.3);
+
+    .thankyou-check {
+      width: 56px;
+      height: 56px;
+      background: rgba(34,197,94,0.1);
       border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.5rem;
-      font-size: 1.4rem;
-    }
-    .card-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-5);
       color: var(--green);
-      margin-bottom: 0.75rem;
     }
-    .card-title {
+
+    .thankyou-headline {
       font-family: var(--font-head);
-      font-size: 3rem;
+      font-size: clamp(28px, 4vw, 42px);
       letter-spacing: 0.03em;
       color: var(--text);
-      margin-bottom: 1rem;
-      line-height: 1;
+      margin-bottom: var(--space-3);
+      line-height: 1.05;
     }
-    .card-body {
-      font-size: 0.9rem;
-      color: var(--muted);
+
+    .thankyou-sub {
+      font-family: var(--font-body);
       font-weight: 300;
-      line-height: 1.8;
-      margin-bottom: 0.75rem;
-    }
-    .card-secondary {
-      font-size: 0.82rem;
-      color: var(--muted);
-      font-weight: 300;
+      font-size: 15px;
       line-height: 1.7;
-      margin-bottom: 2rem;
+      color: var(--muted);
+      margin-bottom: var(--space-6);
     }
-    .card-secondary a { color: var(--gold); text-decoration: none; }
-    .card-secondary a:hover { text-decoration: underline; }
 
-    .nav-pills {
+    .next-steps {
       display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 2rem;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      text-align: left;
     }
-    .nav-pill {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.5rem 1rem;
+
+    .next-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: rgba(10,12,16,0.5);
+      border-radius: var(--radius-sm);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--muted);
-      text-decoration: none;
-      transition: all 0.2s;
     }
-    .nav-pill:hover { border-color: var(--gold); color: var(--gold); }
-    .nav-pill.primary { background: var(--gold); color: var(--bg); border-color: var(--gold); }
-    .nav-pill.primary:hover { background: #f5c842; }
 
-    .disc {
+    .next-step-num {
       font-family: var(--font-mono);
-      font-size: 0.62rem;
-      color: var(--muted);
+      font-size: 12px;
+      color: var(--gold);
+      min-width: 20px;
+      padding-top: 2px;
+    }
+
+    .next-step-text {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 13px;
       line-height: 1.6;
-      border-top: 1px solid var(--border);
-      padding-top: 1.2rem;
+      color: var(--muted);
     }
 
-    footer {
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      padding: 2rem 2.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem;
-    }
-
-    @media (max-width: 600px) {
-      .card { padding: 2rem 1.5rem; }
-      nav { padding: 1rem 1.5rem; }
-    }
+    .next-step-text strong { color: var(--text); font-weight: 500; }
   </style>
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="/">
-    <span class="nav-wordmark">Arc<em>Vest</em></span>
-  </a>
-  <div class="nav-links">
-    <a href="/scorecard.html">Scorecard</a>
-    <a href="/daily-card.html">Daily Card</a>
-    <a href="/odds.html">Odds</a>
-    <a href="/tournaments.html">Tournaments</a>
-    <a href="/edgevault.html">EdgeVault</a>
-  </div>
-  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
-</nav>
+<div id="nav-root"></div>
 
-<main class="main">
-  <div class="card">
-    <div class="check-icon">✓</div>
-    <div class="card-eyebrow">Waitlist confirmed</div>
-    <h1 class="card-title">You're on the list.</h1>
-    <p class="card-body">
-      Thanks for joining ArcVest. We'll send updates as new tools go live, the public Scorecard expands, and membership features move closer to launch.
-    </p>
-    <p class="card-secondary">
-      In the meantime, you can follow the build in public through the
-      <a href="/scorecard.html">Scorecard</a>,
-      <a href="/odds.html">Odds</a>, and
-      <a href="/edgevault.html">EdgeVault</a>.
-    </p>
+<div class="thankyou-wrap">
+  <div class="thankyou-card">
 
-    <div class="nav-pills">
-      <a class="nav-pill primary" href="/scorecard.html">View Scorecard</a>
-      <a class="nav-pill" href="/edgevault.html">Explore EdgeVault</a>
-      <a class="nav-pill" href="/">Back to Home</a>
+    <div class="thankyou-check">
+      <i data-lucide="check" style="width:28px;height:28px;"></i>
     </div>
 
-    <div class="disc">
-      For informational and entertainment purposes only. Not financial or betting advice.
-      Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal.
+    <h1 class="thankyou-headline">YOU'RE IN.</h1>
+
+    <p class="thankyou-sub">
+      Welcome to ArcVest. You're part of the founding team —
+      the people who are here while the track record is being built.
+      Check back each morning after the engine runs.
+    </p>
+
+    <div class="next-steps">
+      <div class="next-step">
+        <span class="next-step-num">01</span>
+        <span class="next-step-text"><strong>Check the Daily Card each morning.</strong> The model seals positions after the daily COMMIT run. Full execution detail — position, price, Kelly, and allocation — is available to account holders.</span>
+      </div>
+      <div class="next-step">
+        <span class="next-step-num">02</span>
+        <span class="next-step-text"><strong>Watch the Scorecard build.</strong> As positions settle each morning, the cumulative record fills in. The skill vs. chance decomposition becomes meaningful after a few weeks of data.</span>
+      </div>
+      <div class="next-step">
+        <span class="next-step-num">03</span>
+        <span class="next-step-text"><strong>Read the methodology.</strong> EdgeVault documents every model decision — the two-gate filter, fractional Kelly, Price Capture Alpha, and why ArcVest tracks CLV on every position.</span>
+      </div>
     </div>
-  </div>
-</main>
 
-<footer>
-  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.02em;color:#8e9ab5;">Arc<span style="color:#c9a84c">Vest</span></div>
-  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-    <a href="/" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Home</a>
-    <a href="/scorecard.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Scorecard</a>
-    <a href="/daily-card.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Daily Card</a>
-    <a href="/odds.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Odds</a>
-    <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Tournaments</a>
-    <a href="/edgevault.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">EdgeVault</a>
-  </div>
-  <div style="width:100%;display:flex;gap:1.5rem;padding-bottom:0.75rem;">
-    <a href="/about.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">About</a>
-    <a href="/privacy.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Privacy Policy</a>
-    <a href="/terms.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Terms of Service</a>
-  </div>
-  <div style="width:100%;font-size:0.68rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;line-height:1.5;">
-    For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io
-  </div>
-</footer>
+    <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap;">
+      <a href="/daily-card.html" class="btn btn-primary">
+        <i data-lucide="layout-list" class="icon-sm"></i>
+        TODAY'S CARD
+      </a>
+      <a href="/scorecard.html" class="btn btn-outline">VIEW SCORECARD</a>
+    </div>
 
+    <p class="t-disclaimer" style="margin-top:var(--space-5);">
+      Free during the public beta. No credit card required.
+      <a href="/privacy.html" style="color:var(--dim);">Privacy Policy</a>
+    </p>
+
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+</script>
+<div id="footer-root" data-variant="minimal"></div>
+<script src="/arcvest-components.js"></script>
 </body>
 </html>

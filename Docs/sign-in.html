@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Sign In</title>
+  <meta name="description" content="Sign in to your ArcVest account to access the full Daily Card, Performance Log, and Subscriber Path.">
+  <link rel="stylesheet" href="arcvest.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* PAGE-OVERRIDE: Sign In — centered auth card layout */
+
+    .signin-wrap {
+      min-height: calc(100vh - var(--nav-height));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--nav-height) + var(--space-6)) var(--page-padding-x) var(--space-8);
+    }
+
+    .signin-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: var(--radius-lg);
+      padding: var(--space-7) var(--space-6);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .signin-header {
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .signin-title {
+      font-family: var(--font-head);
+      font-size: 32px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .signin-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .phase-notice {
+      background: rgba(201,168,76,0.05);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-bottom: var(--space-5);
+      text-align: center;
+    }
+
+    .phase-notice-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: var(--space-2);
+    }
+
+    .phase-notice-body {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin: var(--space-4) 0;
+    }
+
+    .divider-text::before,
+    .divider-text::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-text span {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<div id="nav-root"></div>
+
+
+<!-- ── Sign In Card ── -->
+<div class="signin-wrap">
+  <div class="signin-card">
+
+    <div class="signin-header">
+      <a href="/index.html" style="text-decoration:none;">
+        <span class="t-wordmark" style="display:block;margin-bottom:var(--space-4);">Arc<em>Vest</em></span>
+      </a>
+      <div class="signin-title">SIGN IN</div>
+      <p class="signin-sub">Access your full Daily Card, Performance Log, and Subscriber Path.</p>
+    </div>
+
+    <!-- Phase 1 notice — authentication not yet live -->
+    <div class="phase-notice" id="phase-notice">
+      <div class="phase-notice-title">
+        <i data-lucide="clock" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+        AUTHENTICATION COMING IN PHASE 2
+      </div>
+      <p class="phase-notice-body">
+        ArcVest is in Phase 1 — the public calibration period. Account creation
+        and sign-in go live in Phase 2. Register your interest below and you'll
+        be among the first notified when accounts open.
+      </p>
+    </div>
+
+    <!-- Email interest capture (Phase 1) -->
+    <div id="interest-form">
+      <div class="form-group">
+        <label class="form-label" for="email-input">Email Address</label>
+        <input class="input" type="email" id="email-input"
+               placeholder="your@email.com" autocomplete="email">
+      </div>
+      <button class="btn btn-primary" style="width:100%;" id="notify-btn" onclick="handleNotify()">
+        <i data-lucide="bell" class="icon-sm"></i>
+        NOTIFY ME WHEN ACCOUNTS OPEN
+      </button>
+    </div>
+
+    <!-- Success state (shown after submit) -->
+    <div id="success-state" style="display:none;text-align:center;padding:var(--space-4) 0;">
+      <i data-lucide="check-circle" style="width:32px;height:32px;color:var(--green);margin-bottom:var(--space-3);"></i>
+      <div class="t-card-title" style="margin-bottom:var(--space-2);">You're on the list.</div>
+      <p class="t-disclaimer">We'll notify you as soon as Phase 2 accounts open.</p>
+    </div>
+
+    <!-- Phase 2 form (hidden until auth is live — swap display:none to display:block) -->
+    <div id="auth-form" style="display:none;">
+      <div class="form-group">
+        <label class="form-label" for="auth-email">Email Address</label>
+        <input class="input" type="email" id="auth-email"
+               placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="auth-password">Password</label>
+        <input class="input" type="password" id="auth-password"
+               placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-bottom:var(--space-3);"
+              onclick="handleSignIn()">
+        SIGN IN
+      </button>
+      <div style="text-align:center;">
+        <a href="#" class="t-label c-gold" style="text-decoration:none;font-size:11px;">
+          Forgot password?
+        </a>
+      </div>
+    </div>
+
+    <div class="divider-text" style="margin:var(--space-5) 0 var(--space-4);">
+      <span>OR</span>
+    </div>
+
+    <a href="/membership.html" class="btn btn-ghost" style="width:100%;justify-content:center;">
+      LEARN ABOUT MEMBERSHIP
+    </a>
+
+    <p class="t-disclaimer" style="text-align:center;margin-top:var(--space-4);">
+      Free during beta · No credit card ·
+      <a href="/privacy.html" style="color:var(--dim);">Privacy Policy</a>
+    </p>
+
+  </div>
+</div>
+
+
+<!-- ── Footer (minimal on sign-in) ── -->
+<div id="footer-root" data-variant="minimal"></div>
+
+
+<script>
+lucide.createIcons();
+
+// ── Nav ──
+
+
+// ── Phase toggle ──
+// PHASE 1: interest form visible, auth form hidden
+// PHASE 2: set PHASE = 2 below — swaps to real auth form, hides interest form
+const PHASE = 1;
+
+if (PHASE >= 2) {
+  document.getElementById('phase-notice').style.display  = 'none';
+  document.getElementById('interest-form').style.display = 'none';
+  document.getElementById('auth-form').style.display     = 'block';
+}
+
+// ── Interest capture (Phase 1) ──
+// Wire to Mailchimp or form endpoint when ready.
+// Replace the console.log with the actual API call.
+function handleNotify() {
+  const email = document.getElementById('email-input').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('email-input').focus();
+    return;
+  }
+
+  // TODO Phase 2: replace with Mailchimp subscribe endpoint
+  console.log('Interest registered:', email);
+
+  // Show success state
+  document.getElementById('interest-form').style.display = 'none';
+  document.getElementById('success-state').style.display = 'block';
+  lucide.createIcons();
+}
+
+// ── Sign In handler (Phase 2) ──
+// Replace with actual auth call when authentication layer is live.
+function handleSignIn() {
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) return;
+
+  // TODO Phase 2: implement authentication
+  // On success: set session token, redirect to daily-card.html
+  // On failure: show inline error message
+  console.log('Sign in attempted:', email);
+}
+
+// ── Enter key on interest form ──
+document.getElementById('email-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleNotify();
+});
+</script>
+
+<script src="/arcvest-components.js"></script>
+</body>
+</html>

@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Component Reference Library</title>
+  <link rel="stylesheet" href="arcvest.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    /* ── Reference-file-only styles — NOT copied into pages ── */
+    .ref-section {
+      border-top: 2px solid var(--gold);
+      margin: var(--space-8) 0 var(--space-6);
+      padding-top: var(--space-5);
+    }
+    .ref-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: var(--space-2);
+    }
+    .ref-section-desc {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--muted);
+      margin-bottom: var(--space-5);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+    .ref-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin: var(--space-5) 0 var(--space-2);
+    }
+    .ref-rule {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--dim);
+      margin-top: var(--space-2);
+      border-left: 2px solid var(--border);
+      padding-left: var(--space-3);
+      line-height: 1.6;
+    }
+    .ref-toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+      margin: var(--space-6) 0;
+      column-count: 2;
+      column-gap: var(--space-6);
+    }
+    .ref-toc a {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: var(--space-1) 0;
+      text-decoration: none;
+      transition: color var(--transition-base);
+    }
+    .ref-toc a:hover { color: var(--gold); }
+    .ref-preview {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+      margin-bottom: var(--space-3);
+    }
+    .ref-preview-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: var(--space-3);
+      opacity: 0.6;
+    }
+    .demo-spacer { height: var(--space-4); }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     ARCVEST COMPONENT REFERENCE LIBRARY
+     Step 2 of SITE-PASS-1 | Mountain Engineering
+     Version 1.0 | April 2026
+
+     HOW TO USE THIS FILE:
+     1. Find the component you need by section.
+     2. Copy the HTML block between the CUT markers.
+     3. Paste into the target page file.
+     4. Replace placeholder text (ALL_CAPS) with real content
+        or dynamic values from JSON.
+     5. arcvest.css must be linked on every page that uses
+        these components. No other stylesheet is needed.
+     6. Add the Lucide script tag to every page head.
+        Call lucide.createIcons() before </body>.
+
+     RULES:
+     - Never modify component class names in page files.
+     - Page-level CSS overrides must be clearly marked with
+       a comment: /* PAGE-OVERRIDE: reason */
+     - If a component needs a new variant, add it to
+       arcvest.css first — never inline in a page file.
+     - The active nav link gets class="active" set by JS,
+       not hardcoded — see nav JS block in Section 1.
+     ════════════════════════════════════════════════════════ -->
+
+<!-- ── Reference Header (not copied into pages) ── -->
+<div style="background:var(--bg-surface);border-bottom:1px solid var(--border);padding:var(--space-4) var(--page-padding-x);">
+  <div style="max-width:var(--max-width);margin:0 auto;display:flex;align-items:baseline;gap:var(--space-4);">
+    <span style="font-family:var(--font-syne);font-weight:800;font-size:1.4rem;color:var(--text);">Arc<em style="color:var(--gold);font-style:normal;">Vest</em></span>
+    <span style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--dim);">Component Reference Library · Step 2 of SITE-PASS-1 · v1.0</span>
+  </div>
+</div>
+
+<div class="page-container" style="padding-top:var(--space-6);padding-bottom:var(--space-8);">
+
+  <!-- Table of Contents -->
+  <div class="ref-toc">
+    <a href="#nav">01 — Navigation (Nav + Mobile Menu)</a>
+    <a href="#footer">02 — Footer</a>
+    <a href="#page-header">03 — Page Header</a>
+    <a href="#cards">04 — Cards</a>
+    <a href="#badges">05 — Badge System</a>
+    <a href="#sport-header">06 — Sport Section Header</a>
+    <a href="#drawer">07 — Drawer (Expand/Collapse)</a>
+    <a href="#filter-bar">08 — Filter Bar</a>
+    <a href="#stat-display">09 — Stat / KPI Display</a>
+    <a href="#dial">10 — Process Score Dial</a>
+    <a href="#equity-chart">11 — Equity Curve Chart</a>
+    <a href="#perf-bars">12 — Sport Performance Bars</a>
+    <a href="#attribution">13 — Attribution Decomposition</a>
+    <a href="#integrity">14 — Sample Integrity Bar</a>
+    <a href="#article">15 — Article Body (EdgeVault)</a>
+    <a href="#tool-card">16 — Tool Card (EdgeVault Calculators)</a>
+    <a href="#ad-slot">17 — Ad Slot</a>
+    <a href="#empty-state">18 — Empty State</a>
+    <a href="#buttons">19 — Buttons</a>
+    <a href="#page-shell">20 — Full Page Shell Template</a>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SECTION 1 — NAVIGATION
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="nav">
+    <div class="ref-section-title">01 — Navigation</div>
+    <div class="ref-section-desc">
+      Fixed top nav. Identical on every page. Desktop shows full link row.
+      Mobile collapses to hamburger drawer. Active link set by JS on page load —
+      never hardcode the active class. TOURNAMENTS link is conditionally rendered
+      by JS reading <code>tournaments_active</code> from summary.json.
+    </div>
+  </div>
+
+  <div class="ref-label">Preview</div>
+  <div class="ref-preview" style="padding:0;overflow:hidden;border-radius:var(--radius-md);">
+    <div class="ref-preview-label" style="padding:var(--space-3) var(--space-4) 0;">nav component</div>
+    <!-- Static preview version (position:relative for reference file) -->
+    <nav style="position:relative;top:auto;left:auto;right:auto;" class="nav">
+      <a href="/" class="nav-logo">
+        <span class="t-wordmark">Arc<em>Vest</em></span>
+      </a>
+      <div class="nav-links">
+        <a href="/index.html">HOME</a>
+        <a href="/daily-card.html">DAILY CARD</a>
+        <a href="/odds.html" class="active">ODDS</a>
+        <a href="/scorecard.html">SCORECARD</a>
+        <a href="/performance-log.html">PERFORMANCE LOG</a>
+        <a href="/vault.html">EDGEVAULT</a>
+        <a href="/membership.html">MEMBERSHIP</a>
+      </div>
+      <a href="/sign-in.html" class="nav-cta">SIGN IN</a>
+      <button class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="ref-label">Copy-paste block — paste inside &lt;body&gt;, before page content</div>
+  <div class="ref-rule">
+    Replace <code>CURRENT_PAGE.html</code> with the actual filename on each page.
+    The JS block at the bottom auto-sets the active class — no manual editing needed after that.
+    The Tournaments link is injected by JS only when tournaments_active is true in summary.json.
+  </div>
+
+<!-- ═══════════════════════════ CUT: NAV START ═══════════════════════════ -->
+<pre style="display:none">
+&lt;!-- ── Navigation ── --&gt;
+&lt;nav class="nav" id="site-nav"&gt;
+  &lt;a href="/index.html" class="nav-logo"&gt;
+    &lt;span class="t-wordmark"&gt;Arc&lt;em&gt;Vest&lt;/em&gt;&lt;/span&gt;
+  &lt;/a&gt;
+
+  &lt;div class="nav-links" id="nav-links"&gt;
+    &lt;a href="/index.html"&gt;HOME&lt;/a&gt;
+    &lt;a href="/daily-card.html"&gt;DAILY CARD&lt;/a&gt;
+    &lt;a href="/odds.html"&gt;ODDS&lt;/a&gt;
+    &lt;!-- TOURNAMENTS injected here by nav.js when tournaments_active = true --&gt;
+    &lt;a href="/scorecard.html"&gt;SCORECARD&lt;/a&gt;
+    &lt;a href="/performance-log.html"&gt;PERFORMANCE LOG&lt;/a&gt;
+    &lt;a href="/vault.html"&gt;EDGEVAULT&lt;/a&gt;
+    &lt;a href="/membership.html"&gt;MEMBERSHIP&lt;/a&gt;
+  &lt;/div&gt;
+
+  &lt;a href="/sign-in.html" class="nav-cta"&gt;SIGN IN&lt;/a&gt;
+
+  &lt;button class="nav-hamburger" id="nav-hamburger"
+          aria-label="Open navigation menu" aria-expanded="false"&gt;
+    &lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/nav&gt;
+
+&lt;!-- ── Mobile Menu ── --&gt;
+&lt;div class="nav-mobile" id="nav-mobile" role="navigation" aria-label="Mobile navigation"&gt;
+  &lt;a href="/index.html"&gt;HOME&lt;/a&gt;
+  &lt;a href="/daily-card.html"&gt;DAILY CARD&lt;/a&gt;
+  &lt;a href="/odds.html"&gt;ODDS&lt;/a&gt;
+  &lt;!-- TOURNAMENTS injected here by nav.js when tournaments_active = true --&gt;
+  &lt;a href="/scorecard.html"&gt;SCORECARD&lt;/a&gt;
+  &lt;a href="/performance-log.html"&gt;PERFORMANCE LOG&lt;/a&gt;
+  &lt;a href="/vault.html"&gt;EDGEVAULT&lt;/a&gt;
+  &lt;a href="/membership.html"&gt;MEMBERSHIP&lt;/a&gt;
+  &lt;a href="/sign-in.html"&gt;SIGN IN&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;!-- ── Nav JS — active state + hamburger + tournaments conditional ── --&gt;
+&lt;script&gt;
+(function() {
+  // Active link
+  const path = window.location.pathname.replace(/\/$/, '') || '/index.html';
+  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(a =&gt; {
+    const href = a.getAttribute('href').replace(/\/$/, '');
+    if (path.endsWith(href) || (path === '' &amp;&amp; href.includes('index'))) {
+      a.classList.add('active');
+    }
+  });
+
+  // Hamburger toggle
+  const hamburger = document.getElementById('nav-hamburger');
+  const mobileMenu = document.getElementById('nav-mobile');
+  hamburger.addEventListener('click', function() {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+
+  // Tournaments conditional — reads summary.json
+  const DATA_BASE = 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/main/Docs/data/';
+  fetch(DATA_BASE + 'summary.json')
+    .then(r =&gt; r.json())
+    .then(data =&gt; {
+      if (data.tournaments_active) {
+        const tournLink = '&lt;a href="/tournaments.html"&gt;TOURNAMENTS&lt;/a&gt;';
+        // Insert after ODDS in desktop nav
+        const oddsLink = document.querySelector('.nav-links a[href*="odds"]');
+        if (oddsLink) oddsLink.insertAdjacentHTML('afterend', tournLink);
+        // Insert after ODDS in mobile nav
+        const oddsLinkM = document.querySelector('.nav-mobile a[href*="odds"]');
+        if (oddsLinkM) oddsLinkM.insertAdjacentHTML('afterend', tournLink);
+        // Re-run active state check
+        const newLinks = document.querySelectorAll('.nav-links a[href*="tournaments"], .nav-mobile a[href*="tournaments"]');
+        newLinks.forEach(a =&gt; {
+          if (path.includes('tournaments')) a.classList.add('active');
+        });
+      }
+    })
+    .catch(() =&gt; {}); // Fail silently — tournaments hidden if fetch fails
+})();
+&lt;/script&gt;
+</pre>
+<!-- ═══════════════════════════ CUT: NAV END ═══════════════════════════ -->
+
+  <!-- Live rendered version -->
+  <div class="ref-preview" style="margin-top:var(--space-3);">
+    <div class="ref-preview-label">nav — rendered (desktop + mobile toggle)</div>
+    <nav style="position:relative;top:auto;" class="nav">
+      <a href="/" class="nav-logo"><span class="t-wordmark">Arc<em>Vest</em></span></a>
+      <div class="nav-links">
+        <a href="#">HOME</a>
+        <a href="#">DAILY CARD</a>
+        <a href="#" class="active">ODDS</a>
+        <a href="#">SCORECARD</a>
+        <a href="#">PERFORMANCE LOG</a>
+        <a href="#">EDGEVAULT</a>
+        <a href="#">MEMBERSHIP</a>
+      </div>
+      <a href="#" class="nav-cta">SIGN IN</a>
+      <button class="nav-hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 2 — FOOTER
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="footer">
+    <div class="ref-section-title">02 — Footer</div>
+    <div class="ref-section-desc">
+      Identical on every page. Contains wordmark, canonical disclaimer, footer-only nav links,
+      Reset 4 baseline date, and last engine run timestamp (populated from summary.json).
+      Never put primary navigation links in the footer.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">footer — rendered</div>
+    <footer class="footer" style="margin-top:0;">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a href="/index.html" class="t-wordmark" style="text-decoration:none;">Arc<em>Vest</em></a>
+          <p class="footer-disclaimer">
+            ArcVest is a quantitative advisory framework for evaluating sports-market prices and
+            portfolio risk. For informational purposes only. Not betting advice. ArcVest uses
+            non-intrusive advertising to keep the platform accessible. Pro subscribers are ad-free.
+          </p>
+          <span class="footer-copy">Reset 4 baseline: April 23, 2026 &nbsp;·&nbsp; Last run: <span id="footer-last-run">—</span></span>
+        </div>
+        <div class="footer-links">
+          <a href="/about.html">ABOUT</a>
+          <a href="/privacy.html">PRIVACY POLICY</a>
+          <a href="/terms.html">TERMS OF USE</a>
+          <span class="footer-copy" style="margin-top:var(--space-3);">© 2026 Mountain Capital, LLC</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <div class="ref-rule">
+    The <code>footer-last-run</code> span is populated by JS reading <code>generated_at</code>
+    from summary.json. Copy the footer JS block below alongside the footer HTML.
+    The Reset 4 baseline date is hardcoded — it does not change.
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 3 — PAGE HEADER
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="page-header">
+    <div class="ref-section-title">03 — Page Header</div>
+    <div class="ref-section-desc">
+      Standard interior page header. Eyebrow line (decorative — never primary info),
+      page title in Bebas Neue, optional subtitle. Used on every page except Home
+      (which has its own hero treatment).
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">page-header — rendered</div>
+    <div class="page-header" style="padding-top:var(--space-5);">
+      <div class="page-header-inner" style="padding:0;">
+        <div class="page-eyebrow">
+          <i data-lucide="bar-chart-2" class="icon-sm icon-gold"></i>
+          MARKET INTELLIGENCE
+        </div>
+        <h1 class="page-title">ODDS</h1>
+        <p class="page-subtitle">
+          Full market coverage across all active sports. Best available lines,
+          no-vig fair probabilities, and model EV for every game.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-label">Variants</div>
+  <div class="ref-preview">
+    <div class="ref-preview-label">page-header — with run timestamp badge</div>
+    <div style="padding: var(--space-4) 0 0;">
+      <div class="page-eyebrow">
+        <i data-lucide="activity" class="icon-sm icon-gold"></i>
+        DAILY CARD
+      </div>
+      <div class="flex-between" style="align-items:flex-end;">
+        <h1 class="page-title">TODAY'S POSITIONS</h1>
+        <span class="badge badge-gold" style="margin-bottom:var(--space-2);">
+          <span class="badge-dot badge-dot-pulse"></span>
+          LIVE
+        </span>
+      </div>
+      <p class="page-subtitle">Model-qualified positions for April 29, 2026.</p>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 4 — CARDS
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="cards">
+    <div class="ref-section-title">04 — Cards</div>
+    <div class="ref-section-desc">
+      All card variants. Use <code>.card</code> as the base.
+      Card header row uses <code>.card-header</code> + <code>.card-header-label</code>.
+      Never put sport accent colors on cards — identity is icon + label only.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">card variants</div>
+    <div class="grid-3" style="gap:var(--space-4);">
+
+      <!-- Standard card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-label">
+            <i data-lucide="trending-up" class="icon-sm icon-muted"></i>
+            MODEL EDGE
+          </span>
+          <span class="badge badge-qualified">QUALIFIED</span>
+        </div>
+        <div class="stat-value" style="margin-bottom:var(--space-1);">+7.4%</div>
+        <div class="t-label c-dim">Expected value</div>
+      </div>
+
+      <!-- Card with accent top border -->
+      <div class="card-accent">
+        <div class="card-header">
+          <span class="card-header-label">
+            <i data-lucide="trophy" class="icon-sm icon-muted"></i>
+            WIN RATE
+          </span>
+        </div>
+        <div class="stat-value c-gold" style="margin-bottom:var(--space-1);">58.3%</div>
+        <div class="t-label c-dim">Reset 4 · 24 settled</div>
+      </div>
+
+      <!-- Small card -->
+      <div class="card card-sm">
+        <div class="card-header">
+          <span class="card-header-label">OPEN</span>
+          <span class="badge badge-open">
+            <span class="badge-dot"></span>
+            PENDING
+          </span>
+        </div>
+        <div class="t-data c-text">BOS ML · -118</div>
+        <div class="t-label c-dim mt-2">Celtics vs Heat · Tonight</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="ref-label">Pick card — full layout (Daily Card use)</div>
+  <div class="ref-preview">
+    <div class="ref-preview-label">pick-card — rendered</div>
+    <div class="card" style="max-width:560px;">
+      <div class="card-header">
+        <span class="card-header-label">
+          <i data-lucide="circle" class="icon-sm icon-muted"></i>
+          NBA · MONEYLINE
+        </span>
+        <span class="badge badge-qualified">QUALIFIED</span>
+      </div>
+      <div class="flex-between mt-3">
+        <div>
+          <div class="t-card-title">Boston Celtics</div>
+          <div class="t-label c-dim mt-2">vs Miami Heat · 7:30 PM ET</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="t-data-lg">-118</div>
+          <div class="t-label c-dim mt-2">BEST PRICE</div>
+        </div>
+      </div>
+      <div class="divider-light"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);">
+        <div>
+          <div class="t-label c-dim">E(WIN)</div>
+          <div class="t-data c-teal mt-2">54.8%</div>
+        </div>
+        <div>
+          <div class="t-label c-dim">KELLY</div>
+          <div class="t-data c-text mt-2">2.1%</div>
+        </div>
+        <div>
+          <div class="t-label c-dim">ALLOCATION</div>
+          <div class="t-data c-gold mt-2">$21.00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 5 — BADGE SYSTEM
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="badges">
+    <div class="ref-section-title">05 — Badge System</div>
+    <div class="ref-section-desc">
+      All badge variants. Every badge uses DM Mono 11px. Never use sport accent
+      colors in badges — result and state signals only. The dot indicator is optional
+      and used only for genuinely live/active states.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">result badges</div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-win">WIN</span>
+      <span class="badge badge-loss">LOSS</span>
+      <span class="badge badge-push">PUSH</span>
+      <span class="badge badge-open"><span class="badge-dot badge-dot-pulse"></span> OPEN</span>
+      <span class="badge badge-void">VOID</span>
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">filter / model badges</div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-qualified">QUALIFIED</span>
+      <span class="badge badge-below-threshold">BELOW THRESHOLD</span>
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">variance / noise state badges</div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-standard-noise">STANDARD NOISE</span>
+      <span class="badge badge-elevated-noise">ELEVATED NOISE</span>
+      <span class="badge badge-critical-sigma">CRITICAL SIGMA</span>
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">accent + sport + type badges</div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-gold"><i data-lucide="zap" class="icon-sm"></i> MODEL ACTIVE</span>
+      <span class="badge badge-teal">RESET 4</span>
+      <span class="badge badge-sport"><i data-lucide="circle" class="icon-sm"></i> NBA</span>
+      <span class="badge badge-sport"><i data-lucide="circle" class="icon-sm"></i> MLB</span>
+      <span class="badge badge-sport"><i data-lucide="circle" class="icon-sm"></i> NHL</span>
+      <span class="badge badge-type">MONEYLINE</span>
+      <span class="badge badge-type">SPREAD</span>
+      <span class="badge badge-type">TOTAL</span>
+      <span class="badge badge-type">BTTS</span>
+    </div>
+  </div>
+
+  <div class="ref-rule">
+    Sport icons in badges: use <code>circle</code> as a generic placeholder until
+    Lucide sport-specific icon names are confirmed. Tennis uses <code>circle-dot</code>.
+    All icons in badges use <code>.icon-sm</code> (16px).
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 6 — SPORT SECTION HEADER
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="sport-header">
+    <div class="ref-section-title">06 — Sport Section Header</div>
+    <div class="ref-section-desc">
+      Used on Odds and Daily Card pages to divide content by sport.
+      Icon is 24px. Title is Bebas Neue. Meta (game count) optional.
+      No sport accent colors — Off-White icon and title only.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">sport-section-header — variants</div>
+    <div class="sport-section-header">
+      <div class="sport-section-icon">
+        <i data-lucide="circle" class="icon-lg icon-text"></i>
+      </div>
+      <span class="sport-section-title">NBA</span>
+      <span class="sport-section-meta">8 GAMES</span>
+    </div>
+    <div class="demo-spacer"></div>
+    <div class="sport-section-header">
+      <div class="sport-section-icon">
+        <i data-lucide="circle" class="icon-lg icon-text"></i>
+      </div>
+      <span class="sport-section-title">MLB</span>
+      <span class="sport-section-meta">14 GAMES · 2 QUALIFIED</span>
+    </div>
+    <div class="demo-spacer"></div>
+    <div class="sport-section-header">
+      <div class="sport-section-icon">
+        <i data-lucide="circle-dot" class="icon-lg icon-text"></i>
+      </div>
+      <span class="sport-section-title">ATP — MADRID OPEN</span>
+      <span class="sport-section-meta">6 MATCHES</span>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 7 — DRAWER
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="drawer">
+    <div class="ref-section-title">07 — Drawer (Expand / Collapse)</div>
+    <div class="ref-section-desc">
+      Tap-to-expand pattern. Used for pick detail rows, attribution decomposition,
+      and scorecard skill/luck breakdown. All drawers are open by default on desktop
+      (class="drawer-content open") and closed by default on mobile — JS handles
+      this via the responsive toggle. Chevron rotates on open state via CSS.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">drawer — full example</div>
+    <div class="card" style="max-width:560px;">
+      <!-- Drawer trigger -->
+      <button class="drawer-trigger" aria-expanded="false" aria-controls="demo-drawer-1">
+        <span class="card-header-label">
+          <i data-lucide="pie-chart" class="icon-sm icon-muted"></i>
+          ATTRIBUTION BREAKDOWN
+        </span>
+        <i data-lucide="chevron-down" class="drawer-chevron"></i>
+      </button>
+      <!-- Drawer content -->
+      <div class="drawer-content" id="demo-drawer-1">
+        <div class="divider-light"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);padding-top:var(--space-3);">
+          <div>
+            <div class="t-label c-dim">PRICE CAPTURE α</div>
+            <div class="t-data c-teal mt-2">+2.1%</div>
+          </div>
+          <div>
+            <div class="t-label c-dim">SELECTION α</div>
+            <div class="t-data c-gold mt-2">+3.8%</div>
+          </div>
+          <div>
+            <div class="t-label c-dim">VARIANCE</div>
+            <div class="t-data c-muted mt-2">−0.6%</div>
+          </div>
+        </div>
+        <div class="attribution-bar mt-4" style="margin-top:var(--space-4);">
+          <div class="attribution-segment-pca" style="width:38%;"></div>
+          <div class="attribution-segment-sel" style="width:54%;"></div>
+          <div class="attribution-segment-chance" style="width:8%;"></div>
+        </div>
+        <div class="flex gap-3 mt-2" style="margin-top:var(--space-2);">
+          <span class="t-label" style="color:var(--teal);">■ Price</span>
+          <span class="t-label" style="color:var(--gold);">■ Selection</span>
+          <span class="t-label c-dim">■ Variance</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-label">Drawer JS — add once per page (handles all drawers)</div>
+  <div class="ref-rule">
+    Copy this script block into every page that uses drawers.
+    It handles all <code>.drawer-trigger</code> elements on the page automatically.
+  </div>
+
+<pre style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-4);font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow-x:auto;margin-top:var(--space-3);">
+// Drawer toggle — handles all .drawer-trigger elements
+document.querySelectorAll('.drawer-trigger').forEach(trigger => {
+  trigger.addEventListener('click', function() {
+    const targetId = this.getAttribute('aria-controls');
+    const content  = document.getElementById(targetId);
+    const isOpen   = content.classList.toggle('open');
+    this.setAttribute('aria-expanded', isOpen);
+  });
+});
+</pre>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 8 — FILTER BAR
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="filter-bar">
+    <div class="ref-section-title">08 — Filter Bar</div>
+    <div class="ref-section-desc">
+      Sport and result filter pills. Used on Odds, Daily Card, and Performance Log.
+      Active pill gets the <code>.active</code> class via JS on click.
+      "ALL" is always the first pill and is active by default.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">filter-bar — rendered</div>
+    <div class="filter-bar">
+      <span class="filter-label">FILTER:</span>
+      <button class="filter-pill active">ALL</button>
+      <button class="filter-pill">NBA</button>
+      <button class="filter-pill">MLB</button>
+      <button class="filter-pill">NHL</button>
+      <button class="filter-pill">SOCCER</button>
+      <button class="filter-pill">TENNIS</button>
+    </div>
+    <div class="demo-spacer"></div>
+    <div class="filter-bar">
+      <span class="filter-label">RESULT:</span>
+      <button class="filter-pill active">ALL</button>
+      <button class="filter-pill">WIN</button>
+      <button class="filter-pill">LOSS</button>
+      <button class="filter-pill">OPEN</button>
+      <button class="filter-pill">PUSH</button>
+    </div>
+  </div>
+
+  <div class="ref-label">Filter JS — add once per filter-bar group</div>
+<pre style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-4);font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow-x:auto;margin-top:var(--space-3);">
+// Filter pill toggle — call with the container selector and a callback
+function initFilterBar(barSelector, onFilter) {
+  const bar = document.querySelector(barSelector);
+  if (!bar) return;
+  bar.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      bar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      onFilter(this.textContent.trim());
+    });
+  });
+}
+
+// Usage example:
+// initFilterBar('#sport-filter-bar', (sport) => filterTableBySport(sport));
+</pre>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 9 — STAT / KPI DISPLAY
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="stat-display">
+    <div class="ref-section-title">09 — Stat / KPI Display</div>
+    <div class="ref-section-desc">
+      Two patterns: inline stat row (value + label side by side) and stat card
+      (standalone KPI block for grid layouts). Teal is default data color.
+      Override with <code>.stat-positive</code>, <code>.stat-negative</code>,
+      or <code>.stat-gold</code> on the parent for context-appropriate color.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">stat cards — grid layout</div>
+    <div class="grid-4" style="gap:var(--space-3);">
+      <div class="stat-card stat-gold">
+        <div class="stat-card-value">$950.36</div>
+        <div class="stat-card-label">BANKROLL</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">−4.96%</div>
+        <div class="stat-card-label">RETURN · RESET 4</div>
+      </div>
+      <div class="stat-card stat-positive">
+        <div class="stat-card-value">58.3%</div>
+        <div class="stat-card-label">WIN RATE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">24</div>
+        <div class="stat-card-label">SETTLED · R4</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">inline stat rows</div>
+    <div class="flex-col gap-3">
+      <div class="stat-row">
+        <span class="stat-value">+7.4%</span>
+        <span class="stat-label">MODEL EV</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-value c-green">WIN</span>
+        <span class="stat-label">RESULT</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-value c-gold">$21.00</span>
+        <span class="stat-label">ALLOCATION</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 10 — PROCESS SCORE DIAL
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="dial">
+    <div class="ref-section-title">10 — Process Score Dial</div>
+    <div class="ref-section-desc">
+      Inline SVG dial. Color-banded: Red (0–39), Amber (40–59), Gold (60–79),
+      Green (80–100). Animated needle sweep on load. Used on Scorecard and Home.
+      The <code>drawDial(score)</code> function renders the SVG — call it with
+      the numeric score from scorecard.json <code>process_score</code> field.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">process score dial — rendered (score: 72)</div>
+    <div style="display:flex;align-items:center;gap:var(--space-6);">
+      <div class="dial-wrapper" id="demo-dial" style="width:140px;height:140px;"></div>
+      <div>
+        <div class="t-label c-dim">PROCESS SCORE</div>
+        <div class="stat-value c-gold mt-2" style="font-size:32px;">72</div>
+        <div class="t-label c-muted mt-2">GOOD — Model operating normally</div>
+        <div class="badge badge-gold mt-3" style="margin-top:var(--space-3);">
+          <i data-lucide="chevrons-right" class="icon-sm"></i>
+          VIEW BREAKDOWN
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-label">Dial JS — copy into any page using the dial</div>
+<pre style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-4);font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow-x:auto;margin-top:var(--space-3);">
+function drawDial(score, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const pct = Math.min(Math.max(score, 0), 100) / 100;
+  // Color bands: 0-39 red, 40-59 amber, 60-79 gold, 80-100 green
+  const color = score >= 80 ? '#22c55e'
+              : score >= 60 ? '#c9a84c'
+              : score >= 40 ? '#f59e0b'
+              :               '#ef4444';
+  const r = 54, cx = 70, cy = 76;
+  const startAngle = Math.PI;        // 180deg — left
+  const endAngle   = startAngle + Math.PI * pct; // sweep right
+  const x1 = cx + r * Math.cos(startAngle);
+  const y1 = cy + r * Math.sin(startAngle);
+  const x2 = cx + r * Math.cos(endAngle);
+  const y2 = cy + r * Math.sin(endAngle);
+  const large = pct > 0.5 ? 1 : 0;
+  el.innerHTML = `
+    <svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg">
+      <!-- Track -->
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}"
+            fill="none" stroke="#1a2238" stroke-width="10" stroke-linecap="round"/>
+      <!-- Fill arc -->
+      <path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}"
+            fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="1000" stroke-dashoffset="1000">
+        <animate attributeName="stroke-dashoffset" from="1000" to="0"
+                 dur="0.8s" fill="freeze" calcMode="spline"
+                 keySplines="0.4 0 0.2 1"/>
+      </path>
+      <!-- Score label -->
+      <text x="${cx}" y="${cy - 8}" text-anchor="middle"
+            font-family="DM Mono" font-size="22" fill="${color}">${score}</text>
+      <text x="${cx}" y="${cy + 8}" text-anchor="middle"
+            font-family="DM Mono" font-size="9" fill="#6b7794"
+            letter-spacing="2">PROCESS</text>
+    </svg>`;
+}
+
+// Call on page load with score from scorecard.json:
+// drawDial(data.process_score, 'process-dial');
+</pre>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 11 — EQUITY CURVE CHART
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="equity-chart">
+    <div class="ref-section-title">11 — Equity Curve Chart</div>
+    <div class="ref-section-desc">
+      Chart.js line chart. Arc Gold line, Teal area fill at low opacity.
+      Dark background. Time window selector (7D / 30D / ALL) above chart.
+      Reads from <code>paper_log.json</code> equity_curve array.
+      Responsive — fills container width.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">equity-chart — wrapper structure</div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-label">
+          <i data-lucide="trending-up" class="icon-sm icon-muted"></i>
+          EQUITY CURVE
+        </span>
+        <div class="flex gap-2">
+          <button class="filter-pill" data-window="7">7D</button>
+          <button class="filter-pill active" data-window="30">30D</button>
+          <button class="filter-pill" data-window="0">ALL</button>
+        </div>
+      </div>
+      <div class="chart-equity">
+        <canvas id="demo-equity-chart"></canvas>
+      </div>
+      <div class="flex-between mt-3" style="margin-top:var(--space-3);">
+        <span class="t-label c-dim">Reset 4 · Apr 23, 2026</span>
+        <span class="t-label c-dim">Bankroll: <span class="c-gold">$950.36</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-label">Chart JS — Chart.js config template</div>
+<pre style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-4);font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow-x:auto;margin-top:var(--space-3);">
+// Requires Chart.js:
+// &lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;
+
+function renderEquityCurve(canvasId, labels, values) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: '#c9a84c',
+        borderWidth: 2,
+        backgroundColor: 'rgba(45,212,191,0.08)',
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: '#c9a84c',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#141720',
+        borderColor: '#1a2238',
+        borderWidth: 1,
+        titleColor: '#6b7794',
+        bodyColor: '#c9a84c',
+        titleFont: { family: 'DM Mono', size: 10 },
+        bodyFont:  { family: 'DM Mono', size: 13 }
+      }},
+      scales: {
+        x: { grid: { color: '#1a2238' }, ticks: {
+          color: '#6b7794', font: { family: 'DM Mono', size: 10 } }},
+        y: { grid: { color: '#1a2238' }, ticks: {
+          color: '#6b7794', font: { family: 'DM Mono', size: 10 },
+          callback: v => '$' + v.toFixed(0) }}
+      }
+    }
+  });
+}
+</pre>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 12 — SPORT PERFORMANCE BARS
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="perf-bars">
+    <div class="ref-section-title">12 — Sport Performance Bars</div>
+    <div class="ref-section-desc">
+      Simple horizontal bars. Green for positive ROI, Red for negative.
+      Used on Scorecard sport breakdown section.
+      Bar width is set inline as a percentage of the track.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">sport performance bars — rendered</div>
+    <div class="card" style="max-width:400px;">
+      <div class="card-header">
+        <span class="card-header-label">ROI BY SPORT</span>
+      </div>
+      <div>
+        <div class="perf-bar-row">
+          <span class="perf-bar-label">NBA</span>
+          <div class="perf-bar-track">
+            <div class="perf-bar-fill" style="width:65%;"></div>
+          </div>
+          <span class="perf-bar-value c-green">+12.4%</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-bar-label">MLB</span>
+          <div class="perf-bar-track">
+            <div class="perf-bar-fill negative" style="width:30%;"></div>
+          </div>
+          <span class="perf-bar-value c-red">−5.8%</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-bar-label">TENNIS</span>
+          <div class="perf-bar-track">
+            <div class="perf-bar-fill" style="width:48%;"></div>
+          </div>
+          <span class="perf-bar-value c-green">+4.2%</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-bar-label">SOCCER</span>
+          <div class="perf-bar-track">
+            <div class="perf-bar-fill" style="width:20%;"></div>
+          </div>
+          <span class="perf-bar-value c-muted">+1.1%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 13 — ATTRIBUTION DECOMPOSITION
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="attribution">
+    <div class="ref-section-title">13 — Attribution Decomposition Bar</div>
+    <div class="ref-section-desc">
+      Three-segment stacked bar. Teal = Price Capture Alpha, Gold = Selection Alpha,
+      Dim = Chance/Variance. Widths are percentages set inline from scorecard.json fields.
+      Used in the Scorecard drawer and the skill/luck decomposition section.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">attribution bar — rendered</div>
+    <div class="card" style="max-width:480px;">
+      <div class="card-header">
+        <span class="card-header-label">RETURN ATTRIBUTION</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3);margin-bottom:var(--space-3);">
+        <div>
+          <div class="t-label" style="color:var(--teal);">PRICE CAPTURE</div>
+          <div class="t-data c-teal mt-2">+2.1%</div>
+        </div>
+        <div>
+          <div class="t-label" style="color:var(--gold);">SELECTION</div>
+          <div class="t-data c-gold mt-2">+3.8%</div>
+        </div>
+        <div>
+          <div class="t-label c-dim">VARIANCE</div>
+          <div class="t-data c-muted mt-2">−10.9%</div>
+        </div>
+      </div>
+      <div class="attribution-bar">
+        <div class="attribution-segment-pca"   style="width:18%;"></div>
+        <div class="attribution-segment-sel"   style="width:33%;"></div>
+        <div class="attribution-segment-chance" style="width:49%;"></div>
+      </div>
+      <p class="t-disclaimer mt-3" style="margin-top:var(--space-3);">
+        Teal = process edge extracted. Gold = model valuation edge. Grey = outcome noise beyond model control.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 14 — SAMPLE INTEGRITY BAR
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="integrity">
+    <div class="ref-section-title">14 — Sample Integrity Bar</div>
+    <div class="ref-section-desc">
+      Progress bar showing sample maturity. Color-banded by threshold.
+      Used on Scorecard to communicate that early-Reset data has high variance.
+      Fill color is set by JS based on current value vs. thresholds.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">sample integrity — variants</div>
+    <div class="flex-col gap-4" style="max-width:400px;">
+      <div>
+        <div class="flex-between mb-2" style="margin-bottom:var(--space-2);">
+          <span class="t-label c-dim">SAMPLE INTEGRITY</span>
+          <span class="t-label c-amber">24 / 200 PICKS</span>
+        </div>
+        <div class="integrity-bar">
+          <div class="integrity-fill" style="width:12%;background:var(--amber);"></div>
+        </div>
+        <p class="t-disclaimer mt-2" style="margin-top:var(--space-2);">Early sample — high variance expected.</p>
+      </div>
+      <div>
+        <div class="flex-between mb-2" style="margin-bottom:var(--space-2);">
+          <span class="t-label c-dim">SAMPLE INTEGRITY</span>
+          <span class="t-label c-green">148 / 200 PICKS</span>
+        </div>
+        <div class="integrity-bar">
+          <div class="integrity-fill" style="width:74%;background:var(--green);"></div>
+        </div>
+        <p class="t-disclaimer mt-2" style="margin-top:var(--space-2);">Sample approaching reliability threshold.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 15 — ARTICLE BODY (EDGEVAULT)
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="article">
+    <div class="ref-section-title">15 — Article Body (EdgeVault)</div>
+    <div class="ref-section-desc">
+      Long-form reading layout. DM Sans 300 at 15px, max-width 700px.
+      H2 uses Bebas Neue. H3 uses DM Sans 500. Callout block is a gold
+      left-border pull quote. Affiliate links use standard anchor style —
+      gold color, underline. Never a button in article body.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">article-body — rendered sample</div>
+    <div class="article-body">
+      <h2>What the Market Is Actually Saying</h2>
+      <p>
+        Closing line value is the strongest early signal a quantitative system can produce.
+        It does not ask you to trust a backtest. It asks a simpler question: did the entry
+        age well as the market absorbed more information?
+      </p>
+      <h3>How to think about CLV in plain language</h3>
+      <p>
+        Suppose ArcVest enters a position at a price that implies a lower probability than
+        the closing market eventually implies. That means the entry was better than the
+        final consensus price.
+      </p>
+      <div class="article-callout">
+        If a model cannot show that its entries beat the closing market over time, it is
+        asking for trust without offering proof.
+      </div>
+      <p>
+        That is why Price Capture Alpha is surfaced in the ArcVest record and why the
+        <a href="/performance-log.html">Performance Log</a> exists.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 16 — TOOL CARD (EDGEVAULT)
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="tool-card">
+    <div class="ref-section-title">16 — Tool Card (EdgeVault Calculators)</div>
+    <div class="ref-section-desc">
+      Container for the Kelly, Hedge, No-Vig, and Odds Converter tools.
+      Icon badge in top-left uses gold tint background. Result block
+      appears below inputs after calculation — never pre-populated with
+      fake values.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">tool-card — kelly calculator example</div>
+    <div class="tool-card" style="max-width:400px;">
+      <div class="tool-card-header">
+        <div class="tool-card-icon">
+          <i data-lucide="percent" class="icon-md"></i>
+        </div>
+        <div>
+          <div class="tool-card-title">Kelly Calculator</div>
+          <div class="tool-card-description">Optimal stake size from edge and price</div>
+        </div>
+      </div>
+      <div class="flex-col gap-3">
+        <div>
+          <label class="t-label c-dim" style="display:block;margin-bottom:var(--space-1);">WIN PROBABILITY (%)</label>
+          <input class="input" type="number" placeholder="e.g. 54.5" min="0" max="100">
+        </div>
+        <div>
+          <label class="t-label c-dim" style="display:block;margin-bottom:var(--space-1);">AMERICAN ODDS</label>
+          <input class="input" type="number" placeholder="e.g. -110">
+        </div>
+        <button class="btn btn-outline" style="width:100%;">CALCULATE</button>
+      </div>
+      <div class="tool-result">
+        <div class="tool-result-value">2.4%</div>
+        <div class="tool-result-label">FULL KELLY · USE ½ KELLY FOR LIVE TRADING</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 17 — AD SLOT
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="ad-slot">
+    <div class="ref-section-title">17 — Ad Slot</div>
+    <div class="ref-section-desc">
+      Two sizes: leaderboard (728×90) for between-section placement,
+      rectangle (300×250) for sidebar use. Label is subtle and
+      never obstructs ad content. Pro subscribers see neither slot —
+      hide via auth-state class on body (<code>body.is-pro .ad-slot { display:none; }</code>).
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">ad-slot — leaderboard</div>
+    <div class="ad-slot ad-slot-leaderboard" style="width:100%;">
+      <span class="ad-slot-label">ADVERTISEMENT</span>
+      <!-- Ad network tag goes here -->
+    </div>
+    <div class="demo-spacer"></div>
+    <div class="ref-preview-label">ad-slot — rectangle</div>
+    <div class="ad-slot ad-slot-rectangle">
+      <span class="ad-slot-label">ADVERTISEMENT</span>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 18 — EMPTY STATE
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="empty-state">
+    <div class="ref-section-title">18 — Empty State</div>
+    <div class="ref-section-desc">
+      Used whenever an engine field is not yet available (performance_log.json writer
+      pending, CLV fields Phase 9, etc.). Never show an error, never show a broken
+      placeholder. Clean, honest empty state only. Two variants: full-section
+      and inline (for individual cells/fields).
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">empty-state — full section</div>
+    <div class="card">
+      <div class="empty-state">
+        <i data-lucide="clock" class="icon-lg empty-state-icon" style="width:32px;height:32px;"></i>
+        <div class="empty-state-title">PERFORMANCE LOG</div>
+        <div class="empty-state-message">
+          Full position history will be available here once the performance log
+          writer is deployed. Check back after the next engine update.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">empty-state — inline field dash</div>
+    <div class="card card-sm" style="max-width:320px;">
+      <div class="card-header">
+        <span class="card-header-label">CLV CAPTURE</span>
+        <span class="badge badge-teal">PHASE 9</span>
+      </div>
+      <div class="flex gap-4 mt-3" style="margin-top:var(--space-3);">
+        <div>
+          <div class="t-label c-dim">ENTRY PRICE</div>
+          <div class="t-data c-muted mt-2 data-empty"></div>
+        </div>
+        <div>
+          <div class="t-label c-dim">CLOSING PRICE</div>
+          <div class="t-data c-muted mt-2 data-empty"></div>
+        </div>
+        <div>
+          <div class="t-label c-dim">CLV DELTA</div>
+          <div class="t-data c-muted mt-2 data-empty"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 19 — BUTTONS
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="buttons">
+    <div class="ref-section-title">19 — Buttons</div>
+    <div class="ref-section-desc">
+      Three variants: primary (filled gold), outline (gold border), ghost (muted border).
+      Three sizes: default, sm, lg. Icon buttons follow the same pattern —
+      add an icon inside with <code>.icon-sm</code>.
+    </div>
+  </div>
+
+  <div class="ref-preview">
+    <div class="ref-preview-label">button variants</div>
+    <div class="flex flex-wrap gap-3">
+      <a href="#" class="btn btn-primary">CREATE FREE ACCOUNT</a>
+      <a href="#" class="btn btn-outline">
+        <i data-lucide="external-link" class="icon-sm"></i>
+        VIEW FULL RECORD
+      </a>
+      <button class="btn btn-ghost">DISMISS</button>
+    </div>
+    <div class="flex flex-wrap gap-3 mt-4" style="margin-top:var(--space-4);">
+      <button class="btn btn-primary btn-sm">JOIN FREE</button>
+      <button class="btn btn-outline btn-sm">LEARN MORE</button>
+      <button class="btn btn-outline btn-lg">
+        <i data-lucide="zap" class="icon-sm"></i>
+        START TRACKING
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════
+       SECTION 20 — FULL PAGE SHELL TEMPLATE
+       ════════════════════════════════════════════ -->
+  <div class="ref-section" id="page-shell">
+    <div class="ref-section-title">20 — Full Page Shell Template</div>
+    <div class="ref-section-desc">
+      Copy this entire block as the starting point for every new page.
+      Replace PAGE_TITLE, PAGE_DESCRIPTION, PAGE_EYEBROW, PAGE_HEADING,
+      PAGE_SUBHEADING, and PAGE_SLUG_ACTIVE with real values.
+      Add page content inside the <code>&lt;main&gt;</code> block.
+    </div>
+  </div>
+
+  <div class="ref-rule">
+    This is the exact structure every SITE-PASS-1 page starts from.
+    The only page that deviates is Home (no standard page-header — has its own hero).
+    Never add a <code>&lt;style&gt;</code> block unless it is a clearly marked
+    PAGE-OVERRIDE with a stated reason.
+  </div>
+
+<pre style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:var(--space-5);font-family:var(--font-mono);font-size:11px;color:var(--muted);overflow-x:auto;margin-top:var(--space-4);line-height:1.7;">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;ArcVest — PAGE_TITLE&lt;/title&gt;
+  &lt;meta name="description" content="PAGE_DESCRIPTION"&gt;
+  &lt;link rel="stylesheet" href="arcvest.css"&gt;
+  &lt;script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"&gt;&lt;/script&gt;
+  &lt;!-- Add Chart.js only on pages that use equity chart --&gt;
+  &lt;!-- &lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt; --&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;!-- Navigation — copy from Section 1 --&gt;
+  &lt;nav class="nav" id="site-nav"&gt;...&lt;/nav&gt;
+  &lt;div class="nav-mobile" id="nav-mobile"&gt;...&lt;/div&gt;
+
+  &lt;!-- Page Header --&gt;
+  &lt;div class="page-header"&gt;
+    &lt;div class="page-header-inner"&gt;
+      &lt;div class="page-eyebrow"&gt;
+        &lt;i data-lucide="ICON_NAME" class="icon-sm icon-gold"&gt;&lt;/i&gt;
+        PAGE_EYEBROW
+      &lt;/div&gt;
+      &lt;h1 class="page-title"&gt;PAGE_HEADING&lt;/h1&gt;
+      &lt;p class="page-subtitle"&gt;PAGE_SUBHEADING&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Main Content --&gt;
+  &lt;main&gt;
+    &lt;div class="page-container"&gt;
+
+      &lt;!-- PAGE CONTENT HERE --&gt;
+
+    &lt;/div&gt;
+  &lt;/main&gt;
+
+  &lt;!-- Footer — copy from Section 2 --&gt;
+  &lt;footer class="footer"&gt;...&lt;/footer&gt;
+
+  &lt;!-- Scripts --&gt;
+  &lt;script&gt;
+    lucide.createIcons();
+
+    // Nav active state + hamburger + tournaments conditional
+    // (copy full nav JS from Section 1)
+
+    // Drawer toggle (if page uses drawers)
+    // document.querySelectorAll('.drawer-trigger').forEach(t =&gt; { ... });
+
+    // Footer last-run timestamp
+    const DATA_BASE = 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/main/Docs/data/';
+    fetch(DATA_BASE + 'summary.json')
+      .then(r =&gt; r.json())
+      .then(d =&gt; {
+        const el = document.getElementById('footer-last-run');
+        if (el &amp;&amp; d.generated_at) {
+          el.textContent = new Date(d.generated_at).toLocaleString('en-US', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+            timeZoneName: 'short'
+          });
+        }
+      })
+      .catch(() =&gt; {});
+
+    // Page-specific JS below
+  &lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+</div><!-- end page-container -->
+
+<!-- Demo dial render -->
+<script>
+  lucide.createIcons();
+
+  // Demo drawer
+  document.querySelectorAll('.drawer-trigger').forEach(trigger => {
+    trigger.addEventListener('click', function() {
+      const targetId = this.getAttribute('aria-controls');
+      const content  = document.getElementById(targetId);
+      if (!content) return;
+      const isOpen = content.classList.toggle('open');
+      this.setAttribute('aria-expanded', isOpen);
+    });
+  });
+
+  // Demo dial
+  (function drawDial(score, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const pct = Math.min(Math.max(score, 0), 100) / 100;
+    const color = score >= 80 ? '#22c55e'
+                : score >= 60 ? '#c9a84c'
+                : score >= 40 ? '#f59e0b'
+                :               '#ef4444';
+    const r = 54, cx = 70, cy = 76;
+    const startAngle = Math.PI;
+    const endAngle   = startAngle + Math.PI * pct;
+    const x1 = cx + r * Math.cos(startAngle);
+    const y1 = cy + r * Math.sin(startAngle);
+    const x2 = cx + r * Math.cos(endAngle);
+    const y2 = cy + r * Math.sin(endAngle);
+    const large = pct > 0.5 ? 1 : 0;
+    el.innerHTML = `
+      <svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg">
+        <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}"
+              fill="none" stroke="#1a2238" stroke-width="10" stroke-linecap="round"/>
+        <path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}"
+              fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="1000" stroke-dashoffset="1000">
+          <animate attributeName="stroke-dashoffset" from="1000" to="0"
+                   dur="0.8s" fill="freeze" calcMode="spline"
+                   keySplines="0.4 0 0.2 1"/>
+        </path>
+        <text x="${cx}" y="${cy - 8}" text-anchor="middle"
+              font-family="DM Mono" font-size="22" fill="${color}">${score}</text>
+        <text x="${cx}" y="${cy + 8}" text-anchor="middle"
+              font-family="DM Mono" font-size="9" fill="#6b7794"
+              letter-spacing="2">PROCESS</text>
+      </svg>`;
+  })(72, 'demo-dial');
+</script>
+
+</body>
+</html>

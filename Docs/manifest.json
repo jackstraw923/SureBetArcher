@@ -1,0 +1,72 @@
+{
+  "name": "ArcVest — Quantitative Sports Market Analysis",
+  "short_name": "ArcVest",
+  "description": "Quantitative sports market analysis. No gut feel. No touts. Pure math.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#0a0c10",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["sports", "finance", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Daily Card",
+      "short_name": "Daily Card",
+      "description": "Today's model-qualified positions",
+      "url": "/daily-card.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Scorecard",
+      "short_name": "Scorecard",
+      "description": "Model performance record",
+      "url": "/scorecard.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Odds",
+      "short_name": "Odds",
+      "description": "Full market intelligence",
+      "url": "/odds.html",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/daily-card-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Daily Card — Today's advisory positions"
+    },
+    {
+      "src": "/screenshots/scorecard-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Scorecard — Model performance record"
+    }
+  ]
+}

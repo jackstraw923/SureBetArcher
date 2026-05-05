@@ -1,0 +1,82 @@
+<!--
+  ============================================================
+  ArcVest PWA Install Snippet
+  Step 12 of SITE-PASS-1 | Mountain Engineering
+  ============================================================
+  Add these two blocks to EVERY page:
+
+  BLOCK 1 — Inside <head>, after <meta name="viewport">:
+  ============================================================
+-->
+
+<!-- PWA manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- iOS home screen support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ArcVest">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+
+<!-- Theme color (matches --bg in arcvest.css) -->
+<meta name="theme-color" content="#0a0c10">
+
+<!--
+  BLOCK 2 — Before </body> on every page, after lucide.createIcons():
+  ============================================================
+-->
+
+<script>
+// ── Service Worker Registration ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(reg => {
+        console.log('[ArcVest] Service worker registered:', reg.scope);
+
+        // Check for updates on each page load
+        reg.addEventListener('updatefound', () => {
+          const worker = reg.installing;
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New version available — could show a "Refresh for update" toast here
+              // For now, auto-reload is avoided to prevent disrupting active use
+              console.log('[ArcVest] New version available — reload to update.');
+            }
+          });
+        });
+      })
+      .catch(err => console.warn('[ArcVest] Service worker registration failed:', err));
+  });
+}
+</script>
+
+<!--
+  ============================================================
+  NOTES:
+
+  1. CACHE VERSION: When making significant changes to arcvest.css
+     or any shell file, increment CACHE_VERSION in sw.js from
+     'arcvest-v1' to 'arcvest-v2' etc. This forces all clients
+     to fetch fresh files on next visit.
+
+  2. ICONS: Three icon files are required in /icons/:
+       icon-192.png  — 192×192 — Android home screen
+       icon-512.png  — 512×512 — Android splash / install prompt
+       icon-180.png  — 180×180 — iOS Apple Touch Icon
+     These will be generated when the favicon is designed (Step 0b).
+     The manifest and SW function correctly without them — icons
+     just show as blank until the files are in place.
+
+  3. PUSH NOTIFICATIONS (Phase 2):
+     To send a push notification when COMMIT run completes:
+     - Subscribe the user to push in sign-in flow (get PushSubscription)
+     - Store the subscription endpoint on the server
+     - POST a push payload to the endpoint when AssessorM completes
+     - Payload: { title, body, url, icon, badge }
+     - The SW's 'push' event handler (sw.js) handles display.
+
+  4. HTTPS REQUIRED: Service workers only work on HTTPS or localhost.
+     GitHub Pages serves HTTPS by default — no action needed.
+  ============================================================
+-->

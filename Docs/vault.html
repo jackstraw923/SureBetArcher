@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — EdgeVault</title>
+  <meta name="description" content="EdgeVault by ArcVest — research articles and free tools for quantitative sports market analysis. No-vig calculator, odds converter, Kelly sizer, hedge calculator, and deep-dive methodology pieces.">
+  <link rel="stylesheet" href="arcvest.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <style>
+    /* PAGE-OVERRIDE: EdgeVault — sidebar layout, panel system, tool cards */
+
+    /* ── Sidebar layout ── */
+    .vault-layout {
+      display: flex;
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+    }
+
+    .vault-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      position: fixed;
+      top: var(--nav-height);
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      padding: var(--space-5) 0 var(--space-8);
+      z-index: var(--z-card);
+    }
+
+    .vault-sidebar::-webkit-scrollbar { width: 3px; }
+    .vault-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .vault-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Sidebar brand */
+    .vault-brand {
+      padding: 0 var(--space-5) var(--space-4);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-4);
+    }
+
+    .vault-brand-name {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .vault-brand-name em { color: var(--gold); font-style: normal; }
+
+    .vault-brand-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: var(--space-1);
+    }
+
+    /* Sidebar section label */
+    .vault-section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: var(--space-4) var(--space-5) var(--space-2);
+    }
+
+    .vault-section-sublabel {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: var(--space-3) var(--space-5) var(--space-1);
+      opacity: 0.7;
+    }
+
+    /* Sidebar nav item */
+    .vault-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      width: 100%;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+      padding: var(--space-2) var(--space-5);
+      cursor: pointer;
+      border: none;
+      background: none;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      border-left: 2px solid transparent;
+    }
+
+    .vault-item:hover {
+      background: rgba(201,168,76,0.04);
+      color: var(--text);
+    }
+
+    .vault-item.active {
+      background: rgba(201,168,76,0.08);
+      color: var(--gold);
+      border-left-color: var(--gold);
+    }
+
+    .vault-item-badge {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      padding: 1px var(--space-2);
+      border-radius: var(--radius-sm);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .vault-item-badge.new {
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.3);
+    }
+
+    .vault-item-badge.playoff {
+      color: var(--teal);
+      border-color: rgba(45,212,191,0.3);
+    }
+
+    /* Odds format toggle in sidebar */
+    .odds-format-bar {
+      padding: var(--space-3) var(--space-5) var(--space-3);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-2);
+    }
+
+    .odds-format-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: var(--space-2);
+    }
+
+    .odds-format-btns { display: flex; gap: var(--space-1); }
+
+    .odds-format-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .odds-format-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+
+    /* ── Main content area ── */
+    .vault-main {
+      margin-left: 260px;
+      flex: 1;
+      padding: var(--space-7) var(--space-7) var(--space-8);
+      max-width: 900px;
+    }
+
+    /* ── Panel system ── */
+    .vault-panel { display: none; }
+    .vault-panel.active { display: block; }
+
+    /* Panel header */
+    .panel-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: var(--space-3);
+    }
+
+    .panel-title {
+      font-family: var(--font-head);
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: 0.03em;
+      color: var(--text);
+      margin-bottom: var(--space-3);
+      line-height: 1.05;
+    }
+
+    .panel-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: var(--space-5);
+    }
+
+    .panel-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      margin-bottom: var(--space-6);
+    }
+
+    /* ── Tool inputs ── */
+    .tool-row {
+      display: flex;
+      gap: var(--space-4);
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-5);
+    }
+
+    .tool-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .tool-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tool-input {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition-base);
+      width: 100%;
+    }
+
+    .tool-input:focus { border-color: var(--gold); }
+    .tool-input::placeholder { color: var(--dim); }
+
+    .tool-select {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--transition-base);
+      width: 100%;
+      appearance: none;
+    }
+
+    .tool-select:focus { border-color: var(--gold); }
+
+    /* Tool result block */
+    .tool-result {
+      background: rgba(10,12,16,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      margin-top: var(--space-3);
+      display: none;
+    }
+
+    .tool-result.show { display: block; }
+
+    .tool-result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid rgba(26,34,56,0.5);
+    }
+
+    .tool-result-row:last-child { border-bottom: none; }
+
+    .tool-result-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tool-result-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--gold);
+    }
+
+    .tool-result-val.green { color: var(--green); }
+    .tool-result-val.red   { color: var(--red); }
+    .tool-result-val.white { color: var(--text); }
+
+    .tool-divider {
+      height: 1px;
+      background: var(--border);
+      margin: var(--space-5) 0;
+    }
+
+    .tool-note {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 13px;
+      color: var(--dim);
+      line-height: 1.6;
+      font-style: italic;
+      margin-top: var(--space-4);
+    }
+
+    .formula-box {
+      background: rgba(10,12,16,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      line-height: 1.9;
+    }
+
+    /* ── Article body ── */
+    .vault-article {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.85;
+      color: var(--text);
+      max-width: 700px;
+    }
+
+    .vault-article h3 {
+      font-family: var(--font-head);
+      font-size: 24px;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin: var(--space-6) 0 var(--space-3);
+      line-height: 1.1;
+    }
+
+    .vault-article p { margin-bottom: var(--space-4); color: var(--muted); }
+    .vault-article strong { color: var(--text); font-weight: 500; }
+
+    .vault-article .formula {
+      background: rgba(10,12,16,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4) var(--space-5);
+      margin: var(--space-4) 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--gold);
+      line-height: 1.9;
+    }
+
+    .vault-article .callout {
+      border-left: 3px solid var(--gold);
+      padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+      background: rgba(201,168,76,0.04);
+      margin: var(--space-5) 0;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .vault-article .callout strong { color: var(--gold); }
+
+    .vault-article .article-disclaimer {
+      font-size: 12px;
+      color: var(--dim);
+      margin-top: var(--space-6);
+      font-style: italic;
+    }
+
+    /* Cross-link callout card */
+    .vault-crosslink {
+      margin-top: var(--space-6);
+      padding: var(--space-4) var(--space-5);
+      background: rgba(201,168,76,0.04);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    /* ── Soon card grid ── */
+    .soon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+
+    .soon-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      opacity: 0.65;
+      transition: opacity var(--transition-base);
+      cursor: default;
+    }
+
+    .soon-card.live {
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    .soon-card:hover { opacity: 0.85; }
+    .soon-card.live:hover { opacity: 1; }
+
+    .soon-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      display: inline-block;
+      padding: 1px var(--space-2);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-2);
+    }
+
+    .soon-badge.live { color: var(--green); border-color: rgba(34,197,94,0.3); }
+    .soon-badge.new  { color: var(--gold);  border-color: rgba(201,168,76,0.3); }
+
+    .soon-title {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: var(--space-2);
+    }
+
+    .soon-desc {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Coming panel */
+    .coming-panel {
+      text-align: center;
+      padding: var(--space-8) var(--space-5);
+    }
+
+    .coming-panel-icon {
+      width: 48px;
+      height: 48px;
+      color: var(--border-light);
+      margin: 0 auto var(--space-4);
+    }
+
+    .coming-panel-title {
+      font-family: var(--font-head);
+      font-size: 28px;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: var(--space-3);
+    }
+
+    .coming-panel-sub {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Mobile sidebar toggle */
+    .vault-sidebar-toggle {
+      display: none;
+      align-items: center;
+      gap: var(--space-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2) var(--space-4);
+      cursor: pointer;
+      margin-bottom: var(--space-5);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .vault-sidebar {
+        display: none;
+        z-index: 150;
+      }
+
+      .vault-sidebar.open { display: block; }
+
+      .vault-main {
+        margin-left: 0;
+        padding: var(--space-5) var(--page-padding-x) var(--space-8);
+        max-width: 100%;
+      }
+
+      .vault-sidebar-toggle { display: flex; }
+    }
+
+    @media (max-width: 600px) {
+      .tool-row { flex-direction: column; }
+      .soon-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<div id="nav-root"></div>
+
+
+<!-- ── EdgeVault Layout ── -->
+<div class="vault-layout">
+
+  <!-- Sidebar -->
+  <aside class="vault-sidebar" id="vault-sidebar">
+
+    <div class="vault-brand">
+      <div class="vault-brand-name">Edge<em>Vault</em></div>
+      <div class="vault-brand-sub">Research &amp; Tools</div>
+    </div>
+
+    <!-- Odds format toggle — affects No-Vig and Hedge tools -->
+    <div class="odds-format-bar">
+      <div class="odds-format-label">Odds Format</div>
+      <div class="odds-format-btns">
+        <button class="odds-format-btn active" id="ev-btn-american" onclick="setToolOddsFormat('american')">AMERICAN</button>
+        <button class="odds-format-btn" id="ev-btn-decimal" onclick="setToolOddsFormat('decimal')">DECIMAL</button>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <div class="vault-section-label">TOOLS</div>
+    <button class="vault-item active" data-panel="novig">No-Vig Calculator</button>
+    <button class="vault-item" data-panel="odds-converter">Odds Converter</button>
+    <button class="vault-item" data-panel="kelly">Kelly Sizer</button>
+    <button class="vault-item" data-panel="hedge">Hedge Calculator</button>
+
+    <!-- Methodology — Plex articles (new) -->
+    <div class="vault-section-label">METHODOLOGY</div>
+    <button class="vault-item" data-panel="article-alpha-ledger">The Synthetic Alpha Ledger <span class="vault-item-badge new">NEW</span></button>
+    <button class="vault-item" data-panel="article-variance-shadow">The Variance Shadow <span class="vault-item-badge new">NEW</span></button>
+    <button class="vault-item" data-panel="article-allocation-guide">The Sovereign Allocation Guide <span class="vault-item-badge new">NEW</span></button>
+
+    <!-- Playoff Strategy -->
+    <div class="vault-section-label">PLAYOFF STRATEGY</div>
+    <button class="vault-item" data-panel="article-bounded-overlay">The Bounded Overlay <span class="vault-item-badge playoff">Playoff</span></button>
+    <button class="vault-item" data-panel="article-path-to-cup">The Path to the Cup <span class="vault-item-badge playoff">Playoff</span></button>
+
+    <!-- Foundations -->
+    <div class="vault-section-label">FOUNDATIONS</div>
+    <button class="vault-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
+    <button class="vault-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
+
+    <!-- Coming soon -->
+    <div class="vault-section-label">COMING SOON</div>
+    <div class="vault-section-sublabel">Articles</div>
+    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Why Win Rates Lie <span class="vault-item-badge">Soon</span></button>
+    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Line Shopping Is Free Money <span class="vault-item-badge">Soon</span></button>
+    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Closing Line Value (CLV) <span class="vault-item-badge">Soon</span></button>
+    <div class="vault-section-sublabel">Deep Dives</div>
+    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Kelly Criterion for Sports <span class="vault-item-badge">Soon</span></button>
+    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Pythagorean Expectation <span class="vault-item-badge">Soon</span></button>
+    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Soccer Double Chance <span class="vault-item-badge">Soon</span></button>
+    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Tennis Elo + Bracket Sim <span class="vault-item-badge">Soon</span></button>
+
+  </aside>
+
+
+  <!-- Main Content -->
+  <main class="vault-main">
+
+    <!-- Mobile sidebar toggle -->
+    <button class="vault-sidebar-toggle" id="sidebar-toggle">
+      <i data-lucide="menu" class="icon-sm"></i>
+      BROWSE EDGEVAULT
+    </button>
+
+    <!-- EdgeVault intro strip -->
+    <div style="margin-bottom:var(--space-6);padding-bottom:var(--space-5);border-bottom:1px solid var(--border);">
+      <div class="t-eyebrow" style="margin-bottom:var(--space-3);">EdgeVault · Research &amp; Utility Hub</div>
+      <p class="t-body-light" style="color:var(--muted);max-width:600px;">
+        ArcVest's research and utility hub. Explore the math behind expected value,
+        use the same tools that drive every model position, and learn how ArcVest approaches
+        price, sizing, and portfolio management.
+      </p>
+    </div>
+
+    <!-- Fanatics affiliate disclosure — FTC required, covers all affiliate links on this page -->
+    <p style="font-size:0.65rem;color:var(--muted);letter-spacing:0.05em;margin-bottom:var(--space-3);text-transform:uppercase;">
+      ArcVest participates in the Fanatics affiliate program and may earn a commission on qualifying purchases at no cost to you.
+    </p>
+
+    <!-- Fanatics Fan Gear — affiliate placement (top) -->
+    <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+       target="_blank" rel="noopener noreferrer sponsored"
+       style="display:block;text-decoration:none;margin-bottom:var(--space-5);"
+       aria-label="Shop officially licensed fan gear at Fanatics">
+      <div style="
+        position:relative;overflow:hidden;
+        background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+        border:1px solid rgba(201,168,76,0.25);border-radius:6px;
+        padding:1.4rem 1.6rem;
+        display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+        transition:border-color 0.2s,box-shadow 0.2s;
+      "
+      onmouseover="this.style.borderColor='rgba(201,168,76,0.55)';this.style.boxShadow='0 0 24px rgba(201,168,76,0.08)'"
+      onmouseout="this.style.borderColor='rgba(201,168,76,0.25)';this.style.boxShadow='none'">
+        <div style="position:absolute;top:0;right:0;width:180px;height:100%;
+          background:linear-gradient(135deg,transparent 40%,rgba(201,168,76,0.04) 100%);
+          pointer-events:none;"></div>
+        <div style="position:relative;z-index:1;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:0.6rem;
+            letter-spacing:0.2em;color:var(--gold);margin-bottom:0.45rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;
+            letter-spacing:0.05em;color:var(--text);line-height:1.1;margin-bottom:0.5rem;">REPRESENT YOUR TEAM</div>
+          <p style="font-size:0.72rem;color:var(--muted);line-height:1.5;max-width:340px;margin-bottom:0;">
+            NFL, MLB, NBA, NHL, MLS &amp; more. Officially licensed jerseys, gear, and collectibles from Fanatics.</p>
+        </div>
+        <div style="flex-shrink:0;position:relative;z-index:1;
+          background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);
+          border-radius:4px;padding:0.6rem 1.1rem;
+          font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:500;
+          letter-spacing:0.12em;color:var(--gold);white-space:nowrap;text-transform:uppercase;">SHOP NOW →</div>
+      </div>
+    </a>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: No-Vig Calculator (default)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel active" id="panel-novig">
+      <div class="panel-eyebrow">Tools · No-Vig Calculator</div>
+      <h1 class="panel-title">No-Vig Calculator</h1>
+      <p class="panel-sub">Strip the market maker's margin out of any line and see the fair probabilities underneath the posted price. This is the exact calculation behind Gate 2 of the ArcVest two-gate filter.</p>
+
+      <div class="card card-lg" style="margin-bottom:var(--space-5);">
+        <div class="t-card-title" style="margin-bottom:var(--space-2);">Two-Way Market (Moneyline / Spread)</div>
+        <p class="t-disclaimer" style="margin-bottom:var(--space-4);">Enter the odds for both sides. The calculator strips the vig and returns the fair implied probability for each.</p>
+
+        <div class="formula-box">
+          Fair prob (side A) = (1 / decimal_A) / (1/decimal_A + 1/decimal_B)
+        </div>
+
+        <div class="tool-row">
+          <div class="tool-field">
+            <label class="tool-label" id="nv-a-label">Side A Odds (American)</label>
+            <input class="tool-input" id="nv-a" type="number" placeholder="e.g. -110">
+          </div>
+          <div class="tool-field">
+            <label class="tool-label" id="nv-b-label">Side B Odds (American)</label>
+            <input class="tool-input" id="nv-b" type="number" placeholder="e.g. -110">
+          </div>
+          <button class="btn btn-primary" onclick="calcNoVig2()">CALCULATE</button>
+        </div>
+        <div class="tool-result" id="nv-result-2way">
+          <div class="tool-result-row"><span class="tool-result-label">Overround (Vig)</span><span class="tool-result-val red" id="nv-vig">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Fair Prob — Side A</span><span class="tool-result-val green" id="nv-fair-a">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Fair Prob — Side B</span><span class="tool-result-val green" id="nv-fair-b">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Breakeven Win Rate (Side A)</span><span class="tool-result-val white" id="nv-break-a">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Breakeven Win Rate (Side B)</span><span class="tool-result-val white" id="nv-break-b">—</span></div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="t-card-title" style="margin-bottom:var(--space-2);">Three-Way Market (Soccer 1X2)</div>
+        <p class="t-disclaimer" style="margin-bottom:var(--space-4);">Enter all three outcomes — Home, Draw, Away — for soccer or any three-way market.</p>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label" id="nv-h-label">Home (American)</label><input class="tool-input" id="nv-h" type="number" placeholder="e.g. +120"></div>
+          <div class="tool-field"><label class="tool-label" id="nv-d-label">Draw (American)</label><input class="tool-input" id="nv-d" type="number" placeholder="e.g. +220"></div>
+          <div class="tool-field"><label class="tool-label" id="nv-aw-label">Away (American)</label><input class="tool-input" id="nv-aw" type="number" placeholder="e.g. +200"></div>
+          <button class="btn btn-primary" onclick="calcNoVig3()">CALCULATE</button>
+        </div>
+        <div class="tool-result" id="nv-result-3way">
+          <div class="tool-result-row"><span class="tool-result-label">Overround (Vig)</span><span class="tool-result-val red" id="nv3-vig">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Fair Prob — Home</span><span class="tool-result-val green" id="nv3-home">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Fair Prob — Draw</span><span class="tool-result-val green" id="nv3-draw">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Fair Prob — Away</span><span class="tool-result-val green" id="nv3-away">—</span></div>
+        </div>
+        <p class="tool-note">This is the exact formula ArcVest uses on every position. Gate 2 of the two-gate filter compares the model probability against this no-vig fair probability — edge only exists when the model disagrees with the fair line.</p>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: Odds Converter
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-odds-converter">
+      <div class="panel-eyebrow">Tools · Odds Converter</div>
+      <h1 class="panel-title">Odds Converter</h1>
+      <p class="panel-sub">Convert between American, Decimal, and Implied Probability instantly. Enter any one format — the others calculate automatically.</p>
+
+      <div class="card card-lg">
+        <div class="t-card-title" style="margin-bottom:var(--space-2);">American → Decimal → Implied %</div>
+        <p class="t-disclaimer" style="margin-bottom:var(--space-4);">Enter American odds (e.g. −110, +150) and see the decimal equivalent and true implied probability.</p>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label">American Odds</label><input class="tool-input" id="oc-american" type="number" placeholder="e.g. -110 or +150"></div>
+          <button class="btn btn-primary" onclick="convertFromAmerican()">CONVERT</button>
+        </div>
+        <div class="tool-result" id="oc-result-american">
+          <div class="tool-result-row"><span class="tool-result-label">Decimal Odds</span><span class="tool-result-val" id="oc-decimal-out">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Implied Probability</span><span class="tool-result-val" id="oc-implied-out">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">To profit $100 you risk</span><span class="tool-result-val white" id="oc-risk-out">—</span></div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="t-card-title" style="font-size:14px;margin-bottom:var(--space-2);">Decimal → American → Implied %</div>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label">Decimal Odds</label><input class="tool-input" id="oc-decimal" type="number" step="0.01" placeholder="e.g. 1.91 or 2.50"></div>
+          <button class="btn btn-primary" onclick="convertFromDecimal()">CONVERT</button>
+        </div>
+        <div class="tool-result" id="oc-result-decimal">
+          <div class="tool-result-row"><span class="tool-result-label">American Odds</span><span class="tool-result-val" id="oc-american-out">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Implied Probability</span><span class="tool-result-val" id="oc-implied2-out">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Return on $100 stake</span><span class="tool-result-val white" id="oc-return-out">—</span></div>
+        </div>
+
+        <div class="tool-divider"></div>
+
+        <div class="t-card-title" style="font-size:14px;margin-bottom:var(--space-2);">Implied % → Decimal → American</div>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label">Implied Probability (%)</label><input class="tool-input" id="oc-prob" type="number" step="0.1" min="1" max="99" placeholder="e.g. 52.4"></div>
+          <button class="btn btn-primary" onclick="convertFromProb()">CONVERT</button>
+        </div>
+        <div class="tool-result" id="oc-result-prob">
+          <div class="tool-result-row"><span class="tool-result-label">Decimal Odds</span><span class="tool-result-val" id="oc-decimal2-out">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">American Odds</span><span class="tool-result-val" id="oc-american2-out">—</span></div>
+        </div>
+        <p class="tool-note">Implied probability includes the market maker's vig. Use the No-Vig Calculator to find the fair probability with margin removed.</p>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: Kelly Sizer
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-kelly">
+      <div class="panel-eyebrow">Tools · Kelly Sizer</div>
+      <h1 class="panel-title">Kelly Sizer</h1>
+      <p class="panel-sub">Calculate optimal stake size from your estimated edge and bankroll using the Kelly Criterion — the same formula behind every ArcVest allocation.</p>
+
+      <div class="card card-lg">
+        <div class="t-card-title" style="margin-bottom:var(--space-2);">Fractional Kelly Stake</div>
+        <p class="t-disclaimer" style="margin-bottom:var(--space-4);">Enter your win probability estimate, the available decimal price, and your bankroll.</p>
+
+        <div class="formula-box">
+          f = (b × p − q) / b &nbsp;&nbsp; where b = decimal_odds − 1, q = 1 − p<br>
+          ArcVest uses ¼ Kelly by default to manage variance.
+        </div>
+
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label">Win Probability (%)</label><input class="tool-input" id="ks-prob" type="number" step="0.1" min="1" max="99" placeholder="e.g. 54.5"></div>
+          <div class="tool-field"><label class="tool-label">Decimal Price</label><input class="tool-input" id="ks-odds" type="number" step="0.01" placeholder="e.g. 1.91"></div>
+          <div class="tool-field"><label class="tool-label">Bankroll ($)</label><input class="tool-input" id="ks-bankroll" type="number" step="0.01" placeholder="e.g. 1000"></div>
+          <button class="btn btn-primary" onclick="calcKelly()">CALCULATE</button>
+        </div>
+        <div class="tool-result" id="ks-result">
+          <div class="tool-result-row"><span class="tool-result-label">Edge (EV)</span><span class="tool-result-val" id="ks-ev">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Full Kelly Fraction</span><span class="tool-result-val white" id="ks-full">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Half Kelly (½)</span><span class="tool-result-val white" id="ks-half">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Quarter Kelly (¼) — ArcVest Default</span><span class="tool-result-val green" id="ks-quarter">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Dollar Stake at ¼ Kelly</span><span class="tool-result-val green" id="ks-dollar">—</span></div>
+        </div>
+        <p class="tool-note">Full Kelly maximizes long-run growth but produces high variance and large drawdowns. ArcVest uses ¼ Kelly as a deliberate conservative scaling to manage daily portfolio exposure.</p>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: Hedge Calculator
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-hedge">
+      <div class="panel-eyebrow">Tools · Hedge Calculator</div>
+      <h1 class="panel-title">Hedge Calculator</h1>
+      <p class="panel-sub">Calculate the optimal hedge stake to lock in a guaranteed return or minimize loss on an existing position.</p>
+
+      <div class="card card-lg">
+        <div class="t-card-title" style="margin-bottom:var(--space-2);">Lock-In Return Hedge</div>
+        <p class="t-disclaimer" style="margin-bottom:var(--space-4);">You have a position in play that has moved in your favor. Enter your original position and the current opposing odds to find the hedge stake that guarantees a return regardless of outcome.</p>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label">Original Stake ($)</label><input class="tool-input" id="hg-stake" type="number" step="0.01" placeholder="e.g. 50"></div>
+          <div class="tool-field"><label class="tool-label" id="hg-orig-label">Original Odds (American)</label><input class="tool-input" id="hg-orig-odds" type="number" placeholder="e.g. +150"></div>
+        </div>
+        <div class="tool-row">
+          <div class="tool-field"><label class="tool-label" id="hg-hedge-label">Hedge Odds (American)</label><input class="tool-input" id="hg-hedge-odds" type="number" placeholder="e.g. -130"></div>
+          <div class="tool-field">
+            <label class="tool-label">Target</label>
+            <select class="tool-select" id="hg-target">
+              <option value="equal">Equal return both sides</option>
+              <option value="break">Break even on original</option>
+              <option value="half">Lock half original return</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="calcHedge()">CALCULATE</button>
+        </div>
+        <div class="tool-result" id="hg-result">
+          <div class="tool-result-row"><span class="tool-result-label">Hedge Stake</span><span class="tool-result-val" id="hg-hedge-stake">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Return if Original Wins</span><span class="tool-result-val green" id="hg-profit-orig">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Return if Hedge Wins</span><span class="tool-result-val green" id="hg-profit-hedge">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Total Committed</span><span class="tool-result-val white" id="hg-total-committed">—</span></div>
+          <div class="tool-result-row"><span class="tool-result-label">Guaranteed Floor</span><span class="tool-result-val green" id="hg-floor">—</span></div>
+        </div>
+        <p class="tool-note">Hedging reduces upside in exchange for certainty. Whether to hedge depends on your portfolio position, the odds movement, and your edge conviction. A hedge that eliminates all upside on a positive-EV original position may not be optimal long-run.</p>
+      </div>
+    </div>
+
+    <!-- Fanatics Fan Gear — affiliate placement (mid, MLB-themed since season active) -->
+    <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663?u=https%3A%2F%2Fwww.fanatics.com%2FMLB"
+       target="_blank" rel="noopener noreferrer sponsored"
+       style="display:block;text-decoration:none;margin:var(--space-5) 0;"
+       aria-label="Shop officially licensed MLB gear at Fanatics">
+      <div style="
+        position:relative;overflow:hidden;
+        background:linear-gradient(135deg,#0d1218 0%,#0f1a10 100%);
+        border:1px solid rgba(45,212,191,0.18);border-radius:6px;
+        padding:1.1rem 1.6rem;
+        display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
+        transition:border-color 0.2s,box-shadow 0.2s;
+      "
+      onmouseover="this.style.borderColor='rgba(45,212,191,0.4)';this.style.boxShadow='0 0 20px rgba(45,212,191,0.06)'"
+      onmouseout="this.style.borderColor='rgba(45,212,191,0.18)';this.style.boxShadow='none'">
+        <div style="position:relative;z-index:1;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+            letter-spacing:0.2em;color:var(--teal);margin-bottom:0.3rem;">MLB · 2026 SEASON GEAR</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.25rem;
+            letter-spacing:0.04em;color:var(--text);line-height:1.1;">
+            JERSEYS, CAPS &amp; COLLECTIBLES</div>
+        </div>
+        <div style="flex-shrink:0;
+          background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.3);
+          border-radius:4px;padding:0.5rem 1rem;
+          font-family:'DM Mono',monospace;font-size:0.62rem;
+          letter-spacing:0.1em;color:var(--teal);white-space:nowrap;text-transform:uppercase;">SHOP MLB →</div>
+      </div>
+    </a>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Synthetic Alpha Ledger (Plex)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-alpha-ledger">
+      <div class="panel-eyebrow">Methodology · Price Capture Alpha</div>
+      <h1 class="panel-title">The Synthetic Alpha Ledger</h1>
+      <p class="panel-sub">Why closing line value is the strongest single trust metric on the platform — and what it means that ArcVest makes it public.</p>
+      <div class="panel-meta">ArcVest Research · Authored by Plex · April 2026 · 7 min read</div>
+
+      <div class="vault-article">
+
+        <h3>What the Market Is Actually Saying</h3>
+        <p>Closing line value is the strongest early signal a quantitative system can produce. It does not ask you to trust a backtest. It asks a simpler question: did the entry age well as the market absorbed more information?</p>
+
+        <h3>How to think about CLV in plain language</h3>
+        <p>Suppose ArcVest enters a position at a price that implies a lower probability than the closing market eventually implies. That means the entry was better than the final consensus price. Put differently, ArcVest entered the position before the market fully repriced it.</p>
+        <p>That is the sports-market equivalent of entering a trade before the rest of the tape acknowledges the information. The final outcome still matters for realized return, but the price move itself tells you whether the process saw value before the market corrected.</p>
+        <p>This is why Price Capture Alpha is the strongest single trust metric on the platform. It does not ask you to believe a backtest. It does not ask you to trust selective screenshots. It asks a simpler question: did the entry age well as the market absorbed more information?</p>
+
+        <h3>Why line shopping still matters</h3>
+        <p>CLV is only meaningful if the entry is real. That means finding the best available price matters. Two users can hold the same opinion on a side and still end up with different long-run results because one consistently enters at a stronger number.</p>
+        <p>This is where line shopping becomes an execution discipline rather than a convenience. A small difference in entry price compounds across a portfolio. The objective is not to collect more apps. The objective is to reduce friction between model signal and actual entry quality.</p>
+
+        <h3>Why ArcVest makes it public</h3>
+        <p>Most products discuss edge in a way that cannot be audited. ArcVest treats that as a credibility failure. If a model claims skill, the public should be able to inspect whether its entries actually beat the close over time.</p>
+        <p>That is why Price Capture Alpha is surfaced in the ArcVest record and why the <a href="/performance-log.html">Performance Log</a> exists. The ledger is not there as decoration. It exists so readers can inspect sealed positions, compare entry and closing prices, and evaluate whether the process improved relative to the market.</p>
+        <p>That is the difference between narrative confidence and measurable confidence. One is copy. The other is evidence.</p>
+
+        <h3>What CLV can and cannot do</h3>
+        <p>CLV is the best early proof of process quality, but it is not the only metric that matters. It does not replace calibration, allocation discipline, or realized portfolio management. It also does not make every individual position correct in hindsight.</p>
+        <p>What it does do is answer the most important pre-result question available to a public-facing quantitative system: did the model get into the market at a number that the market itself later validated? If the answer is consistently yes, that is the strongest available sign that the process is operating on real informational edge rather than on luck.</p>
+
+        <div class="callout">If a model cannot show that its entries beat the closing market over time, it is asking for trust without offering proof.</div>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">SEE IT IN ACTION</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">The Scorecard surfaces Price Capture Alpha alongside Selection Alpha and Variance — the three-component attribution that separates process quality from outcome noise.</p>
+        </div>
+        <a href="/scorecard.html" class="btn btn-outline btn-sm">VIEW SCORECARD →</a>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Variance Shadow (Plex)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-variance-shadow">
+      <div class="panel-eyebrow">Methodology · Drawdown Diagnostics</div>
+      <h1 class="panel-title">The Variance Shadow</h1>
+      <p class="panel-sub">What a losing stretch actually tells you — and what it doesn't. The three-part decomposition that separates process stress from outcome noise.</p>
+      <div class="panel-meta">ArcVest Research · Authored by Plex · April 2026 · 8 min read</div>
+
+      <div class="vault-article">
+
+        <h3>Start with the right question</h3>
+        <p>A losing stretch feels personal because the result is immediate and the signal is emotional. But a drawdown does not begin as a moral event. It begins as a diagnostic event.</p>
+        <p>The useful question is not, "Did the portfolio lose this week?" The useful question is, "What part of the process moved?" ArcVest answers that by separating drawdowns into three components: Price Capture Alpha, Selection Alpha, and Outcome Variance.</p>
+        <p>This matters because not every losing stretch means the model is broken. Some losing stretches are standard noise. Some reflect unstable conditions. A small number indicate that the process itself deserves investigation.</p>
+
+        <div class="callout">A drawdown is information, not a verdict. The job is to identify whether the pressure is coming from execution, selection, or variance.</div>
+
+        <h3>The three-part decomposition</h3>
+        <p><strong>Price Capture Alpha</strong> asks whether the portfolio entered at prices that the market later improved through. If this remains healthy during a drawdown, the model may still be seeing the market well even if outcomes are temporarily unfavorable.</p>
+        <p><strong>Selection Alpha</strong> asks whether the model's probability estimate was superior to the market's implied probability at entry. This is the valuation layer. If Price Capture Alpha is steady but Selection Alpha is weakening, the signal may still be reaching the market efficiently while the underlying event assessment softens.</p>
+        <p><strong>Outcome Variance</strong> is the luck layer. It measures the gap between realized return and expected return. In plain language, it asks how much of the recent pain came from events resolving worse than the underlying prices implied.</p>
+
+        <h3>The variance-status ladder</h3>
+        <p>ArcVest translates drawdown states into a simple diagnostic ladder. Standard Noise means recent results are uncomfortable but still sit within the portfolio's expected distribution. Elevated Noise means recent outcomes have become meaningfully more unstable and deserve closer review. Critical Sigma means the system is outside normal expectations and should be investigated with more care.</p>
+        <p>This framing matters because it gives the user a vocabulary that is calmer than panic and more useful than denial. "We are down" is a fact. "We are in an Elevated Noise state" is a fact plus context.</p>
+        <p>That is the difference between a reactive interface and a disciplined one. A good interface does not hide the red number. It explains what the red number is likely saying.</p>
+
+        <h3>What to do during a bad week</h3>
+        <p>The first discipline is not to abandon line quality. Drawdowns often tempt users to rush, overtrade, or ignore execution quality. That usually compounds the problem. During unstable stretches, the need for good entry prices becomes more important, not less, which is why line shopping across market makers remains essential.</p>
+        <p>The second discipline is to keep process and outcome separate. If Price Capture Alpha remains healthy and Outcome Variance is doing most of the damage, the correct response is usually restraint and review, not emotional intervention.</p>
+        <p>The third discipline is to use the public record. The <a href="/scorecard.html">Scorecard</a> exists so that a bad stretch can be interpreted in context rather than in isolation.</p>
+
+        <h3>When a drawdown becomes more than noise</h3>
+        <p>There are losing stretches that deserve concern. If Price Capture Alpha weakens, Selection Alpha deteriorates, and variance status escalates together, the system is no longer just absorbing noise. It may be losing its pricing advantage, misreading the market, or operating in conditions where the prior assumptions no longer hold.</p>
+        <p>This is exactly why a disciplined platform should show more than record and ROI. Record and ROI describe what happened. The decomposition starts to explain why.</p>
+
+        <h3>The mistake most readers make</h3>
+        <p>The most common error is to treat every losing streak as proof that the process has failed. That interpretation is emotionally understandable and analytically weak. A short drawdown can emerge from a run of unfavorable realizations even while the process is still entering the market well.</p>
+        <p>The second most common error is the opposite one: assuming every drawdown is harmless. Sometimes the market is signaling that the edge has narrowed or that the environment has changed. The point of the decomposition is not to excuse losses. The point is to diagnose them honestly.</p>
+        <p>Serious users do not need reassurance. They need a framework that tells them which layer of the process is carrying the stress.</p>
+
+        <div class="callout">A disciplined response to a drawdown begins with decomposition. Price, selection, and variance tell a more useful story than the headline loss alone.</div>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">VARIANCE STATE ON THE SCORECARD</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">When VARIANCE STATE shows ELEVATED NOISE or CRITICAL SIGMA on the Daily Card or Scorecard, that badge links directly to this article — the diagnostic framework behind the signal.</p>
+        </div>
+        <a href="/scorecard.html" class="btn btn-outline btn-sm">VIEW SCORECARD →</a>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Sovereign Allocation Guide (Plex)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-allocation-guide">
+      <div class="panel-eyebrow">Methodology · Position Sizing</div>
+      <h1 class="panel-title">The Sovereign Allocation Guide</h1>
+      <p class="panel-sub">Why ArcVest sizes positions with a formula, not a feeling — and what that means for long-run portfolio discipline.</p>
+      <div class="panel-meta">ArcVest Research · Authored by Plex · April 2026 · 7 min read</div>
+
+      <div class="vault-article">
+
+        <h3>Sizing is where discipline becomes real</h3>
+        <p>Most readers spend too much time deciding what they like and too little time deciding how much to allocate. That is backwards. In a portfolio system, sizing is not a footnote to the signal. It is the mechanism that determines whether the signal compounds or self-destructs.</p>
+        <p>ArcVest uses fractional Kelly because it converts estimated edge into a position size in a way that is mathematically coherent. It does not ask how confident the user feels. It asks how large the edge is relative to the price and how much capital the portfolio can responsibly expose.</p>
+        <p>This is why the platform sizes positions with a formula, not a feeling. Feelings do not scale across a portfolio. Rules do.</p>
+
+        <h3>What Kelly is doing in plain language</h3>
+        <p>The Kelly framework starts with a simple idea: when the market price is favorable relative to the estimated probability, the position deserves capital. When the edge is larger, the position deserves more capital. When there is no edge, the position deserves nothing.</p>
+
+        <div class="formula">
+          f = (b × p − q) / b<br>
+          b = decimal_odds − 1 &nbsp; (net return per unit risked)<br>
+          p = estimated win probability<br>
+          q = 1 − p &nbsp; (estimated loss probability)
+        </div>
+
+        <p>The result is a fraction of bankroll. A Kelly fraction of 0.04 means 4% of current bankroll on this position. That fraction shrinks when the edge is thin and grows when the edge is wide. It naturally sizes down as the bankroll falls and sizes up as it grows.</p>
+
+        <h3>Why fractional, not full</h3>
+        <p>Full Kelly maximizes long-run expected portfolio growth under certain assumptions. In practice, those assumptions are rarely met precisely. Win probability estimates carry uncertainty. Prices move between model run and execution. The assumed independence of positions does not fully hold across a multi-sport slate.</p>
+        <p>Running full Kelly under realistic uncertainty produces higher variance and deeper drawdowns than the math on paper suggests. ArcVest uses quarter Kelly as a deliberate conservative scaling. The expected growth rate is lower, but the drawdown profile is substantially more controlled. For a platform with a public track record that builds trust over time, drawdown control is as important as growth rate.</p>
+
+        <h3>The role of line shopping</h3>
+        <p>Sizing and price quality are inseparable. The first determines how much the portfolio commits. The second determines whether that commitment was made efficiently. A small difference in entry price compounds across a portfolio. Readers who want to improve execution quality should always compare multiple market makers before committing capital.</p>
+
+        <h3>What the minimum-allocation floor is for</h3>
+        <p>ArcVest's minimum-allocation floor exists because not every mathematically positive position deserves a practically tiny allocation. In a pure model environment, extremely small position sizes can emerge from very modest edges. In a real operating environment, those positions may be too small to execute efficiently or too small to matter after friction.</p>
+        <p>The floor solves that by enforcing a minimum operational threshold. It is not there to exaggerate conviction. It is there to keep the portfolio executable. This is an important distinction. A minimum floor is an execution rule, not a confidence signal.</p>
+
+        <h3>How the daily allocation works</h3>
+        <p>Each day's card should be understood as a portfolio, not as a stack of isolated opinions. That means total allocation matters in addition to individual stake sizes. A disciplined system manages both the size of each position and the aggregate exposure of the daily set.</p>
+        <p>This is how ArcVest turns model output into an operating framework. Edge identifies which positions qualify. Fractional Kelly scales them. Portfolio caps control total exposure. The result is a repeatable allocation process instead of a collection of guesses.</p>
+
+        <div class="callout">The quality of a portfolio is not just a function of which positions it holds. It is also a function of how intelligently capital is allocated across them.</div>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">TRY THE KELLY SIZER</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">Use the Kelly Sizer tool to explore how different prices and edge assumptions change the recommended stake — and compare full, half, and quarter Kelly outputs.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showPanel('kelly')">OPEN KELLY SIZER →</button>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Bounded Overlay (migrated)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-bounded-overlay">
+      <div class="panel-eyebrow">Playoff Strategy · Methodology</div>
+      <h1 class="panel-title">The Bounded Overlay</h1>
+      <p class="panel-sub">Blending full-season strength with recent momentum — and why the circuit breaker matters as much as the blend.</p>
+      <div class="panel-meta">ArcVest Research · April 2026 · 6 min read</div>
+
+      <div class="vault-article">
+
+        <p>Playoff strength isn't full-season average or hot streak — it's a calibrated blend. ArcVest uses 75% full-season Pythagorean strength and 25% "Last 15" games for NBA playoffs, with 85/15 for NHL. This isn't arbitrary. It's tuned to playoff evidence while guarding against recency bias.</p>
+
+        <h3>Why Full Season Stays Dominant</h3>
+        <p>Full-season strength remains dominant because playoffs reward sustained quality. The NBA Pythagorean exponent (14.3) and NHL's PythagenPuck coefficient (0.458) derive win expectancy from points and goals scored and allowed across 82 games. That captures roster depth, coaching quality, and matchup-adjusted performance better than any short window. But late-season noise — load management, tanking decisions, clinch rest — distorts the full-season average. Enter the Last 15 overlay.</p>
+
+        <h3>The Last 15 as Turbocharger</h3>
+        <p>The Last 15 acts as a turbocharger, not a replacement. Recent Pythagorean strength is computed from the team's own most recent 15 completed games. For NBA, where load management inflates regular-season variance, 25% recent weight acknowledges momentum without overreacting. NHL's cleaner late-season incentives justify just 15% — hockey's physical toll shows in shorter meaningful streaks.</p>
+
+        <div class="formula">
+R<sub>playoff</sub> = 0.75 · R<sub>season</sub> + 0.25 · R<sub>last15</sub>  &nbsp;&nbsp;(NBA)
+R<sub>playoff</sub> = 0.85 · R<sub>season</sub> + 0.15 · R<sub>last15</sub>  &nbsp;&nbsp;(NHL)
+        </div>
+
+        <h3>The ±8% Circuit Breaker</h3>
+        <p>Unchecked, a 15-game heater could swing strength 20% or more — chasing noise rather than signal. The ±8% shift cap is the circuit breaker. Compute the deviation δ = R<sub>last15</sub> − R<sub>season</sub>, clamp it to [−0.08, +0.08], then apply the weighted blend to the clamped value. This bounds the turbocharger while letting genuine signal through.</p>
+
+        <div class="callout"><strong>The Shield in Action:</strong> A tanking team's meaningless 15-game skid or a rested star's artificial late-season hot streak both get rejected by the cap. Meaningful momentum gets through, noise gets filtered out.</div>
+
+        <h3>Tunable by Design</h3>
+        <p>All parameters live in Config as named constants — no recoding required to adjust the blend:</p>
+
+        <div class="formula">
+NBA_PLAYOFF_BLEND_W    = 0.75   # 75% season / 25% recent
+NHL_PLAYOFF_BLEND_W    = 0.85   # 85% season / 15% recent
+RECENT_FORM_N_GAMES    = 15     # rolling window size
+MAX_RECENT_FORM_SHIFT  = 0.08   # ±8% circuit breaker cap
+        </div>
+
+        <p>This bounded approach embodies ArcVest's philosophy: math over narrative. Full season anchors reality. Recent form turbocharges relevance. The cap enforces discipline. Playoff edges emerge from that balance — not from chasing streaks.</p>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">LIVE SIMULATION DATA</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">See the Bounded Overlay model running on live NBA and NHL bracket data — blended team strengths, series win probabilities, and championship equity updated each morning.</p>
+        </div>
+        <a href="/tournaments.html" class="btn btn-outline btn-sm">VIEW TOURNAMENTS →</a>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Path to the Cup (migrated)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-path-to-cup">
+      <div class="panel-eyebrow">Playoff Strategy · Bracket Simulation</div>
+      <h1 class="panel-title">The Path to the Cup</h1>
+      <p class="panel-sub">Why bracket simulations reveal what series odds never can — the full probability of surviving an entire playoff campaign.</p>
+      <div class="panel-meta">ArcVest Research · April 2026 · 4 min read</div>
+
+      <div class="vault-article">
+
+        <p>A team can be favored in the series right in front of it and still be a long shot to win the title. That is not a contradiction. It is how path-dependent probability works.</p>
+        <p>If a team has a 60% chance to win its current series, that sounds strong in isolation. But a championship future is not one position. It is a chain of conditional events. To lift the trophy, that same team might need to survive three or four consecutive rounds against increasingly strong opponents. Even before we account for matchup quality, injuries, rest asymmetry, or home-ice/home-court dynamics, the math compounds quickly.</p>
+
+        <h3>The Compounding Problem</h3>
+        <p>Here is the intuition. Suppose a team has a 60% chance in Round 1, then 45% in Round 2, 35% in Round 3, and 20% in the Final. Its title probability is not 60%. It is the product of the whole path.</p>
+
+        <div class="formula">
+0.60 × 0.45 × 0.35 × 0.20 = 1.89% championship probability
+
+A team can look live in the present and still be priced
+correctly as a distant long shot in the futures market.
+        </div>
+
+        <p>That is why single-series odds are incomplete. They tell you the probability of surviving the next gate. They do not tell you how difficult the road becomes after that gate opens.</p>
+
+        <h3>What Bracket Simulation Solves</h3>
+        <p>Bracket simulation solves the compounding problem by mapping every plausible route through the field and aggregating the probability of each route. Instead of asking, "Can this team win tonight?" the model asks, "What is the full probability distribution of surviving the entire campaign?"</p>
+        <p>This matters because the market often prices the next series more efficiently than the entire path. A club with a favorable opening matchup may look attractive in series odds, but if the likely semifinal and final opponents are elite, its title path can still be thin.</p>
+
+        <div class="callout"><strong>The Quadrant Effect:</strong> Two teams can have identical Round 1 win probabilities and dramatically different championship equity — depending entirely on who they would face if they advanced. Bracket position is a hidden variable that series odds ignore entirely.</div>
+
+        <h3>Path-Pricing vs. Headline-Pricing</h3>
+        <p>ArcVest's view is that futures should be path-priced, not headline-priced. The right question is never just whether a team is favored now. The right question is whether the market has fully accounted for the sequence of opponents it would need to beat next.</p>
+        <p>By running tens of thousands of simulated tournaments and tracking which teams survive each round, the model generates a full championship probability distribution — not a single series price, but a complete map of every path to the title and its likelihood.</p>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">LIVE SIMULATION DATA</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">See the path-probability model running on live NBA and NHL bracket data. Championship equity, round-by-round survival rates, and quadrant analysis updated each morning.</p>
+        </div>
+        <a href="/tournaments.html" class="btn btn-outline btn-sm">VIEW TOURNAMENTS →</a>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: The Two-Gate EV Filter (migrated)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-twogates">
+      <div class="panel-eyebrow">Foundations · Methodology</div>
+      <h1 class="panel-title">The Two-Gate EV Filter</h1>
+      <div class="panel-meta">ArcVest Research · March 2026 · 5 min read</div>
+
+      <div class="vault-article">
+        <p>Every position on ArcVest passes through two independent filters before it's logged. Most candidates fail. The ones that survive are genuine edges — not just low odds or high-probability favorites.</p>
+
+        <h3>Gate 1: Expected Value ≥ 5%</h3>
+        <p>Expected value (EV) measures how much you expect to return per dollar risked, on average, if you made the same position thousands of times.</p>
+
+        <div class="formula">
+EV = (model_win_probability × decimal_odds) − 1
+
+Example: Model says 60% win probability. Market offers 2.00 odds.
+EV = (0.60 × 2.00) − 1 = 0.20 = 20% EV ✓ Passes Gate 1
+        </div>
+
+        <p>The model win probability comes from <strong>Pythagorean expectation</strong> — a formula that uses points scored and points allowed to estimate true team strength, independently of the win-loss record.</p>
+
+        <div class="callout"><strong>Why 5%?</strong> A 5% EV threshold filters out noise while capturing real edge. At high volume, even 5–10% EV positions are profitable over hundreds of settled picks. Lower thresholds produce too many marginal positions; higher thresholds produce too few.</div>
+
+        <h3>Gate 2: Positive Edge vs. No-Vig Probability</h3>
+        <p>Even a position with positive EV might just be exploiting overpriced odds — not a genuine model edge. The second gate compares the model probability directly against the <strong>no-vig (fair) implied probability</strong>.</p>
+
+        <div class="formula">
+No-vig probability = (1/odds_side1) / (1/odds_side1 + 1/odds_side2)
+
+Edge = model_probability − no_vig_probability
+
+A position must have Edge > 0 to pass Gate 2.
+        </div>
+
+        <p>This ensures the model actually disagrees with the market's fair probability — not just the vig-inflated line.</p>
+
+        <h3>Why Both Gates?</h3>
+        <p>EV alone can be gamed by taking huge underdogs — technically positive EV but high variance. Edge alone doesn't account for the actual return magnitude. Together, they ensure every logged position is both <strong>mathematically positive in expectation</strong> and <strong>based on genuine model disagreement with the market</strong>.</p>
+
+        <div class="callout"><strong>In practice:</strong> On a typical day, several hundred raw candidates enter the pipeline. After the two-gate filter, 40–80 survive. Every single one cleared both bars independently.</div>
+
+        <h3>What Comes Next: Kelly Sizing</h3>
+        <p>After filtering, each position receives a <strong>quarter Kelly</strong> stake — a conservative position size derived from the EV and odds. All positions are then scaled uniformly so total daily risk stays within portfolio caps. No single position dominates the portfolio.</p>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+
+      <div class="vault-crosslink">
+        <div>
+          <div class="t-eyebrow" style="margin-bottom:var(--space-2);">TRY IT YOURSELF</div>
+          <p class="t-body-light" style="color:var(--muted);max-width:460px;">Use the No-Vig Calculator to strip the margin from any line and see the fair probability the model checks its estimate against.</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showPanel('novig')">OPEN NO-VIG CALCULATOR →</button>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: American vs. Decimal Odds (migrated)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-article-odds-formats">
+      <div class="panel-eyebrow">Foundations · Odds Formats</div>
+      <h1 class="panel-title">American vs. Decimal Odds</h1>
+      <p class="panel-sub">Which format gives you the edge? The answer depends on what you're doing with the number.</p>
+      <div class="panel-meta">ArcVest Research · April 2026 · 5 min read</div>
+
+      <div class="vault-article">
+
+        <p>Odds formats aren't just display preferences — they shape how you think about value. American odds dominate U.S. market makers because they're compact and intuitive for execution. Decimal odds rule in modeling because they make expected value math direct and repeatable. Neither is universally better, but one will serve your workflow more effectively depending on whether you're scanning lines or sizing positions.</p>
+
+        <h3>American Odds: The Execution Standard</h3>
+        <p>American odds are the default at FanDuel, DraftKings, and every U.S. market maker for a reason. The +/− sign tells you at a glance whether it's a favorite (−150 means lay $150 to win $100) or a longshot (+200 means win $200 on $100 risked). No mental math needed to classify the side.</p>
+        <p><strong>Strengths:</strong> Native to U.S. execution — matches exactly what you see when placing the position. Compact for dense displays. Psychologically clear: positive feels like upside, negative feels like cost.</p>
+        <p><strong>Weaknesses:</strong> EV requires a conversion step. For a quick scan, American wins. Open a spreadsheet for Kelly sizing and the conversions start adding up.</p>
+
+        <h3>Decimal Odds: The Modeler's Language</h3>
+        <p>Decimal odds treat every price as a total return multiple. A 2.50 decimal means $1 risked returns $2.50 total — $1.50 profit. Implied probability is always 1 ÷ decimal odds. Expected value simplifies to one formula regardless of whether you're looking at a favorite or a longshot.</p>
+
+        <div class="formula">
+          EV = (true_prob × decimal_odds) − 1<br>
+          Implied prob = 1 / decimal_odds<br>
+          Kelly f = (b × p − q) / b &nbsp;&nbsp;where b = decimal_odds − 1
+        </div>
+
+        <p><strong>Strengths:</strong> Universal payout formula, no sign-based branching. No-vig and Kelly sizing flow without reformatting. Consistent across sports, markets, and position types.</p>
+        <p>ArcVest's engine computes entirely in decimal internally — that's why the model stores <code>model_odds</code> as 1.91, not −110. It's the natural format for the two-gate filter, fractional Kelly, and CLV calculation.</p>
+
+        <h3>Head-to-Head: Five Real Positions</h3>
+        <p>Same five positions, same model probabilities — the only difference is which format you're reading.</p>
+
+        <div class="formula" style="line-height:2;">
+          American &nbsp;| Decimal | Implied | True Prob | EV<br>
+          ─────────────────────────────────────────────────<br>
+          −110 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1.91 &nbsp;&nbsp;&nbsp;| 52.4% &nbsp;&nbsp;| 55.0% &nbsp;&nbsp;&nbsp;| +5.0%<br>
+          −150 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 1.67 &nbsp;&nbsp;&nbsp;| 60.0% &nbsp;&nbsp;| 65.0% &nbsp;&nbsp;&nbsp;| +8.5%<br>
+          +120 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 2.20 &nbsp;&nbsp;&nbsp;| 45.5% &nbsp;&nbsp;| 48.0% &nbsp;&nbsp;&nbsp;| +5.6%<br>
+          +200 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 3.00 &nbsp;&nbsp;&nbsp;| 33.3% &nbsp;&nbsp;| 35.0% &nbsp;&nbsp;&nbsp;| +5.0%<br>
+          +500 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 6.00 &nbsp;&nbsp;&nbsp;| 16.7% &nbsp;&nbsp;| 20.0% &nbsp;&nbsp;&nbsp;| +20.0%
+        </div>
+
+        <h3>The Trader Workflow</h3>
+        <p><strong>Scan in American.</strong> Your market maker shows −135, not 1.74. American matches the execution environment.</p>
+        <p><strong>Model in decimal.</strong> Once you're computing EV, Kelly fraction, or CLV, decimal removes all the conversion friction. One formula, every market, every sport.</p>
+        <p>The hybrid approach is what disciplined traders actually use. American for the glance, decimal for the math.</p>
+
+        <div class="callout"><strong>Tools in EdgeVault:</strong> The <button onclick="showPanel('odds-converter')" style="background:none;border:none;color:var(--gold);font-family:var(--font-mono);font-size:14px;cursor:pointer;padding:0;text-decoration:underline;">Odds Converter</button> handles all three formats. The <button onclick="showPanel('novig')" style="background:none;border:none;color:var(--gold);font-family:var(--font-mono);font-size:14px;cursor:pointer;padding:0;text-decoration:underline;">No-Vig Calculator</button> strips the juice and shows you the fair line underneath.</div>
+
+        <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════
+         PANEL: Coming Soon (articles / guides / deep dives)
+    ═══════════════════════════════════════ -->
+    <div class="vault-panel" id="panel-articles">
+      <div class="panel-eyebrow">Library · Coming Soon</div>
+      <h1 class="panel-title">More Content Incoming</h1>
+      <p class="panel-sub">New articles publish on a rolling basis as the engine and track record mature. Planned next pieces:</p>
+      <div class="soon-grid">
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Why Win Rates Lie</div><div class="soon-desc">A 55% win rate sounds great until you realize it loses money at −110. How to evaluate model performance the right way.</div></div>
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Line Shopping Is Free Money</div><div class="soon-desc">One half-point better odds compounds to 10%+ ROI over a season. The most underused edge available to any portfolio operator.</div></div>
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Closing Line Value (CLV)</div><div class="soon-desc">The sharp operator's trust metric. Why beating the closing price is more predictive of long-run profitability than outcomes.</div></div>
+      </div>
+    </div>
+
+    <div class="vault-panel" id="panel-deepdives">
+      <div class="panel-eyebrow">Library · Deep Dives</div>
+      <h1 class="panel-title">Deep Dives</h1>
+      <p class="panel-sub">Full methodology documentation for the quantitatively-minded reader. Engine internals, model architecture, and statistical foundations.</p>
+      <div class="soon-grid">
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Kelly Criterion for Sports</div><div class="soon-desc">Full, fractional, and portfolio caps. f = (bp − q) / b. Why quarter-Kelly and what happens at full Kelly.</div></div>
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Pythagorean Expectation Across Sports</div><div class="soon-desc">PythagenPat for NBA (exp 14.3), PythagenPuck for NHL, BaseRuns for MLB. Why the exponent matters.</div></div>
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Soccer Double Chance Explained</div><div class="soon-desc">Why 3-way markets need special handling — and how ArcVest decides between straight moneyline and DC positions.</div></div>
+        <div class="soon-card"><div class="soon-badge">Soon</div><div class="soon-title">Tennis Elo + Bracket Simulation</div><div class="soon-desc">How 50,000 simulations of a draw produce stable championship probabilities — and what they reveal about outright market pricing.</div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ── Footer ── -->
+<div id="footer-root"></div>
+
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+     ════════════════════════════════════════════ -->
+<script>
+const DATA_BASE = 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/main/Docs/data/';
+
+lucide.createIcons();
+
+// ── Nav ──
+(function() {
+  const path = window.location.pathname.replace(/\/$/, '') || '/index.html';
+  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(a => {
+    const href = a.getAttribute('href').replace(/\/$/, '');
+    if (path.endsWith(href)) a.classList.add('active');
+  });
+  const ham = document.getElementById('nav-hamburger');
+  const mob = document.getElementById('nav-mobile');
+  ham.addEventListener('click', () => {
+    const open = mob.classList.toggle('open');
+    ham.setAttribute('aria-expanded', open);
+  });
+})();
+
+// ── Sidebar: panel switching ──
+const vaultItems = document.querySelectorAll('.vault-item[data-panel]');
+const panels     = document.querySelectorAll('.vault-panel');
+
+function showPanel(id) {
+  panels.forEach(p => p.classList.remove('active'));
+  vaultItems.forEach(i => i.classList.remove('active'));
+  const target = document.getElementById('panel-' + id);
+  if (target) target.classList.add('active');
+  vaultItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
+  document.getElementById('vault-sidebar').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+vaultItems.forEach(item => {
+  item.addEventListener('click', () => showPanel(item.dataset.panel));
+});
+
+// Mobile sidebar toggle
+document.getElementById('sidebar-toggle').addEventListener('click', () => {
+  document.getElementById('vault-sidebar').classList.toggle('open');
+});
+
+// URL hash navigation
+const hash = window.location.hash.replace('#', '');
+if (hash) showPanel(hash);
+
+// ── Odds format toggle ──
+let toolOddsMode = 'american';
+
+const ODDS_CONFIG = {
+  american: {
+    'nv-a-label':     'Side A Odds (American)',
+    'nv-b-label':     'Side B Odds (American)',
+    'nv-h-label':     'Home (American)',
+    'nv-d-label':     'Draw (American)',
+    'nv-aw-label':    'Away (American)',
+    'hg-orig-label':  'Original Odds (American)',
+    'hg-hedge-label': 'Hedge Odds (American)',
+    placeholders: {
+      'nv-a': '-110', 'nv-b': '-110',
+      'nv-h': '+120', 'nv-d': '+220', 'nv-aw': '+200',
+      'hg-orig-odds': '+150', 'hg-hedge-odds': '-130',
+    }
+  },
+  decimal: {
+    'nv-a-label':     'Side A Odds (Decimal)',
+    'nv-b-label':     'Side B Odds (Decimal)',
+    'nv-h-label':     'Home (Decimal)',
+    'nv-d-label':     'Draw (Decimal)',
+    'nv-aw-label':    'Away (Decimal)',
+    'hg-orig-label':  'Original Odds (Decimal)',
+    'hg-hedge-label': 'Hedge Odds (Decimal)',
+    placeholders: {
+      'nv-a': '1.91', 'nv-b': '1.91',
+      'nv-h': '2.20', 'nv-d': '3.20', 'nv-aw': '3.00',
+      'hg-orig-odds': '2.50', 'hg-hedge-odds': '1.77',
+    }
+  }
+};
+
+function setToolOddsFormat(fmt) {
+  toolOddsMode = fmt;
+  document.getElementById('ev-btn-american').classList.toggle('active', fmt === 'american');
+  document.getElementById('ev-btn-decimal').classList.toggle('active', fmt === 'decimal');
+  const cfg = ODDS_CONFIG[fmt];
+  Object.keys(cfg).forEach(id => {
+    if (id === 'placeholders') return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = cfg[id];
+  });
+  Object.entries(cfg.placeholders).forEach(([id, ph]) => {
+    const el = document.getElementById(id);
+    if (el) { el.placeholder = 'e.g. ' + ph; el.value = ''; }
+  });
+  ['nv-result-2way','nv-result-3way','hg-result'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+
+function parseToDecimal(val) {
+  const n = parseFloat(val);
+  if (isNaN(n)) return null;
+  if (toolOddsMode === 'decimal') return n > 1 ? n : null;
+  return americanToDecimal(n);
+}
+
+// ── Odds Converter ──
+function americanToDecimal(a) {
+  a = parseFloat(a);
+  if (isNaN(a)) return null;
+  return a >= 0 ? (a / 100) + 1 : (100 / Math.abs(a)) + 1;
+}
+function decimalToAmerican(d) {
+  d = parseFloat(d);
+  if (isNaN(d) || d <= 1) return null;
+  return d >= 2 ? '+' + Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
+}
+function decimalToImplied(d) { return d > 0 ? (1 / d) * 100 : null; }
+function fmt2(n)   { return n !== null ? n.toFixed(2) : '—'; }
+function fmtPct(n) { return n !== null ? n.toFixed(2) + '%' : '—'; }
+
+function convertFromAmerican() {
+  const am  = parseFloat(document.getElementById('oc-american').value);
+  if (isNaN(am)) return;
+  const dec = americanToDecimal(am);
+  const imp = decimalToImplied(dec);
+  const risk = am >= 0 ? '— (you win $' + am.toFixed(0) + ' per $100 risked)' : '$' + Math.abs(am).toFixed(2);
+  document.getElementById('oc-decimal-out').textContent = fmt2(dec);
+  document.getElementById('oc-implied-out').textContent = fmtPct(imp);
+  document.getElementById('oc-risk-out').textContent    = risk;
+  document.getElementById('oc-result-american').classList.add('show');
+}
+function convertFromDecimal() {
+  const dec = parseFloat(document.getElementById('oc-decimal').value);
+  if (isNaN(dec) || dec <= 1) return;
+  const am  = decimalToAmerican(dec);
+  const imp = decimalToImplied(dec);
+  document.getElementById('oc-american-out').textContent  = am !== null ? String(am) : '—';
+  document.getElementById('oc-implied2-out').textContent  = fmtPct(imp);
+  document.getElementById('oc-return-out').textContent    = '$' + ((dec - 1) * 100).toFixed(2);
+  document.getElementById('oc-result-decimal').classList.add('show');
+}
+function convertFromProb() {
+  const pct = parseFloat(document.getElementById('oc-prob').value);
+  if (isNaN(pct) || pct <= 0 || pct >= 100) return;
+  const dec = 100 / pct;
+  const am  = decimalToAmerican(dec);
+  document.getElementById('oc-decimal2-out').textContent  = fmt2(dec);
+  document.getElementById('oc-american2-out').textContent = am !== null ? String(am) : '—';
+  document.getElementById('oc-result-prob').classList.add('show');
+}
+['oc-american','oc-decimal','oc-prob'].forEach((id, i) => {
+  const fns = [convertFromAmerican, convertFromDecimal, convertFromProb];
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fns[i](); });
+});
+
+// ── No-Vig Calculator ──
+function calcNoVig2() {
+  const dA = parseToDecimal(document.getElementById('nv-a').value);
+  const dB = parseToDecimal(document.getElementById('nv-b').value);
+  if (!dA || !dB) return;
+  const iA = 1/dA, iB = 1/dB, tot = iA + iB;
+  document.getElementById('nv-vig').textContent    = ((tot - 1) * 100).toFixed(2) + '%';
+  document.getElementById('nv-fair-a').textContent = (iA / tot * 100).toFixed(2) + '%';
+  document.getElementById('nv-fair-b').textContent = (iB / tot * 100).toFixed(2) + '%';
+  document.getElementById('nv-break-a').textContent= (iA * 100).toFixed(2) + '%';
+  document.getElementById('nv-break-b').textContent= (iB * 100).toFixed(2) + '%';
+  document.getElementById('nv-result-2way').classList.add('show');
+}
+function calcNoVig3() {
+  const dH = parseToDecimal(document.getElementById('nv-h').value);
+  const dD = parseToDecimal(document.getElementById('nv-d').value);
+  const dA = parseToDecimal(document.getElementById('nv-aw').value);
+  if (!dH || !dD || !dA) return;
+  const iH = 1/dH, iD = 1/dD, iA = 1/dA, tot = iH + iD + iA;
+  document.getElementById('nv3-vig').textContent  = ((tot - 1) * 100).toFixed(2) + '%';
+  document.getElementById('nv3-home').textContent = (iH / tot * 100).toFixed(2) + '%';
+  document.getElementById('nv3-draw').textContent = (iD / tot * 100).toFixed(2) + '%';
+  document.getElementById('nv3-away').textContent = (iA / tot * 100).toFixed(2) + '%';
+  document.getElementById('nv-result-3way').classList.add('show');
+}
+['nv-a','nv-b'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig2(); }));
+['nv-h','nv-d','nv-aw'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig3(); }));
+
+// ── Kelly Sizer ──
+function calcKelly() {
+  const prob     = parseFloat(document.getElementById('ks-prob').value) / 100;
+  const decOdds  = parseFloat(document.getElementById('ks-odds').value);
+  const bankroll = parseFloat(document.getElementById('ks-bankroll').value);
+  if (isNaN(prob) || isNaN(decOdds) || decOdds <= 1) return;
+  const b  = decOdds - 1;
+  const q  = 1 - prob;
+  const ev = (prob * decOdds) - 1;
+  const f  = (b * prob - q) / b;
+  const fh = f / 2;
+  const fq = f / 4;
+  document.getElementById('ks-ev').textContent      = (ev >= 0 ? '+' : '') + (ev * 100).toFixed(1) + '%';
+  document.getElementById('ks-full').textContent    = (f * 100).toFixed(2) + '%' + (f <= 0 ? ' (no edge)' : '');
+  document.getElementById('ks-half').textContent    = fh > 0 ? (fh * 100).toFixed(2) + '%' : '—';
+  document.getElementById('ks-quarter').textContent = fq > 0 ? (fq * 100).toFixed(2) + '%' : '—';
+  document.getElementById('ks-dollar').textContent  = (!isNaN(bankroll) && fq > 0)
+    ? '$' + (bankroll * fq).toFixed(2)
+    : (isNaN(bankroll) ? 'Enter bankroll' : '—');
+  document.getElementById('ks-ev').style.color = ev >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('ks-result').classList.add('show');
+}
+['ks-prob','ks-odds','ks-bankroll'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcKelly(); }));
+
+// ── Hedge Calculator ──
+function calcHedge() {
+  const stake    = parseFloat(document.getElementById('hg-stake').value);
+  const decOrig  = parseToDecimal(document.getElementById('hg-orig-odds').value);
+  const decHedge = parseToDecimal(document.getElementById('hg-hedge-odds').value);
+  const target   = document.getElementById('hg-target').value;
+  if (isNaN(stake) || !decOrig || !decHedge) return;
+  const origPayout = stake * decOrig;
+  const origProfit = origPayout - stake;
+  let hedgeStake;
+  if (target === 'equal')  hedgeStake = origPayout / decHedge;
+  else if (target === 'break') hedgeStake = stake / (decHedge - 1);
+  else hedgeStake = (origProfit / 2) / (decHedge - 1);
+  const total        = stake + hedgeStake;
+  const profitIfOrig = origPayout - total;
+  const profitIfHedge= hedgeStake * decHedge - total;
+  const floor        = Math.min(profitIfOrig, profitIfHedge);
+  document.getElementById('hg-hedge-stake').textContent     = '$' + hedgeStake.toFixed(2);
+  document.getElementById('hg-profit-orig').textContent     = '$' + profitIfOrig.toFixed(2);
+  document.getElementById('hg-profit-hedge').textContent    = '$' + profitIfHedge.toFixed(2);
+  document.getElementById('hg-total-committed').textContent = '$' + total.toFixed(2);
+  const floorEl = document.getElementById('hg-floor');
+  floorEl.textContent = '$' + floor.toFixed(2);
+  floorEl.className = 'tool-result-val ' + (floor >= 0 ? 'green' : 'red');
+  document.getElementById('hg-result').classList.add('show');
+}
+['hg-stake','hg-orig-odds','hg-hedge-odds'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcHedge(); }));
+
+// ── Tournaments nav + footer ──
+fetch(DATA_BASE + 'summary.json')
+  .then(r => r.json())
+  .then(s => {
+    if (s.tournaments_active) {
+      const t = '<a href="/tournaments.html">TOURNAMENTS</a>';
+      const od = document.querySelector('.nav-links a[href*="odds"]');
+      if (od) od.insertAdjacentHTML('afterend', t);
+      const om = document.querySelector('.nav-mobile a[href*="odds"]');
+      if (om) om.insertAdjacentHTML('afterend', t);
+    }
+  })
+  .catch(() => {});
+
+// Footer offset when sidebar is hidden on mobile
+function adjustFooter() {
+  // Footer margin adjusted after component injection
+  window.addEventListener('arcvest:ready', function() {
+    const footer = document.querySelector('.footer');
+    if (footer) footer.style.marginLeft = window.innerWidth <= 900 ? '0' : '260px';
+  });
+}
+adjustFooter();
+window.addEventListener('resize', adjustFooter);
+</script>
+
+<script src="/arcvest-components.js"></script>
+</body>
+</html>

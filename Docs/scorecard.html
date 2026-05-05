@@ -1,890 +1,695 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArcVest — Scorecard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
-<style>
-  /* ── Reset & Base ─────────────────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcVest — Scorecard</title>
+  <meta name="description" content="ArcVest model performance record from Reset 4. Process Score, skill vs. chance decomposition, equity curve, and full record breakdown by sport and market type.">
+  <link rel="stylesheet" href="arcvest.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  :root {
-    --bg:           #080b12;
-    --bg2:          #0e1220;
-    --bg3:          #141929;
-    --bg-hover:     #111830;
-    --border:       #1a2238;
-    --border-light: #202840;
-    --gold:         #f0b429;
-    --gold-dim:     #8a6420;
-    --teal:         #10b981;
-    --red:          #ef4444;
-    --yellow:       #eab308;
-    --text:         #eceef4;
-    --muted:        #8e9ab5;
-    --font-head:    'Bebas Neue', sans-serif;
-    --font-body:    'Outfit', sans-serif;
-    --font-mono:    'DM Mono', monospace;
-  }
+  <style>
+    /* PAGE-OVERRIDE: Scorecard layout — hero dial, attribution panels, record table */
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-weight: 300;
-    min-height: 100vh;
-    overflow-x: hidden;
-    padding-top: 57px;
-    scrollbar-gutter: stable;
-  }
+    /* ── Hero strip ── */
+    .sc-hero {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-6) var(--page-padding-x);
+    }
 
-  /* ── Scrollbar ───────────────────────────────────────────── */
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+    .sc-hero-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: var(--space-7);
+      align-items: start;
+    }
 
-  /* ── Nav ─────────────────────────────────────────────────── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2.5rem;
-    background: rgba(8,11,18,0.92);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(26,34,56,0.6);
-  }
+    /* Dial column */
+    .dial-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
 
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-  }
-  .nav-logo-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.55rem;
-    letter-spacing: -0.02em;
-    color: #e8eaf0;
-    line-height: 1;
-    min-width: 7.5rem;
-  }
-  .nav-logo-name em { color: #c9a84c; font-style: normal; }
+    .dial-label-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      text-align: center;
+    }
 
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
-  .nav-links a {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--text); }
-  .nav-links a.active { color: var(--gold); }
+    /* KPI strip right of dial */
+    .sc-kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
 
-  .nav-cta {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 0.5rem 1.2rem;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .nav-cta:hover { background: var(--gold); color: var(--bg); }
+    /* Attribution tray */
+    .attr-tray {
+      background: rgba(10,12,16,0.5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+    }
 
-  /* ── Hamburger & Mobile Menu ─────────────────────────────── */
+    .attr-tray-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: var(--space-4);
+    }
 
-  /* ── Disclaimer ──────────────────────────────────────────── */
-  .disclaimer {
-    background: rgba(240,180,41,0.04);
-    border-bottom: 1px solid rgba(240,180,41,0.12);
-    padding: 0.45rem 2.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .disclaimer-icon { color: var(--gold); font-size: 0.72rem; flex-shrink: 0; }
-  .disclaimer-text {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    color: var(--gold-dim);
-    letter-spacing: 0.03em;
-  }
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
 
-  /* ── Layout ──────────────────────────────────────────────── */
-  .main { padding: 1.5rem 2.5rem 4rem; max-width: 1600px; margin: 0 auto; }
+    .attr-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
 
-  /* ── Section label (matches site pattern) ────────────────── */
-  .section-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-  .section-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 24px;
-    height: 1px;
-    background: var(--gold);
-  }
+    .attr-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      line-height: 1.1;
+    }
 
-  .section-title {
-    font-family: var(--font-head);
-    font-size: 1.1rem;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .section-title::before {
-    content: '';
-    display: inline-block;
-    width: 10px;
-    height: 2px;
-    background: var(--gold);
-  }
+    .attr-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
 
-  /* ── KPI Grid ────────────────────────────────────────────── */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-  }
-  .kpi-card {
-    background: var(--bg2);
-    padding: 1.1rem 1.25rem;
-    transition: background 0.15s;
-  }
-  .kpi-card:hover { background: var(--bg-hover); }
-  .kpi-label {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    margin-bottom: 0.5rem;
-  }
-  .kpi-value {
-    font-family: var(--font-head);
-    font-size: 1.8rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    line-height: 1;
-  }
-  .kpi-value.positive { color: var(--teal); }
-  .kpi-value.negative { color: var(--red); }
-  .kpi-value.gold     { color: var(--gold); }
-  .kpi-sub {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    margin-top: 0.35rem;
-  }
+    .attr-desc {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--dim);
+    }
 
-  /* ── Two-column ──────────────────────────────────────────── */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
+    /* ── Sample integrity bar ── */
+    .integrity-section {
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border);
+    }
 
-  /* ── Card ────────────────────────────────────────────────── */
-  .card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 0.85rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .card-body { padding: 1.25rem; }
+    /* ── Equity chart section ── */
+    .equity-section {
+      padding: var(--space-6) var(--page-padding-x);
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* ── Chart ───────────────────────────────────────────────── */
-  .chart-container { position: relative; height: 220px; }
+    .equity-section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
 
-  /* ── Sport Bars ──────────────────────────────────────────── */
-  .sport-bars { display: flex; flex-direction: column; gap: 0.65rem; }
-  .sport-bar-row {
-    display: grid;
-    grid-template-columns: 72px 1fr 52px;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .sport-label {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--muted);
-    text-align: right;
-  }
-  .sport-bar-track {
-    height: 5px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .sport-bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    background: var(--gold);
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .sport-pct {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    color: var(--muted);
-    text-align: right;
-  }
+    .equity-chart-container {
+      height: 260px;
+      position: relative;
+    }
 
-  /* ── Picks Table ─────────────────────────────────────────── */
-  .picks-section { margin-bottom: 1.5rem; }
-  .table-wrapper { overflow-x: auto; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--font-mono);
-    font-size: 0.73rem;
-  }
-  thead tr { border-bottom: 1px solid var(--border-light); }
-  th {
-    padding: 0.6rem 0.75rem;
-    text-align: left;
-    color: var(--muted);
-    font-weight: 400;
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    white-space: nowrap;
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  tbody tr:hover { background: var(--bg-hover); }
-  tbody tr:last-child { border-bottom: none; }
-  td {
-    padding: 0.65rem 0.75rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-  td.primary { color: var(--text); font-weight: 500; }
-  td.gold    { color: var(--gold); }
-  td.muted   { color: var(--muted); }
+    /* ── Breakdown section ── */
+    .breakdown-section {
+      padding: var(--space-7) var(--page-padding-x);
+      border-bottom: 1px solid var(--border);
+    }
 
-  /* ── Sport Badges ────────────────────────────────────────── */
-  .badge {
-    display: inline-block;
-    padding: 0.15rem 0.45rem;
-    border-radius: 3px;
-    font-size: 0.58rem;
-    font-weight: 500;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .badge-nba    { background: rgba(29,185,84,0.12);  color: #1db954; }
-  .badge-ncaab  { background: rgba(59,130,246,0.12); color: #60a5fa; }
-  .badge-ncaaw  { background: rgba(244,114,182,0.12);color: #f472b6; }
-  .badge-nhl    { background: rgba(139,92,246,0.12); color: #a78bfa; }
-  .badge-mlb    { background: rgba(234,179,8,0.12);  color: #fbbf24; }
-  .badge-soccer { background: rgba(16,185,129,0.12); color: #10b981; }
-  .badge-tennis { background: rgba(249,115,22,0.12); color: #fb923c; }
-  .badge-cha    { background: rgba(236,72,153,0.12); color: #f472b6; }
+    .breakdown-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
 
-  /* ── EV Bar ──────────────────────────────────────────────── */
-  .ev-bar { display: inline-flex; align-items: center; gap: 0.4rem; }
-  .ev-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--border-light); }
-  .ev-pip.lit { background: var(--gold); }
+    /* Sport breakdown bars */
+    .sport-breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
 
-  /* ── Filter Bar ──────────────────────────────────────────── */
-  .filter-bar {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.7rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .filter-btn {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    padding: 0.28rem 0.65rem;
-    border: 1px solid var(--border-light);
-    border-radius: 4px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    transition: all 0.15s;
-  }
-  .filter-btn:hover,
-  .filter-btn.active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(240,180,41,0.06);
-  }
+    /* ── Record section ── */
+    .record-section {
+      padding: var(--space-7) var(--page-padding-x);
+    }
 
-  /* ── Record Grid ─────────────────────────────────────────── */
-  .record-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .record-card {
-    background: var(--bg2);
-    padding: 0.9rem 1rem;
-    transition: background 0.15s;
-  }
-  .record-card:hover { background: var(--bg-hover); }
-  .record-sport {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.4rem;
-  }
-  .record-wl {
-    font-family: var(--font-head);
-    font-size: 1.2rem;
-    letter-spacing: 0.02em;
-    color: var(--text);
-  }
-  .record-pct {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-  }
-  .record-roi {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    margin-top: 0.3rem;
-  }
-  .record-roi.positive { color: var(--teal); }
-  .record-roi.negative { color: var(--red); }
+    .record-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
 
-  /* ── Section header row ──────────────────────────────────── */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    margin-top: 0.5rem;
-  }
+    /* Record table */
+    .record-table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: var(--space-5);
+    }
 
-  /* ── States ──────────────────────────────────────────────── */
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 120px;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    gap: 0.5rem;
-  }
-  .spinner {
-    width: 14px; height: 14px;
-    border: 2px solid var(--border-light);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+    .record-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      min-width: 600px;
+    }
 
-  .empty {
-    padding: 2rem;
-    text-align: center;
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-  }
+    .record-table th {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      font-weight: 400;
+      padding: var(--space-2) var(--space-3);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
 
-  /* ── Fade-in ─────────────────────────────────────────────── */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(6px);
-    animation: fadeIn 0.4s ease forwards;
-  }
-  @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-  .fade-in:nth-child(1) { animation-delay: 0.05s; }
-  .fade-in:nth-child(2) { animation-delay: 0.10s; }
-  .fade-in:nth-child(3) { animation-delay: 0.15s; }
-  .fade-in:nth-child(4) { animation-delay: 0.20s; }
-  .fade-in:nth-child(5) { animation-delay: 0.25s; }
-  .fade-in:nth-child(6) { animation-delay: 0.30s; }
+    .record-table td {
+      padding: var(--space-3);
+      border-bottom: 1px solid rgba(26,34,56,0.5);
+      color: var(--text);
+      vertical-align: middle;
+    }
 
-  .nav-hamburger {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-    padding: 4px;
-    background: none;
-    border: none;
-  }
-  .nav-hamburger span {
-    display: block;
-    width: 22px; height: 2px;
-    background: var(--muted);
-    border-radius: 2px;
-    transition: all 0.2s;
-  }
-  .nav-mobile-menu {
-    display: none;
-    position: fixed;
-    top: 56px; left: 0; right: 0;
-    background: rgba(8,11,18,0.97);
-    border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(16px);
-    padding: 1.5rem 2.5rem;
-    flex-direction: column;
-    gap: 1.2rem;
-    z-index: 99;
-  }
-  .nav-mobile-menu.open { display: flex; }
-  .nav-mobile-menu a {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    padding: 0.4rem 0;
-    border-bottom: 1px solid rgba(26,34,56,0.4);
-    transition: color 0.2s;
-  }
-  .nav-mobile-menu a:hover { color: var(--text); }
-  .nav-mobile-menu a.active { color: var(--gold); }
+    .record-table tr:last-child td { border-bottom: none; }
+    .record-table tr:hover td { background: rgba(26,34,56,0.3); }
 
-  /* ── Responsive ──────────────────────────────────────────── */
-  @media (max-width: 1100px) {
-    .two-col { grid-template-columns: 1fr; }
-    .kpi-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 900px) {
-    .nav-links { display: none; }
-    .nav-hamburger { display: flex; }
-    .nav-cta { display: none; }
-  }
-  @media (max-width: 600px) {
-    .main { padding: 1rem; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    nav { padding: 1rem 1.5rem; }
-  }
-</style>
+    /* ── Subscriber path section (private) ── */
+    .subscriber-section {
+      padding: var(--space-6) var(--page-padding-x);
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .subscriber-section-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .sc-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+      .sport-breakdown-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sc-hero-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-5);
+      }
+      .dial-col { flex-direction: row; justify-content: flex-start; gap: var(--space-5); }
+      .dial-label-row { align-items: flex-start; text-align: left; }
+      .sc-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+      .attr-grid { grid-template-columns: 1fr; gap: var(--space-3); }
+    }
+
+    @media (max-width: 480px) {
+      .sc-kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ── Nav ─────────────────────────────────────────────────── -->
-<nav>
-  <a class="nav-logo" href="/">
-    <span class="nav-logo-name">Arc<em>Vest</em></span>
-  </a>
+<!-- ── Navigation ── -->
+<div id="nav-root"></div>
 
-  <div class="nav-links">
-    <a href="/scorecard.html" class="active">Scorecard</a>
-    <a href="/daily-card.html">Daily Card</a>
-    <a href="/odds.html">Odds</a>
-    <a href="/tournaments.html">Tournaments</a>
-    <a href="/edgevault.html">EdgeVault</a>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-eyebrow">
+      <i data-lucide="bar-chart-2" class="icon-sm icon-gold"></i>
+      MODEL PERFORMANCE
+    </div>
+    <h1 class="page-title">SCORECARD</h1>
+    <p class="page-subtitle">
+      Cumulative model record from Reset 4 baseline — April 23, 2026.
+      Process quality, skill vs. chance decomposition, and full record breakdown.
+      Every figure is settled, not projected.
+    </p>
   </div>
-
-  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
-    <span></span><span></span><span></span>
-  </button>
-  <a class="nav-cta" href="/membership.html">Login / Sign Up</a>
-</nav>
-
-<div class="nav-mobile-menu" id="mobile-menu">
-  <a href="/scorecard.html" class="active">Scorecard</a>
-  <a href="/daily-card.html">Daily Card</a>
-  <a href="/odds.html">Odds</a>
-  <a href="/tournaments.html">Tournaments</a>
-  <a href="/edgevault.html">EdgeVault</a>
-  <a href="/membership.html" style="color:var(--gold);">Login / Sign Up</a>
 </div>
 
 
-<!-- ── Main Content ───────────────────────────────────────── -->
-<main class="main">
+<!-- ════════════════════════════════════════════
+     HERO — DIAL + KPIs + ATTRIBUTION
+     ════════════════════════════════════════════ -->
+<div class="sc-hero">
+  <div class="sc-hero-inner">
 
-  <!-- KPI Row -->
-  <div class="kpi-grid" id="kpi-grid">
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Current Bankroll</div>
-      <div class="kpi-value gold" id="kpi-bankroll">—</div>
-      <div class="kpi-sub" id="kpi-bankroll-sub">—</div>
-    </div>
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Total P&amp;L</div>
-      <div class="kpi-value" id="kpi-pnl">—</div>
-      <div class="kpi-sub" id="kpi-pnl-sub">Since reset</div>
-    </div>
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Cumulative ROI</div>
-      <div class="kpi-value" id="kpi-roi">—</div>
-      <div class="kpi-sub" id="kpi-roi-sub">Since inception</div>
-    </div>
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Overall Record</div>
-      <div class="kpi-value" id="kpi-record">—</div>
-      <div class="kpi-sub" id="kpi-record-sub">—</div>
-    </div>
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Days Tracked</div>
-      <div class="kpi-value gold" id="kpi-days">—</div>
-      <div class="kpi-sub">Live tracking</div>
-    </div>
-    <div class="kpi-card fade-in">
-      <div class="kpi-label">Today's Risk</div>
-      <div class="kpi-value" id="kpi-risk">—</div>
-      <div class="kpi-sub" id="kpi-risk-sub">10% daily cap</div>
-    </div>
-  </div>
-
-  <!-- Last settled metadata -->
-  <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem;margin-top:-1rem;">
-    <span id="last-settled" style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;">—</span>
-  </div>
-
-  <!-- P&L Chart + Sport Allocation -->
-  <div class="two-col">
-
-    <!-- P&L Chart -->
-    <div class="card fade-in">
-      <div class="card-header">
-        <span class="section-title">Bankroll Evolution</span>
-        <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted)">
-          Starting: $<span id="chart-starting">1,000</span>
-        </span>
+    <!-- Dial column -->
+    <div class="dial-col">
+      <div id="process-dial" style="width:160px;height:120px;"></div>
+      <div class="dial-label-row">
+        <span class="t-label c-dim">PROCESS SCORE</span>
+        <div id="variance-badge-wrap"></div>
+        <button class="btn btn-ghost btn-sm" id="attr-toggle" style="margin-top:var(--space-2);">
+          <i data-lucide="layers" class="icon-sm"></i>
+          BREAKDOWN
+        </button>
       </div>
-      <div class="card-body">
-        <div class="chart-container">
-          <canvas id="pnl-chart"></canvas>
+      <!-- Sample integrity -->
+      <div class="integrity-section" style="width:100%;">
+        <div class="flex-between mb-2" style="margin-bottom:var(--space-2);">
+          <span class="t-label c-dim">SAMPLE INTEGRITY</span>
+          <span class="t-label" id="integrity-count" style="color:var(--amber);">— / 1,000</span>
+        </div>
+        <div class="integrity-bar">
+          <div class="integrity-fill" id="integrity-fill" style="width:0%;background:var(--amber);"></div>
+        </div>
+        <p class="t-disclaimer" style="margin-top:var(--space-2);" id="integrity-msg">
+          Early sample — high variance expected.
+        </p>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div>
+
+      <!-- KPI strip -->
+      <div class="sc-kpi-strip">
+        <div class="stat-card stat-gold">
+          <div class="stat-card-value" id="kpi-roi">—</div>
+          <div class="stat-card-label">MODEL ROI · R4</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="kpi-record">—</div>
+          <div class="stat-card-label">RECORD · R4</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="kpi-avg-ev">—</div>
+          <div class="stat-card-label">AVG EDGE AT ENTRY</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value" id="kpi-entry-alpha">—</div>
+          <div class="stat-card-label">ENTRY ALPHA</div>
+        </div>
+      </div>
+
+      <!-- Attribution tray (toggled) -->
+      <div class="attr-tray" id="attr-tray">
+        <div class="attr-tray-title">RETURN ATTRIBUTION — RESET 4</div>
+        <div class="attr-grid">
+          <div class="attr-card">
+            <div class="attr-value" style="color:var(--teal);" id="attr-pca">—</div>
+            <div class="attr-label" style="color:var(--teal);">PRICE CAPTURE ALPHA</div>
+            <div class="attr-desc">
+              Did the model enter at prices the market later validated?
+              Skill extracted from execution — independent of outcomes.
+            </div>
+          </div>
+          <div class="attr-card">
+            <div class="attr-value" style="color:var(--gold);" id="attr-sel">—</div>
+            <div class="attr-label" style="color:var(--gold);">SELECTION ALPHA</div>
+            <div class="attr-desc">
+              Was the model's probability superior to the market's implied probability?
+              Skill from event valuation.
+            </div>
+          </div>
+          <div class="attr-card">
+            <div class="attr-value c-muted" id="attr-var">—</div>
+            <div class="attr-label c-dim">CHANCE</div>
+            <div class="attr-desc">
+              Outcomes that diverged from what the prices implied.
+              The luck layer — not in the model's control.
+            </div>
+          </div>
+        </div>
+        <!-- Attribution bar -->
+        <div class="attribution-bar" id="attr-bar" style="display:none;"></div>
+        <div class="flex gap-3 mt-2" id="attr-legend" style="display:none;margin-top:var(--space-2);">
+          <span class="t-label" style="color:var(--teal);">■ PRICE</span>
+          <span class="t-label" style="color:var(--gold);">■ SELECTION</span>
+          <span class="t-label c-dim">■ CHANCE</span>
+        </div>
+        <p class="t-disclaimer" style="margin-top:var(--space-4);">
+          Attribution fields accumulate as CLV capture history grows.
+          Values marked — indicate the reservoir has not yet produced this metric.
+          <a href="/vault.html" style="color:var(--gold);">Read the methodology →</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     EQUITY CURVE
+     ════════════════════════════════════════════ -->
+<div class="equity-section">
+  <div class="equity-section-inner">
+
+    <div class="flex-between" style="margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-3);">
+      <div>
+        <div class="t-eyebrow" style="margin-bottom:var(--space-2);">PERFORMANCE TIMELINE</div>
+        <h2 class="t-section-header">EQUITY CURVE</h2>
+      </div>
+      <div class="flex gap-2" style="align-items:center;">
+        <button class="filter-pill active" data-window="7">7D</button>
+        <button class="filter-pill" data-window="30">30D</button>
+        <button class="filter-pill" data-window="0">ALL</button>
+      </div>
+    </div>
+
+    <!-- Period change strip -->
+    <div class="flex gap-5 mb-5" style="margin-bottom:var(--space-5);flex-wrap:wrap;gap:var(--space-5);">
+      <div class="summary-stat" style="display:flex;flex-direction:column;gap:3px;">
+        <span style="font-family:var(--font-mono);font-size:20px;line-height:1.1;" id="period-pnl">—</span>
+        <span class="t-label c-dim">PERIOD P&L</span>
+      </div>
+      <div class="summary-stat" style="display:flex;flex-direction:column;gap:3px;">
+        <span style="font-family:var(--font-mono);font-size:20px;line-height:1.1;" id="period-roi">—</span>
+        <span class="t-label c-dim">PERIOD ROI</span>
+      </div>
+      <div class="summary-stat" style="display:flex;flex-direction:column;gap:3px;">
+        <span style="font-family:var(--font-mono);font-size:20px;line-height:1.1;" id="period-settled">—</span>
+        <span class="t-label c-dim">POSITIONS SETTLED</span>
+      </div>
+    </div>
+
+    <div class="equity-chart-container" id="equity-wrap">
+      <canvas id="equity-chart"></canvas>
+    </div>
+    <div class="empty-state" id="equity-empty" style="display:none;padding:var(--space-6);">
+      <i data-lucide="clock" style="width:24px;height:24px;color:var(--border-light);"></i>
+      <div class="empty-state-title">COLLECTING BASELINE</div>
+      <div class="empty-state-message">Equity curve populates as positions settle each morning.</div>
+    </div>
+
+    <div class="flex-between mt-4" style="margin-top:var(--space-4);">
+      <span class="t-label c-dim">Reset 4 baseline · $1,000.00 · April 23, 2026</span>
+      <span class="t-label c-dim">Current: <span class="c-gold" id="current-bankroll">—</span></span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     SPORT BREAKDOWN
+     ════════════════════════════════════════════ -->
+<div class="breakdown-section">
+  <div class="breakdown-inner">
+
+    <div class="t-eyebrow" style="margin-bottom:var(--space-3);">BY SPORT</div>
+    <h2 class="t-section-header">PERFORMANCE BREAKDOWN</h2>
+
+    <!-- Sport ROI bars -->
+    <div class="sport-breakdown-grid" id="sport-breakdown">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-label">
+            <i data-lucide="bar-chart-2" class="icon-sm icon-muted"></i>
+            ROI BY SPORT
+          </span>
+        </div>
+        <div id="sport-roi-bars">
+          <div class="empty-inline" style="padding:var(--space-3) 0;">Loading…</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-label">
+            <i data-lucide="layers" class="icon-sm icon-muted"></i>
+            RECORD BY TRADE TYPE
+          </span>
+        </div>
+        <div id="bet-type-table">
+          <div class="empty-inline" style="padding:var(--space-3) 0;">Loading…</div>
         </div>
       </div>
     </div>
 
-    <!-- Sport Allocation -->
-    <div class="card fade-in">
-      <div class="card-header">
-        <span class="section-title">Today's Allocation</span>
-        <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted)" id="alloc-total">—</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     MODEL RECORD — RECENT PICKS
+     ════════════════════════════════════════════ -->
+<div class="record-section">
+  <div class="record-inner">
+
+    <div class="flex-between" style="flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-5);">
+      <div>
+        <div class="t-eyebrow" style="margin-bottom:var(--space-3);">SETTLED POSITIONS</div>
+        <h2 class="t-section-header">MODEL RECORD</h2>
       </div>
-      <div class="card-body">
-        <div class="sport-bars" id="sport-bars">
-          <div class="loading"><div class="spinner"></div> Loading picks...</div>
+      <a href="/performance-log.html" class="btn btn-outline btn-sm">
+        FULL HISTORY
+        <i data-lucide="arrow-right" class="icon-sm"></i>
+      </a>
+    </div>
+
+    <!-- Record context note -->
+    <div class="run-note" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em;color:var(--dim);text-align:center;padding:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:var(--space-5);background:var(--bg-surface);line-height:1.6;">
+      Positions sealed on daily commit run. Settlement each morning against final scores.
+      Record starts April 23, 2026 (Reset 4 baseline) — no prior history included.
+      <a href="/vault.html" style="color:var(--gold);">Why Reset 4? →</a>
+    </div>
+
+    <!-- Sport filter -->
+    <div class="filter-bar" id="record-filter-bar" style="margin-bottom:var(--space-4);">
+      <span class="filter-label">SPORT:</span>
+      <button class="filter-pill active" data-sport="ALL">ALL</button>
+    </div>
+
+    <div class="record-table-wrapper">
+      <table class="record-table" id="record-table">
+        <thead>
+          <tr>
+            <th>DATE</th>
+            <th>EVENT</th>
+            <th>SPORT</th>
+            <th>MARKET</th>
+            <th>POSITION</th>
+            <th>SEALED PRICE</th>
+            <th>E(WIN)</th>
+            <th>EDGE</th>
+            <th>RESULT</th>
+            <th>P&L</th>
+          </tr>
+        </thead>
+        <tbody id="record-tbody">
+          <tr><td colspan="10" style="text-align:center;padding:var(--space-6);color:var(--dim);font-family:var(--font-mono);font-size:12px;">Loading record…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     SUBSCRIBER PATH (private — masked)
+     ════════════════════════════════════════════ -->
+<div class="subscriber-section">
+  <div class="subscriber-section-inner">
+    <div class="flex-between" style="flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-5);">
+      <div>
+        <div class="t-eyebrow" style="margin-bottom:var(--space-3);">EXECUTION RECORD</div>
+        <h2 class="t-section-header">SUBSCRIBER PATH</h2>
+      </div>
+      <span class="badge badge-gold">ACCOUNT HOLDERS</span>
+    </div>
+
+    <!-- Masked state -->
+    <div id="sub-path-masked" class="card" style="text-align:center;padding:var(--space-7);">
+      <i data-lucide="lock" style="width:28px;height:28px;color:var(--border-light);margin-bottom:var(--space-3);"></i>
+      <div class="t-card-title" style="margin-bottom:var(--space-3);">Subscriber execution record</div>
+      <p class="t-body-light" style="color:var(--muted);max-width:480px;margin:0 auto var(--space-5);">
+        The Subscriber Path compares your confirmed execution record against the model's
+        sealed positions — showing how price discipline and timing affected your realized results
+        vs. what the model targeted.
+      </p>
+      <a href="/membership.html" class="btn btn-primary">
+        <i data-lucide="zap" class="icon-sm"></i>
+        CREATE FREE ACCOUNT
+      </a>
+    </div>
+
+    <!-- Subscriber chart (shown when IS_SUBSCRIBER = true) -->
+    <div id="sub-path-chart" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-label">
+            <i data-lucide="trending-up" class="icon-sm icon-muted"></i>
+            MODEL VS SUBSCRIBER PATH
+          </span>
+        </div>
+        <div style="height:200px;position:relative;">
+          <canvas id="sub-chart"></canvas>
         </div>
       </div>
     </div>
 
   </div>
+</div>
 
-  <!-- Daily Card CTA -->
-  <div class="fade-in" style="margin-bottom:1.5rem;">
-    <div class="card" style="border-color:rgba(240,180,41,0.2);background:linear-gradient(135deg,rgba(240,180,41,0.04),rgba(240,180,41,0.01));">
-      <div style="padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-        <div>
-          <div style="font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0.4rem;">Today's Full Slate</div>
-          <div style="font-family:var(--font-head);font-size:1.4rem;letter-spacing:0.04em;color:var(--text);margin-bottom:0.3rem;">The Daily Card</div>
-          <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">All trades · Kelly sizing · EV · Book · Full filter view</div>
-        </div>
-        <a href="/daily-card.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.7rem 1.5rem;background:var(--gold);color:var(--bg);border-radius:4px;text-decoration:none;white-space:nowrap;font-weight:500;transition:background 0.2s;" onmouseover="this.style.background='#f5c842'" onmouseout="this.style.background='var(--gold)'">
-          View Today's Card →
-        </a>
-      </div>
-    </div>
-  </div>
 
-  <!-- W/L Record by Sport -->
-  <div class="fade-in">
-    <div class="section-header">
-      <span class="section-title">Performance by Sport</span>
-    </div>
-    <div class="record-grid" id="record-grid">
-      <div class="loading"><div class="spinner"></div></div>
-    </div>
-  </div>
+<!-- ── Footer ── -->
+<div id="footer-root"></div>
 
-  <!-- ── Model Scorecard — wired to scorecard.json (AssessorM) ── -->
-  <div style="margin-top:2.5rem;" class="fade-in" id="model-scorecard-section">
 
-    <!-- Section header with model KPI strip -->
-    <div class="section-header" style="margin-bottom:1rem;">
-      <span class="section-title">Model Scorecard</span>
-      <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);letter-spacing:0.06em;" id="model-last-updated">—</span>
-    </div>
-
-    <!-- Model overall KPIs -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.5rem;">
-      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Model Picks</div>
-        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--text);" id="model-picks">—</div>
-      </div>
-      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Record</div>
-        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--text);" id="model-record">—</div>
-      </div>
-      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Model ROI</div>
-        <div style="font-family:var(--font-head);font-size:1.5rem;" id="model-roi">—</div>
-      </div>
-      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Avg EV</div>
-        <div style="font-family:var(--font-head);font-size:1.5rem;color:var(--gold);" id="model-avg-ev">—</div>
-      </div>
-      <div style="background:var(--bg2);padding:1.1rem 1.25rem;">
-        <div style="font-family:var(--font-mono);font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem;">Avg CLV</div>
-        <div style="font-family:var(--font-head);font-size:1.5rem;" id="model-avg-clv">—</div>
-        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--muted);margin-top:0.2rem;">vs closing line</div>
-      </div>
-    </div>
-
-    <!-- Tabs: By Sport / By Bet Type / By Book -->
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;">
-      <button id="tab-sport"    onclick="switchTab('sport')"    style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid var(--gold);color:var(--gold);cursor:pointer;">By Sport</button>
-      <button id="tab-bettype"  onclick="switchTab('bettype')"  style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">By Bet Type</button>
-      <button id="tab-book"     onclick="switchTab('book')"     style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">By Book</button>
-      <button id="tab-recent"   onclick="switchTab('recent')"   style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.6rem 1.2rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;">Recent Form</button>
-    </div>
-
-    <div id="tab-content-sport"   class="tab-panel"></div>
-    <div id="tab-content-bettype" class="tab-panel" style="display:none;"></div>
-    <div id="tab-content-book"    class="tab-panel" style="display:none;"></div>
-    <div id="tab-content-recent"  class="tab-panel" style="display:none;"></div>
-
-  </div>
-
-</main>
-
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+     ════════════════════════════════════════════ -->
 <script>
-// ═══════════════════════════════════════════════════════════
-// ArcVest Dashboard — Data Layer
-// Reads from JSON exports written by SureBet.R
-// ═══════════════════════════════════════════════════════════
+const DATA_BASE = 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/main/Docs/data/';
+const IS_SUBSCRIBER = false; // Phase 2: set from auth session
 
-// Data file paths — relative to this HTML file
-// SureBet.R writes these to docs/data/ for GitHub Pages
-const DATA = {
-  picks:   'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/Docs/data/daily_picks.json',
-  paper:   'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/Docs/data/paper_log.json',
-  summary: 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/Docs/data/summary.json',
-  scorecard: 'data/scorecard.json'
-};
+lucide.createIcons();
 
-let allPicks = [];
-let paperLog = [];
-let summary  = {};
-let scorecard = {};
+// ── Nav ──
+(function() {
+  const path = window.location.pathname.replace(/\/$/, '') || '/index.html';
+  document.querySelectorAll('.nav-links a, .nav-mobile a').forEach(a => {
+    const href = a.getAttribute('href').replace(/\/$/, '');
+    if (path.endsWith(href)) a.classList.add('active');
+  });
+  const ham = document.getElementById('nav-hamburger');
+  const mob = document.getElementById('nav-mobile');
+  ham.addEventListener('click', () => {
+    const open = mob.classList.toggle('open');
+    ham.setAttribute('aria-expanded', open);
+  });
+})();
 
-// ── Inline data injection ─────────────────────────────────────────────────────
-// SureBet.R writes these variables directly into the HTML so the dashboard
-// works when opened locally via file:// (browsers block fetch() on file://).
-// On GitHub Pages, fetch() takes over automatically.
-var INLINE_PICKS   = [{"pick_id":"2386ce67f626833ac0a17b73b4944e41","Sport":"ATP - Francavilla","Date":"05/05/2026","Time (ET)":"10:15 AM","Home":"Martin Krumich","Away":"Gabriele Piraino","Bet Type":"ML","Pick":"Gabriele Piraino","Odds":3.25,"Book":"bet365","E(W%)":"51.9%","E(Spread)":null,"E(Total)":null,"EV":56.5,"Kelly":0.0627,"Risk $":1.93,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"c9478ebc9d6169cb378051732766b77a","Sport":"ATP - Francavilla","Date":"05/05/2026","Time (ET)":"12:00 PM","Home":"Justin Engel","Away":"Nikolas Sanchez Izquierdo","Bet Type":"ML","Pick":"Justin Engel","Odds":2.25,"Book":"Pncl","E(W%)":"52.3%","E(Spread)":null,"E(Total)":null,"EV":17.7,"Kelly":0.0353,"Risk $":1.09,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"b9f7e6a0b4dce411d68e268ad7cd874d","Sport":"ATP - Francavilla","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Juan Carlos Prado Angelo","Away":"Buvaysar Gadamauri","Bet Type":"ML","Pick":"Buvaysar Gadamauri","Odds":2.23,"Book":"Pncl","E(W%)":"48.8%","E(Spread)":null,"E(Total)":null,"EV":14.3,"Kelly":0.029,"Risk $":0.89,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"3432d5f6fd7ccdb8d38d01d300c8aa60","Sport":"ATP - Italian Open","Date":"05/05/2026","Time (ET)":"10:00 AM","Home":"Martin Landaluce","Away":"Andrea Pellegrino","Bet Type":"ML","Pick":"Andrea Pellegrino","Odds":2.4,"Book":"theScore Bet","E(W%)":"50.4%","E(Spread)":null,"E(Total)":null,"EV":19.1,"Kelly":0.034,"Risk $":1.05,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"e0c797263543803f178cb32786023c90","Sport":"ATP - Italian Open","Date":"05/05/2026","Time (ET)":"11:00 AM","Home":"Rinky Hijikata","Away":"Nikoloz Basilashvili","Bet Type":"ML","Pick":"Rinky Hijikata","Odds":2.3,"Book":"FanDuel","E(W%)":"49.2%","E(Spread)":null,"E(Total)":null,"EV":13.2,"Kelly":0.0253,"Risk $":0.78,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"0c7523976e0310609dabb86fc855d187","Sport":"ATP - Italian Open","Date":"05/05/2026","Time (ET)":"9:25 AM","Home":"Mccartney Kessler","Away":"Lucia Bronzetti","Bet Type":"ML","Pick":"Lucia Bronzetti","Odds":2.62,"Book":"bet365","E(W%)":"52.7%","E(Spread)":null,"E(Total)":null,"EV":23.8,"Kelly":0.0368,"Risk $":1.13,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"ab28676547c73c4364a221b8c33b9e39","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Alexandre Muller","Away":"Botic Van De Zandschulp","Bet Type":"ML","Pick":"Alexandre Muller","Odds":2.2,"Book":"bet365","E(W%)":"49.5%","E(Spread)":null,"E(Total)":null,"EV":8.9,"Kelly":0.0185,"Risk $":0.57,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"ce9a8565be37599c0ff5be2e43f7b3a9","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Alexei Popyrin","Away":"Matteo Berrettini","Bet Type":"ML","Pick":"Alexei Popyrin","Odds":2.75,"Book":"theScore Bet","E(W%)":"48.9%","E(Spread)":null,"E(Total)":null,"EV":34.4,"Kelly":0.0492,"Risk $":1.51,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"30219da0981c84a8ab46a4b3e9bc9d99","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Camilo Ugo Carabelli","Away":"Alexander Shevchenko","Bet Type":"ML","Pick":"Alexander Shevchenko","Odds":2.5,"Book":"theScore Bet","E(W%)":"52%","E(Spread)":null,"E(Total)":null,"EV":20.1,"Kelly":0.0335,"Risk $":1.03,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"339ee9a6747af2f1788bcd57730245dd","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Damir Dzumhur","Away":"Adrian Mannarino","Bet Type":"ML","Pick":"Adrian Mannarino","Odds":3.2,"Book":"DraftKings","E(W%)":"52.4%","E(Spread)":null,"E(Total)":null,"EV":52.4,"Kelly":0.0595,"Risk $":1.83,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"f39dfca73fadbb469ecadbad9230986a","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Denis Shapovalov","Away":"Mariano Navone","Bet Type":"ML","Pick":"Denis Shapovalov","Odds":2.5,"Book":"theScore Bet","E(W%)":"49.2%","E(Spread)":null,"E(Total)":null,"EV":23.1,"Kelly":0.0384,"Risk $":1.18,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"ec6c300642168f4a17e639a4230cad7c","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Fabian Marozsan","Away":"Vit Kopriva","Bet Type":"ML","Pick":"Vit Kopriva","Odds":2.19,"Book":"DraftKings","E(W%)":"50.3%","E(Spread)":null,"E(Total)":null,"EV":8.8,"Kelly":0.0185,"Risk $":0.57,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"33dc284b7a1b6e5fdad4bba42a42e88a","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Federico Coria","Away":"Alexander Blockx","Bet Type":"ML","Pick":"Federico Coria","Odds":3.75,"Book":"theScore Bet","E(W%)":"44.9%","E(Spread)":null,"E(Total)":null,"EV":68.5,"Kelly":0.0623,"Risk $":1.92,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"bb6a8a8e98c0d4a22a32557c7d6bc6e8","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Hamad Medjedovic","Away":"Valentin Royer","Bet Type":"ML","Pick":"Valentin Royer","Odds":3.1,"Book":"Hard Rock Bet","E(W%)":"52.5%","E(Spread)":null,"E(Total)":null,"EV":47.2,"Kelly":0.0562,"Risk $":1.73,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"94fde34057ee60ec86ad66d98d2e0d69","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Hubert Hurkacz","Away":"Yannick Hanfmann","Bet Type":"ML","Pick":"Yannick Hanfmann","Odds":2.75,"Book":"theScore Bet","E(W%)":"50.6%","E(Spread)":null,"E(Total)":null,"EV":36,"Kelly":0.0514,"Risk $":1.58,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"3225106b5312f9f12aba3e9355056b64","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Jenson Brooksby","Away":"Sebastian Baez","Bet Type":"ML","Pick":"Jenson Brooksby","Odds":3.46,"Book":"DraftKings","E(W%)":"49.2%","E(Spread)":null,"E(Total)":null,"EV":70.3,"Kelly":0.0714,"Risk $":2.2,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"c3a9f80f959d0323a9136e9563f2b1d4","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Lorenzo Sonego","Away":"Ignacio Buse","Bet Type":"ML","Pick":"Lorenzo Sonego","Odds":2.24,"Book":"DraftKings","E(W%)":"49.5%","E(Spread)":null,"E(Total)":null,"EV":10.8,"Kelly":0.0219,"Risk $":0.67,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"1ec0c62d03bdd4ea117d5b06360ee03c","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Marco Trungelliti","Away":"Zachary Svajda","Bet Type":"ML","Pick":"Zachary Svajda","Odds":2.5,"Book":"Hard Rock Bet","E(W%)":"52.8%","E(Spread)":null,"E(Total)":null,"EV":18,"Kelly":0.0301,"Risk $":0.93,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"7187235fadfd24a20dc499f200372f65","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Marcos Giron","Away":"Marin Cilic","Bet Type":"ML","Pick":"Marcos Giron","Odds":2.3,"Book":"theScore Bet","E(W%)":"49%","E(Spread)":null,"E(Total)":null,"EV":12.7,"Kelly":0.0243,"Risk $":0.75,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"5f7c178221b9ee02cab90e4cc22af073","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Matteo Arnaldi","Away":"Jaume Munar","Bet Type":"ML","Pick":"Jaume Munar","Odds":2.15,"Book":"theScore Bet","E(W%)":"50%","E(Spread)":null,"E(Total)":null,"EV":7.6,"Kelly":0.0165,"Risk $":0.51,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"949e5f243f3a3d839d12e1ac527ca671","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Roberto Bautista Agut","Away":"Francesco Maestrelli","Bet Type":"ML","Pick":"Francesco Maestrelli","Odds":2.6,"Book":"Hard Rock Bet","E(W%)":"53.2%","E(Spread)":null,"E(Total)":null,"EV":21.8,"Kelly":0.034,"Risk $":1.05,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"3d00c9ad20e95155915775302ed9d35d","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Roman Andres Burruchaga","Away":"Mattia Bellucci","Bet Type":"ML","Pick":"Mattia Bellucci","Odds":2.7,"Book":"Hard Rock Bet","E(W%)":"52.7%","E(Spread)":null,"E(Total)":null,"EV":27.6,"Kelly":0.0406,"Risk $":1.25,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"ea810cfccdc708ff39c1a20fd27c7339","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Sebastian Ofner","Away":"Alex Michelsen","Bet Type":"ML","Pick":"Alex Michelsen","Odds":2.34,"Book":"DraftKings","E(W%)":"50.4%","E(Spread)":null,"E(Total)":null,"EV":16,"Kelly":0.0299,"Risk $":0.92,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"45d7072a749c301b8f8a565fcd186669","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Thiago Agustin Tirante","Away":"Gianluca Cadenasso","Bet Type":"ML","Pick":"Gianluca Cadenasso","Odds":2.5,"Book":"theScore Bet","E(W%)":"52.3%","E(Spread)":null,"E(Total)":null,"EV":19.2,"Kelly":0.032,"Risk $":0.98,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"652dd249478812197489a6dfbe77f871","Sport":"ATP - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Zhizhen Zhang","Away":"Daniel Altmaier","Bet Type":"ML","Pick":"Zhizhen Zhang","Odds":2.25,"Book":"theScore Bet","E(W%)":"50.4%","E(Spread)":null,"E(Total)":null,"EV":13.5,"Kelly":0.0269,"Risk $":0.83,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"48d6bf566e69640cc8d53bbd44b31c99","Sport":"ATP - Santos","Date":"05/05/2026","Time (ET)":"1:30 PM","Home":"Miguel Tobon","Away":"Eduardo Ribeiro","Bet Type":"ML","Pick":"Miguel Tobon","Odds":2.75,"Book":"bet365","E(W%)":"49.9%","E(Spread)":null,"E(Total)":null,"EV":37.4,"Kelly":0.0534,"Risk $":1.64,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"9f35e9b455317f56799be02c9693b494","Sport":"ATP - Santos","Date":"05/06/2026","Time (ET)":"9:00 AM","Home":"Mateus Alves","Away":"Hernan Casanova","Bet Type":"ML","Pick":"Mateus Alves","Odds":2.37,"Book":"bet365","E(W%)":"47.4%","E(Spread)":null,"E(Total)":null,"EV":12.3,"Kelly":0.0224,"Risk $":0.69,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"c033ef90a0285f8a070c7e0ff174cc1b","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:41 PM","Home":"Detroit Tigers","Away":"Boston Red Sox","Bet Type":"ML","Pick":"Boston Red Sox","Odds":2.4,"Book":"theScore Bet","E(W%)":"49.1%","E(Spread)":null,"E(Total)":9.1,"EV":17.8,"Kelly":0.0317,"Risk $":0.98,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"2ba72b71d8205c846303ccdc427021d7","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:41 PM","Home":"Detroit Tigers","Away":"Boston Red Sox","Bet Type":"TOTAL","Pick":"Over 8.5","Odds":1.95,"Book":"theScore Bet","E(W%)":"55.2%","E(Spread)":null,"E(Total)":9.1,"EV":7.6,"Kelly":0.0201,"Risk $":0.62,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"d515908181dadcd8480842cc715a7459","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:41 PM","Home":"Miami Marlins","Away":"Baltimore Orioles","Bet Type":"TOTAL","Pick":"Over 8.5","Odds":1.91,"Book":"FanDuel","E(W%)":"58.6%","E(Spread)":null,"E(Total)":9.5,"EV":12,"Kelly":0.0329,"Risk $":1.01,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"057c9be289606b05c4021e7e54e00199","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:41 PM","Home":"Philadelphia Phillies","Away":"Athletics","Bet Type":"ML","Pick":"Athletics","Odds":2.6,"Book":"theScore Bet","E(W%)":"43.5%","E(Spread)":null,"E(Total)":9.5,"EV":13.1,"Kelly":0.0204,"Risk $":0.63,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"33988671be044861a37911cfc8816a63","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:41 PM","Home":"Tampa Bay Rays","Away":"Toronto Blue Jays","Bet Type":"TOTAL","Pick":"Over 7.5","Odds":2.05,"Book":"theScore Bet","E(W%)":"64.1%","E(Spread)":null,"E(Total)":9.1,"EV":31.4,"Kelly":0.0748,"Risk $":2.3,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"b115dd1b8584c5dedffd5494db438cd4","Sport":"MLB","Date":"05/05/2026","Time (ET)":"6:46 PM","Home":"Washington Nationals","Away":"Minnesota Twins","Bet Type":"TOTAL","Pick":"Over 9.5","Odds":2.05,"Book":"theScore Bet","E(W%)":"53.2%","E(Spread)":null,"E(Total)":9.9,"EV":9.2,"Kelly":0.0218,"Risk $":0.67,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"ee8767d24db186b5267629630836de02","Sport":"MLB","Date":"05/05/2026","Time (ET)":"7:40 PM","Home":"Chicago Cubs","Away":"Cincinnati Reds","Bet Type":"ML","Pick":"Cincinnati Reds","Odds":2.45,"Book":"theScore Bet","E(W%)":"45.9%","E(Spread)":null,"E(Total)":8.6,"EV":12.4,"Kelly":0.0214,"Risk $":0.66,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"5d5eae22aac40f91c399172ee6792aaf","Sport":"MLB","Date":"05/05/2026","Time (ET)":"7:41 PM","Home":"Kansas City Royals","Away":"Cleveland Guardians","Bet Type":"ML","Pick":"Kansas City Royals","Odds":2.05,"Book":"theScore Bet","E(W%)":"53%","E(Spread)":null,"E(Total)":7.1,"EV":8.7,"Kelly":0.0207,"Risk $":0.64,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"22a367c39fac9b9960f3bec0a4a31ada","Sport":"MLB","Date":"05/05/2026","Time (ET)":"7:46 PM","Home":"St. Louis Cardinals","Away":"Milwaukee Brewers","Bet Type":"TOTAL","Pick":"Over 7.5","Odds":1.85,"Book":"FanDuel","E(W%)":"62.5%","E(Spread)":null,"E(Total)":8.9,"EV":15.6,"Kelly":0.0459,"Risk $":1.41,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"36013de4cf62f2f070b67c863fad1ded","Sport":"MLB","Date":"05/05/2026","Time (ET)":"8:11 PM","Home":"Houston Astros","Away":"Los Angeles Dodgers","Bet Type":"ML","Pick":"Houston Astros","Odds":2.9,"Book":"Fanatics","E(W%)":"49.3%","E(Spread)":null,"E(Total)":8.7,"EV":42.9,"Kelly":0.0564,"Risk $":1.74,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"856cdda2fe7781ef53eb65b9e885a381","Sport":"MLB","Date":"05/05/2026","Time (ET)":"8:41 PM","Home":"Colorado Rockies","Away":"New York Mets","Bet Type":"TOTAL","Pick":"Over 9.5","Odds":1.93,"Book":"DraftKings","E(W%)":"56.9%","E(Spread)":null,"E(Total)":10.3,"EV":9.8,"Kelly":0.0264,"Risk $":0.81,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"a9af2276718104c259ea9cf19c7dc6a6","Sport":"MLB","Date":"05/05/2026","Time (ET)":"9:41 PM","Home":"Seattle Mariners","Away":"Atlanta Braves","Bet Type":"TOTAL","Pick":"Over 7.5","Odds":1.91,"Book":"FanDuel","E(W%)":"64.4%","E(Spread)":null,"E(Total)":9.1,"EV":22.9,"Kelly":0.063,"Risk $":1.94,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"8b54bde93f8c2211faa3eff1d040a65e","Sport":"MLB","Date":"05/05/2026","Time (ET)":"9:46 PM","Home":"San Francisco Giants","Away":"San Diego Padres","Bet Type":"TOTAL","Pick":"Over 7.5","Odds":2.05,"Book":"theScore Bet","E(W%)":"53.4%","E(Spread)":null,"E(Total)":7.9,"EV":9.4,"Kelly":0.0224,"Risk $":0.69,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"1d77a1e27657236be3b5ee65404cef9d","Sport":"NBA","Date":"05/05/2026","Time (ET)":"7:10 PM","Home":"Detroit Pistons","Away":"Cleveland Cavaliers","Bet Type":"TOTAL","Pick":"Over 215.5","Odds":1.88,"Book":"FanDuel","E(W%)":"59.5%","E(Spread)":null,"E(Total)":220,"EV":8.9,"Kelly":0.0477,"Risk $":1.47,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"d95b5e30bdc0244e0120285df3b10c41","Sport":"NBA","Date":"05/05/2026","Time (ET)":"8:40 PM","Home":"Oklahoma City Thunder","Away":"Los Angeles Lakers","Bet Type":"Spread","Pick":"Los Angeles Lakers +15.5","Odds":1.91,"Book":"DraftKings","E(W%)":"35.2%","E(Spread)":4.3,"E(Total)":217.8,"EV":33.7,"Kelly":0.1767,"Risk $":5.44,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"2662541ff7bf9dc3bf37757b0b6f538a","Sport":"NBA","Date":"05/05/2026","Time (ET)":"8:40 PM","Home":"Oklahoma City Thunder","Away":"Los Angeles Lakers","Bet Type":"TOTAL","Pick":"Over 213.5","Odds":1.91,"Book":"DraftKings","E(W%)":"64.8%","E(Spread)":null,"E(Total)":217.8,"EV":8.7,"Kelly":0.0455,"Risk $":1.4,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"a909c1d40f4b4537e0aa0083548b4d25","Sport":"NBA","Date":"05/06/2026","Time (ET)":"7:10 PM","Home":"New York Knicks","Away":"Philadelphia 76ers","Bet Type":"ML","Pick":"Philadelphia 76ers","Odds":3.35,"Book":"FanDuel","E(W%)":"52.4%","E(Spread)":null,"E(Total)":null,"EV":59.3,"Kelly":0.0631,"Risk $":1.94,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"f9eb6b86e4b5cee7fe58aaeb5163a42a","Sport":"NBA","Date":"05/06/2026","Time (ET)":"7:10 PM","Home":"New York Knicks","Away":"Philadelphia 76ers","Bet Type":"TOTAL","Pick":"Over 214.5","Odds":1.91,"Book":"Fanatics","E(W%)":"66.2%","E(Spread)":null,"E(Total)":217.7,"EV":6.4,"Kelly":0.0334,"Risk $":1.03,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"9bee8ef83f0a35a1d6c105f14bf60ccc","Sport":"NBA","Date":"05/06/2026","Time (ET)":"9:40 PM","Home":"San Antonio Spurs","Away":"Minnesota Timberwolves","Bet Type":"ML","Pick":"Minnesota Timberwolves","Odds":4,"Book":"Hard Rock Bet","E(W%)":"38.1%","E(Spread)":null,"E(Total)":null,"EV":147.8,"Kelly":0.1231,"Risk $":3.79,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"c84505f6562616e2830a7d7a976f5aaf","Sport":"NBA","Date":"05/06/2026","Time (ET)":"9:40 PM","Home":"San Antonio Spurs","Away":"Minnesota Timberwolves","Bet Type":"Spread","Pick":"Minnesota Timberwolves +9.5","Odds":1.91,"Book":"DraftKings","E(W%)":"39.8%","E(Spread)":2.9,"E(Total)":221.1,"EV":19.8,"Kelly":0.1038,"Risk $":3.19,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"1df4213b7720374956d4628b6ebc0dd1","Sport":"NBA","Date":"05/06/2026","Time (ET)":"9:40 PM","Home":"San Antonio Spurs","Away":"Minnesota Timberwolves","Bet Type":"TOTAL","Pick":"Over 215.5","Odds":1.91,"Book":"DraftKings","E(W%)":"60.2%","E(Spread)":null,"E(Total)":221.1,"EV":11.3,"Kelly":0.0592,"Risk $":1.82,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"1306bd04541a5dc33f4737cdbe6b2e5b","Sport":"NHL","Date":"05/06/2026","Time (ET)":"7:20 PM","Home":"Buffalo Sabres","Away":"Montreal Canadiens","Bet Type":"ML","Pick":"Buffalo Sabres","Odds":1.8,"Book":"Hard Rock Bet","E(W%)":"60.3%","E(Spread)":null,"E(Total)":null,"EV":8.6,"Kelly":0.0267,"Risk $":0.82,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"a1fd1103ae1e97e5b0a61c25530ce755","Sport":"NHL","Date":"05/06/2026","Time (ET)":"9:50 PM","Home":"Vegas Golden Knights","Away":"Anaheim Ducks","Bet Type":"ML","Pick":"Anaheim Ducks","Odds":2.36,"Book":"DraftKings","E(W%)":"53.2%","E(Spread)":null,"E(Total)":null,"EV":10.4,"Kelly":0.0191,"Risk $":0.59,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"57ab0b50593b3c15259f5386895bc73c","Sport":"NHL","Date":"05/06/2026","Time (ET)":"9:50 PM","Home":"Vegas Golden Knights","Away":"Anaheim Ducks","Bet Type":"TOTAL","Pick":"Over 6","Odds":1.83,"Book":"Hard Rock Bet","E(W%)":"53.3%","E(Spread)":null,"E(Total)":6.9,"EV":15.2,"Kelly":0.084,"Risk $":2.58,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"69f5e872d7c765575310e70094bb92e8","Sport":"SOCCER-UCL","Date":"05/05/2026","Time (ET)":"3:00 PM","Home":"Arsenal","Away":"Atletico Madrid","Bet Type":"ML","Pick":"Atletico Madrid ML","Odds":5.75,"Book":"DraftKings","E(W%)":"25.9%","E(Spread)":null,"E(Total)":2.7,"EV":49.2,"Kelly":0.0259,"Risk $":0.8,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"5feaff7142e712222dd326087ce096d4","Sport":"SOCCER-UCL","Date":"05/06/2026","Time (ET)":"3:00 PM","Home":"Bayern München","Away":"Paris Saint Germain","Bet Type":"BTTS","Pick":"Both Teams to Score","Odds":1.26,"Book":"DraftKings","E(W%)":"85.8%","E(Spread)":null,"E(Total)":5.3,"EV":8.1,"Kelly":0.0777,"Risk $":2.39,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"a8ff9d5197b59a9ccd093a33de6288db","Sport":"SOCCER-UCL","Date":"05/06/2026","Time (ET)":"3:00 PM","Home":"Bayern München","Away":"Paris Saint Germain","Bet Type":"ML","Pick":"Paris Saint Germain ML","Odds":4.2,"Book":"theScore Bet","E(W%)":"33.5%","E(Spread)":null,"E(Total)":5.3,"EV":40.7,"Kelly":0.0318,"Risk $":0.98,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"34833435e5297631fd8ac781e9d705c5","Sport":"WTA - Italian Open","Date":"05/05/2026","Time (ET)":"10:00 AM","Home":"Anastasia Zakharova","Away":"Dayana Yastremska","Bet Type":"ML","Pick":"Anastasia Zakharova","Odds":2.5,"Book":"Hard Rock Bet","E(W%)":"47%","E(Spread)":null,"E(Total)":null,"EV":17.6,"Kelly":0.0293,"Risk $":0.9,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"67fb91415dda0907adbbb809631b8514","Sport":"WTA - Italian Open","Date":"05/05/2026","Time (ET)":"10:00 AM","Home":"Anhelina Kalinina","Away":"Katie Volynets","Bet Type":"ML","Pick":"Katie Volynets","Odds":5.5,"Book":"FanDuel","E(W%)":"52%","E(Spread)":null,"E(Total)":null,"EV":163.9,"Kelly":0.091,"Risk $":2.8,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"2a488aa7f584c6c8ca2925d378dc6e3a","Sport":"WTA - Italian Open","Date":"05/05/2026","Time (ET)":"11:00 AM","Home":"Martina Trevisan","Away":"Talia Gibson","Bet Type":"ML","Pick":"Martina Trevisan","Odds":2.6,"Book":"theScore Bet","E(W%)":"49.6%","E(Spread)":null,"E(Total)":null,"EV":28.9,"Kelly":0.0452,"Risk $":1.39,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"27f99cbb3d47d03274fb2a85489c8ec6","Sport":"WTA - Italian Open","Date":"05/05/2026","Time (ET)":"11:00 AM","Home":"Zeynep Sonmez","Away":"Jennifer Ruggeri","Bet Type":"ML","Pick":"Jennifer Ruggeri","Odds":2.55,"Book":"Hard Rock Bet","E(W%)":"54.9%","E(Spread)":null,"E(Total)":null,"EV":15,"Kelly":0.0242,"Risk $":0.74,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"b11810cb61ffd12d87226ed919632683","Sport":"WTA - Italian Open","Date":"05/05/2026","Time (ET)":"12:00 PM","Home":"Ann Li","Away":"Shuai Zhang","Bet Type":"ML","Pick":"Shuai Zhang","Odds":3.6,"Book":"theScore Bet","E(W%)":"52.5%","E(Spread)":null,"E(Total)":null,"EV":71.1,"Kelly":0.0684,"Risk $":2.1,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"79501e539886d9d649041e3924578776","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Jaqueline Cristian","Away":"Beatriz Haddad Maia","Bet Type":"ML","Pick":"Beatriz Haddad Maia","Odds":2.75,"Book":"theScore Bet","E(W%)":"51.2%","E(Spread)":null,"E(Total)":null,"EV":34.3,"Kelly":0.0489,"Risk $":1.51,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"f29b6507bea9bac6428d8d2a56789660","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Karolina Pliskova","Away":"Jessica Bouzas Maneiro","Bet Type":"ML","Pick":"Jessica Bouzas Maneiro","Odds":2.35,"Book":"theScore Bet","E(W%)":"51.9%","E(Spread)":null,"E(Total)":null,"EV":13,"Kelly":0.024,"Risk $":0.74,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"74deeeee0ed5dc5a43e128404b0d07a8","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Katerina Siniakova","Away":"Lois Boisson","Bet Type":"ML","Pick":"Lois Boisson","Odds":3.4,"Book":"theScore Bet","E(W%)":"49.1%","E(Spread)":null,"E(Total)":null,"EV":73.1,"Kelly":0.0761,"Risk $":2.34,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"b3a3af13be97a71db5df71d95677263a","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Laura Siegemund","Away":"Sara Bejlek","Bet Type":"ML","Pick":"Laura Siegemund","Odds":2.4,"Book":"theScore Bet","E(W%)":"48.4%","E(Spread)":null,"E(Total)":null,"EV":16.2,"Kelly":0.029,"Risk $":0.89,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"be3e21d2e6aef3bf25b3cb52b74bec01","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Magda Linette","Away":"Tatjana Maria","Bet Type":"ML","Pick":"Tatjana Maria","Odds":3.24,"Book":"DraftKings","E(W%)":"53.5%","E(Spread)":null,"E(Total)":null,"EV":50.8,"Kelly":0.0567,"Risk $":1.74,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"561f99d88bb72875bba9fb5d53a8b87e","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"5:00 AM","Home":"Peyton Stearns","Away":"Janice Tjen","Bet Type":"ML","Pick":"Janice Tjen","Odds":2.75,"Book":"theScore Bet","E(W%)":"52.1%","E(Spread)":null,"E(Total)":null,"EV":31.8,"Kelly":0.0454,"Risk $":1.4,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false},{"pick_id":"52cd2d3805fd490bfe29e857886c3cb7","Sport":"WTA - Italian Open","Date":"05/06/2026","Time (ET)":"8:00 AM","Home":"Katie Boulter","Away":"Eva Lys","Bet Type":"ML","Pick":"Eva Lys","Odds":2.3,"Book":"Hard Rock Bet","E(W%)":"50.4%","E(Spread)":null,"E(Total)":null,"EV":14,"Kelly":0.027,"Risk $":0.83,"placed":null,"actual_odds":null,"actual_spread":null,"actual_total":null,"actual_book":null,"Open Position":false}];  // injected by R
-var INLINE_PAPER   = [{"date":"2026-04-23","starting_bankroll":1000,"total_risked":35.1085,"actual_pnl_dollar":-7.097,"model_pnl_dollar":-7.097,"ending_bankroll":992.903,"daily_roi":-0.0071,"cumulative_roi":-0.0071,"wins":5,"losses":12,"pushes":0},{"date":"2026-04-24","starting_bankroll":992.903,"total_risked":65.8256,"actual_pnl_dollar":0.6182,"model_pnl_dollar":0.684,"ending_bankroll":993.5212,"daily_roi":0.0006,"cumulative_roi":0.0006,"wins":14,"losses":21,"pushes":0},{"date":"2026-04-25","starting_bankroll":993.5212,"total_risked":86.5874,"actual_pnl_dollar":-15.5889,"model_pnl_dollar":-17.147,"ending_bankroll":977.9324,"daily_roi":-0.0157,"cumulative_roi":-0.0157,"wins":12,"losses":25,"pushes":2},{"date":"2026-04-26","starting_bankroll":977.9324,"total_risked":72.6603,"actual_pnl_dollar":-19.8423,"model_pnl_dollar":-19.7115,"ending_bankroll":958.0901,"daily_roi":-0.0203,"cumulative_roi":-0.0203,"wins":10,"losses":16,"pushes":0},{"date":"2026-04-27","starting_bankroll":958.0901,"total_risked":62.0461,"actual_pnl_dollar":-7.8259,"model_pnl_dollar":-7.8259,"ending_bankroll":950.2642,"daily_roi":-0.0082,"cumulative_roi":-0.0082,"wins":9,"losses":15,"pushes":0},{"date":"2026-04-28","starting_bankroll":950.2642,"total_risked":100.1568,"actual_pnl_dollar":0.9563,"model_pnl_dollar":1.7775,"ending_bankroll":951.2205,"daily_roi":0.001,"cumulative_roi":0.001,"wins":15,"losses":17,"pushes":2},{"date":"2026-04-29","starting_bankroll":951.2205,"total_risked":88.4703,"actual_pnl_dollar":-3.5204,"model_pnl_dollar":-4.1785,"ending_bankroll":947.7001,"daily_roi":-0.0037,"cumulative_roi":-0.0037,"wins":10,"losses":17,"pushes":1},{"date":"2026-04-30","starting_bankroll":947.7001,"total_risked":85.635,"actual_pnl_dollar":33.2462,"model_pnl_dollar":32.4129,"ending_bankroll":980.9463,"daily_roi":0.0351,"cumulative_roi":0.0351,"wins":12,"losses":9,"pushes":1},{"date":"2026-05-01","starting_bankroll":980.9463,"total_risked":53.3732,"actual_pnl_dollar":6.911,"model_pnl_dollar":7.5774,"ending_bankroll":987.8573,"daily_roi":0.007,"cumulative_roi":0.007,"wins":12,"losses":10,"pushes":0},{"date":"2026-05-02","starting_bankroll":987.8573,"total_risked":84.5083,"actual_pnl_dollar":-41.1773,"model_pnl_dollar":-40.5907,"ending_bankroll":946.68,"daily_roi":-0.0417,"cumulative_roi":-0.0417,"wins":8,"losses":24,"pushes":0},{"date":"2026-05-03","starting_bankroll":946.68,"total_risked":52.024,"actual_pnl_dollar":2.6036,"model_pnl_dollar":2.6036,"ending_bankroll":949.2836,"daily_roi":0.0028,"cumulative_roi":0.0028,"wins":8,"losses":14,"pushes":1},{"date":"2026-05-04","starting_bankroll":949.2836,"total_risked":1334.8121,"actual_pnl_dollar":-23.5789,"model_pnl_dollar":-20.6042,"ending_bankroll":925.7046,"daily_roi":-0.0248,"cumulative_roi":-0.0248,"wins":10,"losses":16,"pushes":0}];  // injected by R
-var INLINE_SUMMARY = {"starting_bankroll":1000,"current_bankroll":925.7,"total_pnl":-74.3,"cumulative_roi_pct":-2.484,"today_risk":90.93,"last_run":"2026-05-05 11:36","record_by_sport":{"MLB":{"wins":56,"losses":63,"pushes":4,"actual_roi":0.0921},"ATP - Madrid Open":{"wins":11,"losses":29,"pushes":0,"actual_roi":-0.2542},"NHL":{"wins":19,"losses":21,"pushes":0,"actual_roi":-0.5953},"NBA":{"wins":18,"losses":13,"pushes":0,"actual_roi":0.192},"WTA - Madrid Open":{"wins":2,"losses":19,"pushes":0,"actual_roi":-0.7325},"SOCCER-MLS":{"wins":4,"losses":9,"pushes":0,"actual_roi":-0.1428},"SOCCER-LIG1":{"wins":3,"losses":8,"pushes":1,"actual_roi":-0.2006},"SOCCER-SERA":{"wins":3,"losses":4,"pushes":0,"actual_roi":-0.3617},"SOCCER-EPL":{"wins":2,"losses":3,"pushes":0,"actual_roi":1.4619},"SOCCER-LIGA":{"wins":0,"losses":5,"pushes":0,"actual_roi":-1},"ATP - Jiujiang (China) - Qualification":{"wins":2,"losses":2,"pushes":0,"actual_roi":0.0635},"ATP - Madrid":{"wins":0,"losses":3,"pushes":0,"actual_roi":-1},"ATP - Savannah":{"wins":0,"losses":3,"pushes":0,"actual_roi":-1},"SOCCER-BUND":{"wins":0,"losses":3,"pushes":1,"actual_roi":-0.7084},"SOCCER-UCL":{"wins":1,"losses":2,"pushes":1,"actual_roi":-0.6507},"WTA - Madrid":{"wins":2,"losses":1,"pushes":0,"actual_roi":0.3744},"ATP - Abidjan 2":{"wins":0,"losses":2,"pushes":0,"actual_roi":-1},"ATP - Cagliari":{"wins":0,"losses":2,"pushes":0,"actual_roi":-1},"SOCCER-UEL":{"wins":1,"losses":1,"pushes":0,"actual_roi":0.425},"ATP - Abidjan":{"wins":0,"losses":1,"pushes":0,"actual_roi":-1},"ATP - Aix en Provence":{"wins":0,"losses":1,"pushes":0,"actual_roi":-1},"ATP - Gwangju":{"wins":0,"losses":1,"pushes":0,"actual_roi":-1},"ATP - La Bisbal D'Emporda":{"wins":1,"losses":0,"pushes":0,"actual_roi":3}}};  // injected by R
-var INLINE_SCORECARD = {"last_updated":"2026-05-05 09:21","reset_baseline":"2026-04-23","overall":{"picks":564,"wins":196,"losses":351,"pushes":17,"model_roi":21.86,"avg_ev":33.07,"avg_clv":0.0089,"price_capture_alpha":0.1667,"outcome_variance":20.97,"selection_alpha":33.07},"by_sport":{"MLB":{"picks":152,"wins":73,"losses":73,"pushes":6,"model_roi":18.06,"avg_ev":18.26,"price_capture_alpha":0.1447,"outcome_variance":18.2,"selection_alpha":18.26},"NBA":{"picks":62,"wins":34,"losses":28,"pushes":0,"model_roi":115.46,"avg_ev":49.04,"price_capture_alpha":0.1935,"outcome_variance":116.85,"selection_alpha":49.04},"SOCCER-MLS":{"picks":60,"wins":11,"losses":47,"pushes":2,"model_roi":-53.31,"avg_ev":35.89,"price_capture_alpha":0.1667,"outcome_variance":-62.21,"selection_alpha":35.89},"SOCCER-SERA":{"picks":42,"wins":18,"losses":24,"pushes":0,"model_roi":13.96,"avg_ev":34.61,"price_capture_alpha":0.1429,"outcome_variance":16.15,"selection_alpha":34.61},"NHL":{"picks":39,"wins":18,"losses":21,"pushes":0,"model_roi":-20.74,"avg_ev":18.65,"price_capture_alpha":0.2308,"outcome_variance":-17.79,"selection_alpha":18.65},"SOCCER-LIG1":{"picks":38,"wins":9,"losses":26,"pushes":3,"model_roi":-35.87,"avg_ev":37.76,"price_capture_alpha":0.1579,"outcome_variance":-33.5,"selection_alpha":37.76},"SOCCER-LIGA":{"picks":33,"wins":2,"losses":29,"pushes":2,"model_roi":-57.99,"avg_ev":32.82,"price_capture_alpha":0.303,"outcome_variance":-57.02,"selection_alpha":32.82},"SOCCER-EPL":{"picks":27,"wins":6,"losses":18,"pushes":3,"model_roi":-29.54,"avg_ev":29.05,"price_capture_alpha":0.3333,"outcome_variance":-69.17,"selection_alpha":29.05},"ATP - Madrid Open":{"picks":26,"wins":5,"losses":21,"pushes":0,"model_roi":-31.62,"avg_ev":50,"price_capture_alpha":0.0385,"outcome_variance":-27.66,"selection_alpha":50},"SOCCER-BUND":{"picks":23,"wins":6,"losses":16,"pushes":1,"model_roi":-9.82,"avg_ev":27.91,"price_capture_alpha":0.2174,"outcome_variance":-21.3,"selection_alpha":27.91},"WTA - Madrid Open":{"picks":16,"wins":2,"losses":14,"pushes":0,"model_roi":-72.25,"avg_ev":93.86,"price_capture_alpha":0.1875,"outcome_variance":-20.06,"selection_alpha":93.86},"ATP - Jiujiang (China) - Qualification":{"picks":7,"wins":2,"losses":5,"pushes":0,"model_roi":-11.11,"avg_ev":29.76,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":29.76},"SOCCER-UCL":{"picks":6,"wins":1,"losses":5,"pushes":0,"model_roi":-76.47,"avg_ev":22.17,"price_capture_alpha":0.1667,"outcome_variance":-76.97,"selection_alpha":22.17},"SOCCER-UEL":{"picks":6,"wins":1,"losses":5,"pushes":0,"model_roi":-75.4,"avg_ev":40.16,"price_capture_alpha":0,"outcome_variance":-69.56,"selection_alpha":40.16},"ATP - Gwangju":{"picks":4,"wins":1,"losses":3,"pushes":0,"model_roi":-36.17,"avg_ev":30.4,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":30.4},"ATP - Savannah":{"picks":4,"wins":0,"losses":4,"pushes":0,"model_roi":-100,"avg_ev":22.23,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":22.23},"WTA - Madrid":{"picks":4,"wins":3,"losses":1,"pushes":0,"model_roi":91.85,"avg_ev":43.17,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":43.17},"ATP - Cagliari":{"picks":3,"wins":0,"losses":3,"pushes":0,"model_roi":-100,"avg_ev":63.58,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":63.58},"ATP - Madrid":{"picks":3,"wins":0,"losses":3,"pushes":0,"model_roi":-100,"avg_ev":50.85,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":50.85},"ATP - Abidjan":{"picks":2,"wins":0,"losses":2,"pushes":0,"model_roi":-100,"avg_ev":71.19,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":71.19},"ATP - La Bisbal D'Emporda":{"picks":2,"wins":2,"losses":0,"pushes":0,"model_roi":255.56,"avg_ev":63.33,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":63.33},"ATP - Abidjan 2":{"picks":1,"wins":0,"losses":1,"pushes":0,"model_roi":-100,"avg_ev":54.27,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":54.27},"ATP - Oeiras 4 (Portugal) - Qualification":{"picks":1,"wins":1,"losses":0,"pushes":0,"model_roi":175,"avg_ev":35.75,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":35.75},"ATP - Ostrava":{"picks":1,"wins":0,"losses":1,"pushes":0,"model_roi":-100,"avg_ev":54.67,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":54.67},"ATP - Rome":{"picks":1,"wins":1,"losses":0,"pushes":0,"model_roi":137,"avg_ev":7.44,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":7.44},"ATP - Saint Malo":{"picks":1,"wins":0,"losses":1,"pushes":0,"model_roi":-100,"avg_ev":26.52,"price_capture_alpha":0,"outcome_variance":null,"selection_alpha":26.52}},"by_bet_type":{"DC":{"picks":30,"wins":13,"losses":17,"pushes":0,"model_roi":54.89,"price_capture_alpha":0.3667,"outcome_variance":-3.28,"selection_alpha":51.15},"ML":{"picks":261,"wins":63,"losses":198,"pushes":0,"model_roi":65.92,"price_capture_alpha":0.1801,"outcome_variance":71.42,"selection_alpha":38.81},"SPREAD":{"picks":36,"wins":21,"losses":15,"pushes":0,"model_roi":15.89,"price_capture_alpha":0.0833,"outcome_variance":16.03,"selection_alpha":18.76},"TOTAL":{"picks":237,"wins":99,"losses":121,"pushes":17,"model_roi":-15.6,"price_capture_alpha":0.1392,"outcome_variance":-15.46,"selection_alpha":26.64}},"by_book":{"fanduel":{"picks":156,"wins":55,"losses":101,"pushes":0,"model_roi":92.6,"price_capture_alpha":0.2436},"espnbet":{"picks":88,"wins":28,"losses":60,"pushes":0,"model_roi":-30.82,"price_capture_alpha":0.1818},"draftkings":{"picks":72,"wins":30,"losses":39,"pushes":3,"model_roi":12.31,"price_capture_alpha":0.0972},"fanatics":{"picks":57,"wins":20,"losses":34,"pushes":3,"model_roi":15.69,"price_capture_alpha":0.1404},"bovada":{"picks":48,"wins":20,"losses":23,"pushes":5,"model_roi":-29.62,"price_capture_alpha":0.1875},"hardrockbet":{"picks":34,"wins":8,"losses":26,"pushes":0,"model_roi":52.49,"price_capture_alpha":0.1471},"bet365":{"picks":26,"wins":8,"losses":18,"pushes":0,"model_roi":-3.28,"price_capture_alpha":0},"betonlineag":{"picks":18,"wins":7,"losses":8,"pushes":3,"model_roi":-27.84,"price_capture_alpha":0},"lowvig":{"picks":17,"wins":3,"losses":13,"pushes":1,"model_roi":-70.44,"price_capture_alpha":0.3529},"betus":{"picks":14,"wins":3,"losses":9,"pushes":2,"model_roi":-54.08,"price_capture_alpha":0.0714},"ballybet":{"picks":11,"wins":5,"losses":6,"pushes":0,"model_roi":67.94,"price_capture_alpha":0.1818},"Pncl":{"picks":10,"wins":3,"losses":7,"pushes":0,"model_roi":-40.25,"price_capture_alpha":0},"betparx":{"picks":5,"wins":3,"losses":2,"pushes":0,"model_roi":-29.27,"price_capture_alpha":0},"betrivers":{"picks":4,"wins":2,"losses":2,"pushes":0,"model_roi":70.82,"price_capture_alpha":0.25},"mybookieag":{"picks":3,"wins":0,"losses":3,"pushes":0,"model_roi":-100,"price_capture_alpha":0.3333},"betanysports":{"picks":1,"wins":1,"losses":0,"pushes":0,"model_roi":110,"price_capture_alpha":0}},"recent_form":{"2026-04-23":{"date":"2026-04-23","picks":19,"wins":5,"losses":14,"pushes":0,"model_roi":-0.2757,"avg_ev":0.4955,"avg_clv":0},"2026-04-24":{"date":"2026-04-24","picks":46,"wins":19,"losses":27,"pushes":0,"model_roi":-0.1586,"avg_ev":0.3384,"avg_clv":-0.2519},"2026-04-25":{"date":"2026-04-25","picks":102,"wins":37,"losses":62,"pushes":3,"model_roi":0.0767,"avg_ev":0.3329,"avg_clv":0.1819},"2026-04-26":{"date":"2026-04-26","picks":86,"wins":29,"losses":54,"pushes":3,"model_roi":-0.2266,"avg_ev":0.3328,"avg_clv":-0.0125},"2026-04-27":{"date":"2026-04-27","picks":35,"wins":9,"losses":25,"pushes":1,"model_roi":-0.4767,"avg_ev":0.4065,"avg_clv":-0.0248},"2026-04-28":{"date":"2026-04-28","picks":40,"wins":17,"losses":21,"pushes":2,"model_roi":0.1706,"avg_ev":0.3295,"avg_clv":0.0159},"2026-04-29":{"date":"2026-04-29","picks":32,"wins":13,"losses":19,"pushes":0,"model_roi":0.0516,"avg_ev":0.2983,"avg_clv":-0.0141},"2026-04-30":{"date":"2026-04-30","picks":29,"wins":15,"losses":13,"pushes":1,"model_roi":0.1331,"avg_ev":0.3287,"avg_clv":0.005},"2026-05-01":{"date":"2026-05-01","picks":34,"wins":14,"losses":20,"pushes":0,"model_roi":-0.0525,"avg_ev":0.246,"avg_clv":-0.0024},"2026-05-02":{"date":"2026-05-02","picks":55,"wins":12,"losses":39,"pushes":4,"model_roi":-0.1241,"avg_ev":0.2828,"avg_clv":-0.0185},"2026-05-03":{"date":"2026-05-03","picks":63,"wins":17,"losses":43,"pushes":3,"model_roi":-0.2152,"avg_ev":0.3303,"avg_clv":0.0082},"2026-05-04":{"date":"2026-05-04","picks":23,"wins":9,"losses":14,"pushes":0,"model_roi":1.2543,"avg_ev":0.3375,"avg_clv":-0.0568}},"equity_curve":[{"date":"2026-04-23","bankroll":724.3,"daily_pnl":-275.7,"daily_roi":-27.57,"cumulative_roi":-27.57,"picks_settled":19,"clv_positive_pct":0},{"date":"2026-04-24","bankroll":609.43,"daily_pnl":-114.87,"daily_roi":-15.86,"cumulative_roi":-39.06,"picks_settled":46,"clv_positive_pct":13},{"date":"2026-04-25","bankroll":656.17,"daily_pnl":46.74,"daily_roi":7.67,"cumulative_roi":-34.38,"picks_settled":102,"clv_positive_pct":19.6},{"date":"2026-04-26","bankroll":507.48,"daily_pnl":-148.69,"daily_roi":-22.66,"cumulative_roi":-49.25,"picks_settled":86,"clv_positive_pct":5.8},{"date":"2026-04-27","bankroll":265.56,"daily_pnl":-241.92,"daily_roi":-47.67,"cumulative_roi":-73.44,"picks_settled":35,"clv_positive_pct":17.1},{"date":"2026-04-28","bankroll":310.86,"daily_pnl":45.3,"daily_roi":17.06,"cumulative_roi":-68.91,"picks_settled":40,"clv_positive_pct":10},{"date":"2026-04-29","bankroll":326.9,"daily_pnl":16.04,"daily_roi":5.16,"cumulative_roi":-67.31,"picks_settled":32,"clv_positive_pct":12.5},{"date":"2026-04-30","bankroll":370.41,"daily_pnl":43.51,"daily_roi":13.31,"cumulative_roi":-62.96,"picks_settled":29,"clv_positive_pct":10.3},{"date":"2026-05-01","bankroll":350.96,"daily_pnl":-19.45,"daily_roi":-5.25,"cumulative_roi":-64.9,"picks_settled":34,"clv_positive_pct":26.5},{"date":"2026-05-02","bankroll":307.41,"daily_pnl":-43.55,"daily_roi":-12.41,"cumulative_roi":-69.26,"picks_settled":55,"clv_positive_pct":29.1},{"date":"2026-05-03","bankroll":241.26,"daily_pnl":-66.15,"daily_roi":-21.52,"cumulative_roi":-75.87,"picks_settled":63,"clv_positive_pct":30.2},{"date":"2026-05-04","bankroll":543.87,"daily_pnl":302.61,"daily_roi":125.43,"cumulative_roi":-45.61,"picks_settled":23,"clv_positive_pct":8.7}],"skill_luck_summary":{"total_settled":564,"beat_close_count":94,"beat_close_pct":17.8,"avg_clv_when_positive":0.2879,"avg_clv_when_negative":-0.0515,"roi_when_clv_positive":3.37,"roi_when_clv_negative":27.55,"avg_clv_overall":0.0089,"clv_coverage_pct":93.6},"process_quality_score":36.5,"variance_status":"Standard Noise","recent_picks":[{"pick_id":"e83fafa0a34f127f673df7d98eafa332","game_date":"2026-05-04","sport":"NBA","home_team":"San Antonio Spurs","away_team":"Minnesota Timberwolves","bet_type":"ML","bet_team":"Minnesota Timberwolves","bet_line":null,"model_odds":4.3,"model_ev":166.5,"book":"fanduel","result":"W","model_pnl":0.4163,"clv":0,"integrity_flag":{}},{"pick_id":"181b835371bb62206f7edf0b617a702a","game_date":"2026-05-04","sport":"NBA","home_team":"New York Knicks","away_team":"Philadelphia 76ers","bet_type":"ML","bet_team":"Philadelphia 76ers","bet_line":null,"model_odds":3.4,"model_ev":66.9,"book":"draftkings","result":"L","model_pnl":-0.0047,"clv":-0.02,"integrity_flag":{}},{"pick_id":"58e9a14ba4ad9d16dbc5dba5fb369656","game_date":"2026-05-04","sport":"ATP - Jiujiang (China) - Qualification","home_team":"Hayu Kinoshita","away_team":"Kristiana Sidorova","bet_type":"ML","bet_team":"Kristiana Sidorova","bet_line":null,"model_odds":3.4,"model_ev":60.3,"book":"bet365","result":"L","model_pnl":-0,"clv":{},"integrity_flag":{}},{"pick_id":"5dad763bf2c443ebd4cd650bfe49e8ba","game_date":"2026-05-04","sport":"NHL","home_team":"Carolina Hurricanes","away_team":"Philadelphia Flyers","bet_type":"ML","bet_team":"Philadelphia Flyers","bet_line":null,"model_odds":3.1,"model_ev":60,"book":"draftkings","result":"L","model_pnl":-0.0048,"clv":-0.3,"integrity_flag":{}},{"pick_id":"21566f229f5d46662ec4f6c0a595eabb","game_date":"2026-05-04","sport":"SOCCER-EPL","home_team":"Everton","away_team":"Manchester City","bet_type":"DC","bet_team":"Everton or Draw (DC)","bet_line":null,"model_odds":2.63,"model_ev":59.5,"book":"betrivers","result":"W","model_pnl":0.01,"clv":-0.02,"integrity_flag":{}},{"pick_id":"ab07d45672dd5a8e09a0e9517f45d5d5","game_date":"2026-05-04","sport":"SOCCER-EPL","home_team":"Everton","away_team":"Manchester City","bet_type":"TOTAL","bet_team":"UNDER","bet_line":3,"model_odds":1.85,"model_ev":39.1,"book":"lowvig","result":"L","model_pnl":-0.0077,"clv":0.03,"integrity_flag":{}},{"pick_id":"66141ac6f2902843f84f06ff17134039","game_date":"2026-05-04","sport":"NBA","home_team":"San Antonio Spurs","away_team":"Minnesota Timberwolves","bet_type":"SPREAD","bet_team":"Minnesota Timberwolves","bet_line":14.5,"model_odds":1.85,"model_ev":34.7,"book":"fanduel","result":"W","model_pnl":0.0107,"clv":0,"integrity_flag":{}},{"pick_id":"d25604ed6d635d2e2466849441b04e0c","game_date":"2026-05-04","sport":"SOCCER-SERA","home_team":"Cremonese","away_team":"Lazio","bet_type":"TOTAL","bet_team":"UNDER","bet_line":2.25,"model_odds":1.95,"model_ev":33.3,"book":"bovada","result":"L","model_pnl":-0.0059,"clv":0.02,"integrity_flag":{}},{"pick_id":"4eb212ef92cc3cbc55ff2642b3923881","game_date":"2026-05-04","sport":"SOCCER-SERA","home_team":"AS Roma","away_team":"Fiorentina","bet_type":"DC","bet_team":"Fiorentina or Draw (DC)","bet_line":null,"model_odds":2.3,"model_ev":27.9,"book":"fanduel","result":"L","model_pnl":-0.0036,"clv":-0.1,"integrity_flag":{}},{"pick_id":"caf43698655902349d9770af71d965d8","game_date":"2026-05-04","sport":"SOCCER-EPL","home_team":"Chelsea","away_team":"Nottingham Forest","bet_type":"TOTAL","bet_team":"UNDER","bet_line":3,"model_odds":1.77,"model_ev":27.9,"book":"betus","result":"L","model_pnl":-0.006,"clv":-0.06,"integrity_flag":{}},{"pick_id":"bc99aa29614896a717b18eab3016ccdb","game_date":"2026-05-04","sport":"SOCCER-LIGA","home_team":"Sevilla","away_team":"Real Sociedad","bet_type":"TOTAL","bet_team":"OVER","bet_line":2.5,"model_odds":1.95,"model_ev":26.9,"book":"bovada","result":"L","model_pnl":-0.0047,"clv":-0.02,"integrity_flag":{}},{"pick_id":"1af4fd4154ca1e89eca093d4ca97e548","game_date":"2026-05-04","sport":"SOCCER-EPL","home_team":"Chelsea","away_team":"Nottingham Forest","bet_type":"DC","bet_team":"Nottingham Forest or Draw (DC)","bet_line":null,"model_odds":2.23,"model_ev":23.6,"book":"betrivers","result":"W","model_pnl":0.0039,"clv":-0.52,"integrity_flag":{}},{"pick_id":"2cc50aeacb59a8ac3c970d33ebebf516","game_date":"2026-05-04","sport":"MLB","home_team":"Los Angeles Angels","away_team":"Chicago White Sox","bet_type":"TOTAL","bet_team":"OVER","bet_line":7.5,"model_odds":1.87,"model_ev":18.2,"book":"espnbet","result":"L","model_pnl":-0.0523,"clv":0,"integrity_flag":{}},{"pick_id":"72cde148ef34ddc13c068a99eec82d8e","game_date":"2026-05-04","sport":"MLB","home_team":"Seattle Mariners","away_team":"Atlanta Braves","bet_type":"TOTAL","bet_team":"OVER","bet_line":8,"model_odds":1.96,"model_ev":17.7,"book":"draftkings","result":"W","model_pnl":0.0442,"clv":0,"integrity_flag":{}},{"pick_id":"710d5390ad983a883a24b05b169869b3","game_date":"2026-05-04","sport":"SOCCER-SERA","home_team":"Cremonese","away_team":"Lazio","bet_type":"ML","bet_team":"Lazio ML","bet_line":null,"model_odds":2.5,"model_ev":15.6,"book":"fanduel","result":"W","model_pnl":0.0026,"clv":0,"integrity_flag":{}},{"pick_id":"54a8eeed22cbcef8a39500ba2544a6ea","game_date":"2026-05-04","sport":"MLB","home_team":"Los Angeles Angels","away_team":"Chicago White Sox","bet_type":"ML","bet_team":"Chicago White Sox","bet_line":null,"model_odds":2.35,"model_ev":15.5,"book":"hardrockbet","result":"W","model_pnl":0.0388,"clv":0,"integrity_flag":{}},{"pick_id":"c27b902b3ab2eb59c58a504e2b74a89d","game_date":"2026-05-04","sport":"NHL","home_team":"Vegas Golden Knights","away_team":"Anaheim Ducks","bet_type":"TOTAL","bet_team":"OVER","bet_line":6,"model_odds":1.83,"model_ev":15.2,"book":"hardrockbet","result":"L","model_pnl":-0.0056,"clv":0,"integrity_flag":{}},{"pick_id":"c048e3243495d4bad2b2439178ce1637","game_date":"2026-05-04","sport":"SOCCER-SERA","home_team":"AS Roma","away_team":"Fiorentina","bet_type":"TOTAL","bet_team":"UNDER","bet_line":2.5,"model_odds":1.95,"model_ev":13.8,"book":"bovada","result":"L","model_pnl":-0.0024,"clv":-0.05,"integrity_flag":{}},{"pick_id":"cd31b0a268d33a6f299c1d05e3cf6b98","game_date":"2026-05-04","sport":"NHL","home_team":"Carolina Hurricanes","away_team":"Philadelphia Flyers","bet_type":"TOTAL","bet_team":"OVER","bet_line":5.5,"model_odds":2,"model_ev":13.7,"book":"draftkings","result":"L","model_pnl":-0.0046,"clv":-0.14,"integrity_flag":{}},{"pick_id":"30ba11b84cee3dd9b392213b2782af4f","game_date":"2026-05-04","sport":"NHL","home_team":"Vegas Golden Knights","away_team":"Anaheim Ducks","bet_type":"ML","bet_team":"Anaheim Ducks","bet_line":null,"model_odds":2.4,"model_ev":12.3,"book":"draftkings","result":"L","model_pnl":-0.0015,"clv":-0.07,"integrity_flag":{}},{"pick_id":"a3fecc754d453a3bb002be4ea7f4554a","game_date":"2026-05-04","sport":"MLB","home_team":"San Francisco Giants","away_team":"San Diego Padres","bet_type":"ML","bet_team":"San Francisco Giants","bet_line":null,"model_odds":2.16,"model_ev":11.6,"book":"fanduel","result":"W","model_pnl":0.029,"clv":0,"integrity_flag":{}},{"pick_id":"f43600f245d08d94243ecd1ba5cf022f","game_date":"2026-05-04","sport":"NBA","home_team":"New York Knicks","away_team":"Philadelphia 76ers","bet_type":"SPREAD","bet_team":"Philadelphia 76ers","bet_line":7.5,"model_odds":1.89,"model_ev":9.4,"book":"draftkings","result":"L","model_pnl":-0.0033,"clv":0,"integrity_flag":{}},{"pick_id":"7f61d5bf7eabce794c1abb9740851f0f","game_date":"2026-05-04","sport":"NBA","home_team":"New York Knicks","away_team":"Philadelphia 76ers","bet_type":"TOTAL","bet_team":"OVER","bet_line":211.5,"model_odds":1.87,"model_ev":6.4,"book":"hardrockbet","result":"W","model_pnl":0.002,"clv":0,"integrity_flag":{}},{"pick_id":"f9eceb45a1dd25a2095f8f0382a8cfdf","game_date":"2026-05-03","sport":"SOCCER-SERA","home_team":"Inter","away_team":"Parma","bet_type":"DC","bet_team":"Parma or Draw (DC)","bet_line":null,"model_odds":4.8,"model_ev":135.4,"book":"fanduel","result":"L","model_pnl":-0.0039,"clv":0.3,"integrity_flag":{}},{"pick_id":"df8195198495080fdab4e559a8af3ae2","game_date":"2026-05-03","sport":"ATP - Madrid Open","home_team":"Jannik Sinner","away_team":"Alexander Zverev","bet_type":"ML","bet_team":"Alexander Zverev","bet_line":null,"model_odds":4.85,"model_ev":130.8,"book":"espnbet","result":"L","model_pnl":-0.0037,"clv":-0.15,"integrity_flag":{}}]};  // injected by R — AssessorM writes scorecard.json
+// ── Helpers ──
+function fmt$(v)   { return v != null ? '$' + parseFloat(v).toFixed(2) : '—'; }
+function fmtPct(v, decimals=1) {
+  if (v == null) return '—';
+  const n = parseFloat(v);
+  return (n >= 0 ? '+' : '') + n.toFixed(decimals) + '%';
+}
+function fmtRecord(w, l, p) {
+  if (w == null) return '—';
+  return `${w}–${l}${(p||0) > 0 ? '–'+p : ''}`;
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  try { return new Date(d + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric'}); }
+  catch { return d; }
+}
 
-// ── Fetch helpers ─────────────────────────────────────────
-async function loadJSON(path, inline) {
-  // Inline data wins (works on file://) — fetch is fallback for GitHub Pages
-  if (inline !== null && inline !== undefined) return inline;
-  try {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (e) {
-    console.warn(`Could not load ${path}:`, e.message);
-    return null;
+// ── Process Score Dial ──
+function drawDial(score, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const clamped = Math.min(Math.max(score ?? 0, 0), 100);
+  const pct   = clamped / 100;
+  const color = clamped >= 80 ? '#22c55e'
+              : clamped >= 60 ? '#c9a84c'
+              : clamped >= 40 ? '#f59e0b'
+              :                 '#ef4444';
+  const r = 54, cx = 70, cy = 76;
+  const sa = Math.PI, ea = sa + Math.PI * pct;
+  const x1 = cx + r * Math.cos(sa), y1 = cy + r * Math.sin(sa);
+  const x2 = cx + r * Math.cos(ea), y2 = cy + r * Math.sin(ea);
+  el.innerHTML = `
+    <svg viewBox="0 0 140 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+      <path d="M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}"
+            fill="none" stroke="#1a2238" stroke-width="10" stroke-linecap="round"/>
+      <path d="M ${x1} ${y1} A ${r} ${r} 0 ${pct > 0.5 ? 1 : 0} 1 ${x2} ${y2}"
+            fill="none" stroke="${color}" stroke-width="10" stroke-linecap="round"
+            stroke-dasharray="1000" stroke-dashoffset="1000">
+        <animate attributeName="stroke-dashoffset" from="1000" to="0"
+                 dur="0.9s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1"/>
+      </path>
+      <text x="${cx}" y="${cy - 8}" text-anchor="middle"
+            font-family="DM Mono" font-size="24" fill="${color}">${clamped}</text>
+      <text x="${cx}" y="${cy + 8}" text-anchor="middle"
+            font-family="DM Mono" font-size="9" fill="#6b7794" letter-spacing="2">PROCESS</text>
+    </svg>`;
+}
+
+// ── Variance badge (with Literacy Loop link) ──
+function varianceBadge(status) {
+  const map = {
+    'STANDARD_NOISE': { cls:'badge-standard-noise', label:'STANDARD NOISE', link:false },
+    'ELEVATED_NOISE': { cls:'badge-elevated-noise',  label:'ELEVATED NOISE', link:true  },
+    'CRITICAL_SIGMA': { cls:'badge-critical-sigma',  label:'CRITICAL SIGMA', link:true  },
+  };
+  const m = map[status] || { cls:'badge-push', label: status || '—', link:false };
+  if (m.link) {
+    return `<a href="/vault/the-variance-shadow.html" class="badge ${m.cls}" style="text-decoration:none;">
+      ${m.label} <i data-lucide="external-link" style="width:10px;height:10px;display:inline;margin-left:3px;"></i>
+    </a>`;
   }
+  return `<span class="badge ${m.cls}">${m.label}</span>`;
 }
 
-// ── Format helpers ────────────────────────────────────────
-const fmt = {
-  dollar: v => v == null ? '—' : `$${Math.abs(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`,
-  pct:    v => v == null ? '—' : `${(v*100).toFixed(2)}%`,
-  odds:   v => v == null ? '—' : parseFloat(v).toFixed(2),
-  // bet_ev from R is a decimal ratio (e.g. 1.808 = 180.8% EV). Multiply by 100.
-  // Guard: if already >10 it was passed as a whole number — use as-is.
-  ev:     v => { if (v == null) return '—'; const pct = Math.abs(parseFloat(v)) < 10 ? parseFloat(v)*100 : parseFloat(v); return `${pct.toFixed(1)}%`; },
-  kelly:  v => v == null ? '—' : parseFloat(v).toFixed(4),
-};
-
-function signClass(v) {
-  if (v == null) return '';
-  return v > 0 ? 'positive' : v < 0 ? 'negative' : '';
+// ── Sample integrity bar ──
+function renderIntegrity(n) {
+  const target = 1000;
+  const pct    = Math.min((n / target) * 100, 100);
+  const color  = n >= target ? '#22c55e'
+               : n >= 500    ? '#c9a84c'
+               : n >= 100    ? '#f59e0b'
+               :               '#ef4444';
+  const msg = n >= target  ? 'Sample at statistical significance threshold.'
+            : n >= 500     ? 'Sample approaching reliability threshold.'
+            : n >= 100     ? 'Moderate sample — variance narrowing.'
+            :                'Early sample — high variance expected.';
+  document.getElementById('integrity-count').textContent = `${n} / ${target}`;
+  document.getElementById('integrity-count').style.color = color;
+  document.getElementById('integrity-fill').style.width  = pct + '%';
+  document.getElementById('integrity-fill').style.background = color;
+  document.getElementById('integrity-msg').textContent   = msg;
 }
 
-function signPrefix(v) {
-  if (v == null) return '';
-  return v > 0 ? '+' : v < 0 ? '−' : '';
-}
+// ── Equity chart ──
+let equityChart = null;
+let allEquity   = [];
 
-function sportBadge(sport) {
-  if (!sport) return '';
-  const s = sport.toUpperCase();
-  if (s.includes('NBA'))    return `<span class="badge badge-nba">NBA</span>`;
-  if (s.includes('NCAAB'))  return `<span class="badge badge-ncaab">NCAAB</span>`;
-  if (s.includes('NHL'))    return `<span class="badge badge-nhl">NHL</span>`;
-  if (s.includes('MLB'))    return `<span class="badge badge-mlb">MLB</span>`;
-  if (s.includes('SOCCER')) return `<span class="badge badge-soccer">⚽ ${s.replace('SOCCER-','')}</span>`;
-  if (s.includes('CHA'))    return `<span class="badge badge-cha">CHA</span>`;
-  if (s.includes('NCAAW')) return `<span class="badge badge-ncaaw">NCAAW</span>`;
-  if (s.includes('ATP') || s.includes('WTA')) return `<span class="badge badge-tennis">🎾</span>`;
-  return `<span class="badge">${sport}</span>`;
-}
-
-function evPips(ev) {
-  const raw = parseFloat(ev);
-  // bet_ev is a decimal ratio from R (e.g. 1.808); multiply by 100 to get pct.
-  // If already > 10, treat as whole-number percentage.
-  const pct = Math.abs(raw) < 10 ? raw * 100 : raw;
-  const lit = pct > 100 ? 5 : pct > 50 ? 4 : pct > 20 ? 3 : pct > 10 ? 2 : pct > 5 ? 1 : 0;
-  return Array.from({length:5}, (_,i) =>
-    `<span class="ev-pip ${i < lit ? 'lit' : ''}"></span>`
-  ).join('');
-}
-
-// ── Init ──────────────────────────────────────────────────
-async function init() {
-  const [picksData, paperData, summaryData, scorecardData] = await Promise.all([
-    loadJSON(DATA.picks,     INLINE_PICKS),
-    loadJSON(DATA.paper,     INLINE_PAPER),
-    loadJSON(DATA.summary,   INLINE_SUMMARY),
-    loadJSON(DATA.scorecard, INLINE_SCORECARD)
-  ]);
-
-  allPicks  = picksData     || getDemoPicks();
-  paperLog  = paperData     || getDemoPaperLog();
-  summary   = summaryData   || getDemoSummary();
-  scorecard = scorecardData || {};
-
-  renderKPIs();
-  renderChart();
-  renderSportAllocation();
-  renderPicks(allPicks);
-  renderRecordBySport();
-  renderModelScorecard();
-  updateHeader();
-}
-
-// ── KPIs ──────────────────────────────────────────────────
-function renderKPIs() {
-  const last = paperLog.length ? paperLog[paperLog.length - 1] : null;
-  const first = paperLog.length ? paperLog[0] : null;
-
-  const bankroll = last ? last.ending_bankroll : summary.current_bankroll;
-  const starting = summary.starting_bankroll || 1000;
-  const pnl      = bankroll ? bankroll - starting : null;
-  const roi      = last ? last.cumulative_roi : null;
-  const wins     = paperLog.reduce((s,r) => s + (r.wins||0), 0);
-  const losses   = paperLog.reduce((s,r) => s + (r.losses||0), 0);
-  const days     = paperLog.length;
-  const todayRisk = summary.today_risk;
-
-  // Bankroll
-  document.getElementById('kpi-bankroll').textContent = fmt.dollar(bankroll);
-  document.getElementById('kpi-bankroll-sub').textContent = `Started at ${fmt.dollar(starting)}`;
-
-  // P&L
-  const pnlEl = document.getElementById('kpi-pnl');
-  pnlEl.textContent = pnl != null ? `${signPrefix(pnl)}${fmt.dollar(pnl)}` : '—';
-  pnlEl.className = `kpi-value ${signClass(pnl)}`;
-
-  // ROI
-  const roiEl = document.getElementById('kpi-roi');
-  roiEl.textContent = roi != null ? `${signPrefix(roi)}${fmt.pct(roi)}` : '—';
-  roiEl.className = `kpi-value ${signClass(roi)}`;
-
-  // Record
-  const total = wins + losses;
-  document.getElementById('kpi-record').textContent = total ? `${wins}W – ${losses}L` : '—';
-  document.getElementById('kpi-record-sub').textContent = total ? `${(wins/total*100).toFixed(1)}% win rate` : '—';
-
-  // Days
-  document.getElementById('kpi-days').textContent = days || '—';
-
-  // Risk
-  const riskEl = document.getElementById('kpi-risk');
-  riskEl.textContent = todayRisk ? fmt.dollar(todayRisk) : '—';
-  document.getElementById('kpi-risk-sub').textContent = bankroll ? `Cap: ${fmt.dollar(bankroll*0.10)}` : '10% daily cap';
-
-  document.getElementById('chart-starting').textContent = starting.toLocaleString();
-
-  // Last settled metadata
-  const lastSettledEl = document.getElementById('last-settled');
-  if (summary.last_run) {
-    lastSettledEl.textContent = `Model last settled: ${summary.last_run}`;
+function renderEquityChart(data) {
+  if (!data || !data.length) {
+    document.getElementById('equity-wrap').style.display = 'none';
+    document.getElementById('equity-empty').style.display = 'flex';
+    return;
   }
-}
+  document.getElementById('equity-wrap').style.display = 'block';
+  document.getElementById('equity-empty').style.display = 'none';
 
-// ── P&L Chart ─────────────────────────────────────────────
-function renderChart() {
-  const ctx = document.getElementById('pnl-chart').getContext('2d');
-  const starting = summary.starting_bankroll || 1000;
+  const labels = data.map(d => fmtDate(d.date));
+  const values = data.map(d => d.bankroll ?? d.ending_bankroll ?? 1000);
 
-  const labels = ['Start', ...paperLog.map(r => r.date)];
-  const values = [starting, ...paperLog.map(r => r.ending_bankroll)];
-
-  const positive = values[values.length-1] >= starting;
-
-  const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-  gradient.addColorStop(0, positive ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)');
-  gradient.addColorStop(1, 'rgba(0,0,0,0)');
-
-  new Chart(ctx, {
+  if (equityChart) equityChart.destroy();
+  equityChart = new Chart(document.getElementById('equity-chart').getContext('2d'), {
     type: 'line',
     data: {
       labels,
       datasets: [{
         data: values,
-        borderColor: positive ? '#22c55e' : '#ef4444',
+        borderColor: '#c9a84c',
         borderWidth: 2,
+        backgroundColor: 'rgba(45,212,191,0.06)',
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: '#c9a84c',
         fill: true,
-        backgroundColor: gradient,
-        pointRadius: 3,
-        pointBackgroundColor: positive ? '#22c55e' : '#ef4444',
-        pointBorderWidth: 0,
-        tension: 0.4
+        tension: 0.3,
       }]
     },
     options: {
@@ -894,404 +699,332 @@ function renderChart() {
         legend: { display: false },
         tooltip: {
           backgroundColor: '#141720',
-          borderColor: '#1e2333',
+          borderColor: '#1a2238',
           borderWidth: 1,
-          titleColor: '#9aaabf',
-          bodyColor: '#e8eaf0',
-          titleFont: { family: 'DM Mono', size: 11 },
-          bodyFont: { family: 'DM Mono', size: 12 },
+          titleColor: '#6b7794',
+          bodyColor: '#c9a84c',
+          titleFont: { family: 'DM Mono', size: 10 },
+          bodyFont:  { family: 'DM Mono', size: 13 },
           callbacks: {
-            label: ctx => ` $${ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits:2})}`
+            label: ctx => '$' + ctx.parsed.y.toFixed(2),
+            title: items => items[0].label,
           }
         }
       },
       scales: {
-        x: {
-          grid: { color: '#252e45' },
-          ticks: { color: '#9aaabf', font: { family: 'DM Mono', size: 10 } }
-        },
-        y: {
-          grid: { color: '#252e45' },
-          ticks: {
-            color: '#8e9ab5',
-            font: { family: 'DM Mono', size: 10 },
-            callback: v => `$${v.toLocaleString()}`
-          }
-        }
+        x: { grid: { color: '#1a2238' }, ticks: { color: '#6b7794', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8 }},
+        y: { grid: { color: '#1a2238' }, ticks: { color: '#6b7794', font: { family: 'DM Mono', size: 10 }, callback: v => '$' + v.toFixed(0) }}
       }
     }
   });
+
+  // Period stats from window
+  updatePeriodStats(data);
 }
 
-// ── Sport Allocation ──────────────────────────────────────
-function renderSportAllocation() {
-  const container = document.getElementById('sport-bars');
-  if (!allPicks.length) {
-    container.innerHTML = '<div class="empty">No picks for today</div>';
+function updatePeriodStats(data) {
+  if (!data.length) return;
+  const first = data[0], last = data[data.length - 1];
+  const pnl   = (last.bankroll ?? 1000) - (first.bankroll ?? 1000);
+  const roi   = ((pnl) / (first.bankroll ?? 1000)) * 100;
+  const picks = data.reduce((s, d) => s + (d.picks_settled || 0), 0);
+
+  const pnlEl = document.getElementById('period-pnl');
+  pnlEl.textContent = fmt$(pnl);
+  pnlEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const roiEl = document.getElementById('period-roi');
+  roiEl.textContent = fmtPct(roi);
+  roiEl.style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('period-settled').textContent = picks || '—';
+}
+
+function filterEquity(days) {
+  if (!allEquity.length) return;
+  const sliced = days === 0 ? allEquity : allEquity.slice(-Math.max(days, 1));
+  renderEquityChart(sliced);
+}
+
+// Window buttons
+document.querySelectorAll('[data-window]').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('[data-window]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    filterEquity(parseInt(this.dataset.window));
+  });
+});
+
+// ── Attribution toggle ──
+document.getElementById('attr-toggle').addEventListener('click', function() {
+  const tray = document.getElementById('attr-tray');
+  const icon = this.querySelector('i');
+  const showing = tray.style.display !== 'none';
+  tray.style.display = showing ? 'none' : 'block';
+  icon.setAttribute('data-lucide', showing ? 'layers' : 'x');
+  lucide.createIcons();
+});
+
+// ── Sport ROI bars ──
+function renderSportBars(bySport) {
+  if (!bySport || !Object.keys(bySport).length) {
+    document.getElementById('sport-roi-bars').innerHTML =
+      '<div class="empty-inline">No sport data yet.</div>';
     return;
   }
 
-  // Group by sport, sum Risk $
-  const byRisk = {};
-  let total = 0;
-  allPicks.forEach(p => {
-    const status = p.status || p.Status || '';
-    if (status === 'VOID' || status === '910') return;  // advisory picks only
-    const sport = p.Sport || p.sport || 'Other';
-    const risk  = parseFloat(p['Risk $'] || p.risk_dollar || 0);
-    const key   = sport.replace('SOCCER-','SOC-').split(' ')[0];
-    byRisk[key] = (byRisk[key] || 0) + risk;
-    total += risk;
-  });
+  const entries = Object.entries(bySport)
+    .filter(([, v]) => v.picks > 0)
+    .sort((a, b) => (b[1].model_roi ?? 0) - (a[1].model_roi ?? 0));
 
-  document.getElementById('alloc-total').textContent = `Total: ${fmt.dollar(total)}`;
-
-  const sorted = Object.entries(byRisk).sort((a,b) => b[1]-a[1]);
-  const maxVal = sorted[0]?.[1] || 1;
-
-  container.innerHTML = sorted.map(([sport, risk]) => `
-    <div class="sport-bar-row">
-      <span class="sport-label">${sport}</span>
-      <div class="sport-bar-track">
-        <div class="sport-bar-fill" style="width:${(risk/maxVal*100).toFixed(1)}%"></div>
-      </div>
-      <span class="sport-pct">${fmt.dollar(risk)}</span>
-    </div>
-  `).join('');
-}
-
-// ── Picks Table ───────────────────────────────────────────
-let activeFilter = 'ALL';
-
-function buildSportFilters() {
-  const sports = [...new Set(allPicks.map(p => {
-    const s = (p.Sport || p.sport || '').toUpperCase();
-    if (s.includes('SOCCER')) return 'SOCCER';
-    if (s.includes('CHA'))    return 'CHA';
-    return s.split(' ')[0];
-  }))].filter(Boolean).sort();
-
-  const bar = document.getElementById('sport-filters');
-  bar.innerHTML = `<button class="filter-btn active" data-sport="ALL" onclick="filterPicks('ALL')">All</button>` +
-    sports.map(s => `<button class="filter-btn" data-sport="${s}" onclick="filterPicks('${s}')">${s}</button>`).join('');
-
-  document.getElementById('picks-count').textContent = `${allPicks.length} trades · ${fmt.dollar(allPicks.reduce((s,p)=>s+parseFloat(p['Risk $']||p.risk_dollar||0),0))} total risk`;
-}
-
-function filterPicks(sport) {
-  activeFilter = sport;
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.sport === sport);
-  });
-  const filtered = sport === 'ALL' ? allPicks : allPicks.filter(p => {
-    const s = (p.Sport || p.sport || '').toUpperCase();
-    if (sport === 'SOCCER') return s.includes('SOCCER');
-    if (sport === 'CHA')    return s.includes('CHA');
-    return s.startsWith(sport);
-  });
-  renderPicks(filtered);
-}
-
-function renderPicks(picks) {
-  const tbody = document.getElementById('picks-tbody');
-  if (!picks.length) {
-    tbody.innerHTML = '<tr><td colspan="11" class="empty">No picks match filter</td></tr>';
+  if (!entries.length) {
+    document.getElementById('sport-roi-bars').innerHTML =
+      '<div class="empty-inline">No settled picks yet.</div>';
     return;
   }
 
-  tbody.innerHTML = picks.map(p => {
-    const sport   = p.Sport || p.sport || '';
-    const date    = p.Date  || p.game_date || '';
-    const time    = p['Time (ET)'] || p.time_et || '—';
-    const home    = p.Home  || p.home_team  || '';
-    const away    = p.Away  || p.away_team  || '';
-    const betType = p['Bet Type'] || p.bet_type || '';
-    const pick    = p.Pick  || p.bet_team   || '';
-    const odds    = p.Odds  || p.bet_ml     || null;
-    const book    = p.Book  || p.bookmaker_name || '—';
-    const ev      = p.EV    || p.bet_ev     || null;
-    const kelly   = p.Kelly || p.scaled_kelly || null;
-    const risk    = p['Risk $'] || p.risk_dollar || null;
-    const evNum   = parseFloat(ev) || 0;
+  const maxAbs = Math.max(...entries.map(([, v]) => Math.abs(v.model_roi ?? 0)), 1);
 
-    return `<tr>
-      <td>${sportBadge(sport)}</td>
-      <td class="muted">${date}</td>
-      <td class="muted">${time}</td>
-      <td class="primary">${home} <span style="color:var(--text-muted)">vs</span> ${away}</td>
-      <td class="muted">${betType}</td>
-      <td class="primary">${pick}</td>
-      <td class="gold">${fmt.odds(odds)}</td>
-      <td class="muted">${book}</td>
-      <td>
-        <div class="ev-bar">
-          ${evPips(evNum)}
-          <span style="color:${evNum>0.5?'var(--arc-gold)':'var(--text-secondary)'}">${fmt.ev(evNum)}</span>
-        </div>
-      </td>
-      <td class="muted">${fmt.kelly(kelly)}</td>
-      <td class="${risk>2?'gold':'muted'}">${fmt.dollar(risk)}</td>
-    </tr>`;
+  document.getElementById('sport-roi-bars').innerHTML = entries.map(([sport, v]) => {
+    const roi   = v.model_roi ?? 0;
+    const pct   = Math.min((Math.abs(roi) / maxAbs) * 100, 100);
+    const color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+    const rec   = fmtRecord(v.wins, v.losses, v.pushes);
+    return `
+<div class="perf-bar-row">
+  <span class="perf-bar-label">${sport}</span>
+  <div class="perf-bar-track">
+    <div class="perf-bar-fill${roi < 0 ? ' negative' : ''}" style="width:${pct}%;background:${color};"></div>
+  </div>
+  <span class="perf-bar-value" style="color:${color};width:72px;">${fmtPct(roi)} <span style="color:var(--dim);font-size:10px;">${rec}</span></span>
+</div>`;
   }).join('');
 }
 
-// ── W/L Record by Sport ───────────────────────────────────
-function renderRecordBySport() {
-  const grid = document.getElementById('record-grid');
-  const byS = summary.record_by_sport;
-
-  if (!byS || !Object.keys(byS).length) {
-    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No settled bets yet — check back after games complete</div>';
+// ── Bet type table ──
+function renderBetTypeTable(byType) {
+  if (!byType || !Object.keys(byType).length) {
+    document.getElementById('bet-type-table').innerHTML =
+      '<div class="empty-inline">No data yet.</div>';
     return;
   }
 
-  grid.innerHTML = Object.entries(byS).map(([sport, rec]) => {
-    const total = (rec.wins||0) + (rec.losses||0);
-    const pct = total ? (rec.wins/total*100).toFixed(1) : '—';
-    const roi = rec.actual_roi != null ? parseFloat(rec.actual_roi)
-              : rec.roi        != null ? parseFloat(rec.roi) : null;
-    const sportLabel = sport.length > 22 ? sport.replace(/^(CHA|ATP|WTA)\s*-\s*/i, '').substring(0, 18) + '…' : sport;
-    return `<div class="record-card">
-      <div class="record-sport">${sportLabel}</div>
-      <div class="record-wl">${rec.wins||0}W – ${rec.losses||0}L</div>
-      <div class="record-pct">${pct}% win rate</div>
-      ${roi != null ? `<div class="record-roi ${roi>=0?'positive':'negative'}">${signPrefix(roi)}${fmt.pct(roi)} ROI</div>` : ''}
-    </div>`;
-  }).join('');
+  const entries = Object.entries(byType)
+    .filter(([, v]) => v.picks > 0)
+    .sort((a, b) => (b[1].picks ?? 0) - (a[1].picks ?? 0));
+
+  document.getElementById('bet-type-table').innerHTML = `
+<table style="width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px;">
+  <thead>
+    <tr>
+      <th style="text-align:left;padding:var(--space-2) var(--space-2);color:var(--dim);font-weight:400;font-size:9px;letter-spacing:0.12em;border-bottom:1px solid var(--border);">TYPE</th>
+      <th style="text-align:right;padding:var(--space-2);color:var(--dim);font-weight:400;font-size:9px;letter-spacing:0.12em;border-bottom:1px solid var(--border);">RECORD</th>
+      <th style="text-align:right;padding:var(--space-2);color:var(--dim);font-weight:400;font-size:9px;letter-spacing:0.12em;border-bottom:1px solid var(--border);">ROI</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${entries.map(([type, v]) => {
+      const roi = v.model_roi ?? null;
+      const roiColor = roi == null ? 'var(--dim)' : roi >= 0 ? 'var(--green)' : 'var(--red)';
+      return `
+<tr>
+  <td style="padding:var(--space-2);color:var(--text);border-bottom:1px solid rgba(26,34,56,0.4);">${type}</td>
+  <td style="text-align:right;padding:var(--space-2);color:var(--muted);border-bottom:1px solid rgba(26,34,56,0.4);">${fmtRecord(v.wins, v.losses, v.pushes)}</td>
+  <td style="text-align:right;padding:var(--space-2);color:${roiColor};border-bottom:1px solid rgba(26,34,56,0.4);">${fmtPct(roi)}</td>
+</tr>`;
+    }).join('')}
+  </tbody>
+</table>`;
 }
 
-// ── Header last run ───────────────────────────────────────
-function updateHeader() {
-  const el = document.getElementById('last-run');
-  el.textContent = summary.last_run ? `Run: ${summary.last_run}` : 'Paper trading · Live';
-}
+// ── Recent picks record table ──
+function renderRecentPicks(picks) {
+  const tbody = document.getElementById('record-tbody');
 
-// ── Model Scorecard — wired to scorecard.json ─────────────
-let activeTab = 'sport';
+  if (!picks || !picks.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:var(--space-6);color:var(--dim);font-family:var(--font-mono);font-size:12px;">No settled picks yet — record populates as positions close.</td></tr>`;
+    return;
+  }
 
-function switchTab(tab) {
-  activeTab = tab;
-  ['sport','bettype','book','recent'].forEach(t => {
-    const btn = document.getElementById(`tab-${t}`);
-    const panel = document.getElementById(`tab-content-${t}`);
-    const active = t === tab;
-    btn.style.borderBottomColor  = active ? 'var(--gold)' : 'transparent';
-    btn.style.color               = active ? 'var(--gold)' : 'var(--muted)';
-    panel.style.display           = active ? 'block' : 'none';
+  // Sport filter pills
+  const sports = [...new Set(picks.map(p => p.sport || p.Sport || ''))].filter(Boolean);
+  const bar = document.getElementById('record-filter-bar');
+  sports.forEach(s => {
+    const pill = document.createElement('button');
+    pill.className = 'filter-pill';
+    pill.dataset.sport = s;
+    pill.textContent = s;
+    bar.appendChild(pill);
+  });
+
+  function buildRows(filtered) {
+    tbody.innerHTML = filtered.map(p => {
+      const result = (p.result || p.Result || '').toUpperCase();
+      const resultClass = result === 'WIN' ? 'c-green' : result === 'LOSS' ? 'c-red' : result === 'PUSH' ? 'c-muted' : 'c-dim';
+      const pnl   = p.pnl ?? p.actual_pnl_dollar ?? null;
+      const pnlColor = pnl == null ? 'var(--dim)' : parseFloat(pnl) >= 0 ? 'var(--green)' : 'var(--red)';
+
+      const ev = p.model_ev ?? p.EV ?? null;
+      const evDisp = ev != null
+        ? fmtPct(Math.abs(parseFloat(ev)) < 1 ? parseFloat(ev) * 100 : parseFloat(ev))
+        : '—';
+
+      const wp = p.model_win_prob ?? p['E(W%)'] ?? null;
+      const wpDisp = wp != null
+        ? (parseFloat(wp) > 1 ? parseFloat(wp).toFixed(1) : (parseFloat(wp)*100).toFixed(1)) + '%'
+        : '—';
+
+      return `<tr data-sport="${p.sport || p.Sport || ''}">
+        <td>${fmtDate(p.game_date || p.Date)}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(p.away_team||p.Away||'') + ' @ ' + (p.home_team||p.Home||'')}</td>
+        <td><span class="badge badge-sport" style="font-size:9px;">${p.sport||p.Sport||'—'}</span></td>
+        <td><span class="badge badge-type" style="font-size:9px;">${p.bet_type||p['Bet Type']||'—'}</span></td>
+        <td style="color:var(--text);">${p.bet_team||p.Pick||'—'}</td>
+        <td style="color:var(--muted);">${p.model_odds != null ? parseFloat(p.model_odds).toFixed(2) : (p.Odds||'—')}</td>
+        <td style="color:var(--teal);">${wpDisp}</td>
+        <td style="color:var(--teal);">${evDisp}</td>
+        <td><span class="badge ${result === 'WIN' ? 'badge-win' : result === 'LOSS' ? 'badge-loss' : result === 'PUSH' ? 'badge-push' : 'badge-void'}">${result || '—'}</span></td>
+        <td style="color:${pnlColor};">${pnl != null ? fmt$(pnl) : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  buildRows(picks);
+
+  // Filter interaction
+  bar.addEventListener('click', function(e) {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    bar.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    const sport = pill.dataset.sport;
+    const filtered = sport === 'ALL' ? picks : picks.filter(p => (p.sport||p.Sport) === sport);
+    buildRows(filtered);
   });
 }
 
-function renderBreakdownTable(data, cols) {
-  if (!data || !Object.keys(data).length) {
-    return '<div class="empty" style="padding:1.5rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">No settled data yet — check back after games complete</div>';
-  }
-  const rows = Object.entries(data).map(([key, rec]) => {
-    const total  = (rec.picks || (rec.wins||0) + (rec.losses||0) + (rec.pushes||0));
-    const wins   = rec.wins   || 0;
-    const losses = rec.losses || 0;
-    const pushes = rec.pushes || 0;
-    const roi    = rec.model_roi != null ? parseFloat(rec.model_roi) : null;
-    const ev     = rec.avg_ev  != null ? parseFloat(rec.avg_ev)  : null;
-    return `<tr>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text);padding:0.65rem 0.75rem;">${key}</td>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);padding:0.65rem 0.75rem;text-align:center;">${total}</td>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:center;">
-        <span style="color:var(--teal);">${wins}W</span>
-        <span style="color:var(--muted);"> – </span>
-        <span style="color:var(--red);">${losses}L</span>
-        ${pushes ? `<span style="color:var(--muted);"> – ${pushes}P</span>` : ''}
-      </td>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:right;">
-        ${total ? `<span style="color:var(--muted);">${(wins/total*100).toFixed(1)}%</span>` : '—'}
-      </td>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;padding:0.65rem 0.75rem;text-align:right;">
-        ${roi != null ? `<span class="${roi>=0?'positive':'negative'}" style="color:${roi>=0?'var(--teal)':'var(--red)'};">${roi>=0?'+':''}${(roi*100).toFixed(1)}%</span>` : '—'}
-      </td>
-      ${cols.includes('ev') ? `<td style="font-family:var(--font-mono);font-size:0.72rem;color:var(--gold);padding:0.65rem 0.75rem;text-align:right;">${ev != null ? (ev*100).toFixed(1)+'%' : '—'}</td>` : ''}
-    </tr>`;
-  }).join('');
+// ── Load scorecard.json ──
+fetch(DATA_BASE + 'scorecard.json')
+  .then(r => r.json())
+  .then(sc => {
+    const overall = sc.overall || {};
+    const skill   = sc.skill_luck_summary || {};
 
-  const evHeader = cols.includes('ev') ? '<th style="text-align:right;padding:0.5rem 0.75rem;">Avg EV</th>' : '';
-  return `<div class="table-wrapper">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border);">
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">${cols[0]||'Category'}</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Picks</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Record</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">Win%</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">ROI</th>
-          ${evHeader}
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
-}
-
-function renderRecentForm(recentPicks) {
-  if (!recentPicks || !recentPicks.length) {
-    return '<div class="empty" style="padding:1.5rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--muted);">No recent settled picks yet</div>';
-  }
-  const rows = recentPicks.slice(0,15).map(p => {
-    const result = p.result || '—';
-    const clv    = p.clv != null ? parseFloat(p.clv) : null;
-    const roi    = p.model_pnl != null ? parseFloat(p.model_pnl) : null;
-    const resultColor = result === 'W' ? 'var(--teal)' : result === 'L' ? 'var(--red)' : 'var(--muted)';
-    return `<tr style="border-bottom:1px solid rgba(26,34,56,0.5);">
-      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);padding:0.55rem 0.75rem;">${p.game_date||'—'}</td>
-      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text);padding:0.55rem 0.75rem;">${p.sport||'—'}</td>
-      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);padding:0.55rem 0.75rem;">${p.home_team||''} vs ${p.away_team||''}</td>
-      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text);padding:0.55rem 0.75rem;">${p.bet_team||'—'}</td>
-      <td style="font-family:var(--font-mono);font-size:0.65rem;color:var(--gold);padding:0.55rem 0.75rem;text-align:right;">${p.model_odds ? parseFloat(p.model_odds).toFixed(2) : '—'}</td>
-      <td style="font-family:var(--font-mono);font-size:0.72rem;font-weight:500;color:${resultColor};padding:0.55rem 0.75rem;text-align:center;">${result}</td>
-      <td style="font-family:var(--font-mono);font-size:0.65rem;padding:0.55rem 0.75rem;text-align:right;color:${clv!=null?(clv>=0?'var(--teal)':'var(--red)'):'var(--muted)'};">${clv!=null?(clv>=0?'+':'')+clv.toFixed(3):'—'}</td>
-    </tr>`;
-  }).join('');
-
-  return `<div class="table-wrapper">
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border);">
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Date</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Sport</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Game</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:left;padding:0.5rem 0.75rem;">Pick</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">Odds</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding:0.5rem 0.75rem;">Result</th>
-          <th style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;text-align:right;padding:0.5rem 0.75rem;">CLV</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
-}
-
-function renderModelScorecard() {
-  const sc = scorecard;
-  const overall = sc.overall || {};
-
-  // Overall KPIs
-  const picks  = overall.picks  || 0;
-  const wins   = overall.wins   || 0;
-  const losses = overall.losses || 0;
-  const pushes = overall.pushes || 0;
-  const roi    = overall.model_roi != null ? parseFloat(overall.model_roi) : null;
-  const avgEv  = overall.avg_ev    != null ? parseFloat(overall.avg_ev)   : null;
-  const avgClv = overall.avg_clv   != null ? parseFloat(overall.avg_clv)  : null;
-
-  document.getElementById('model-picks').textContent   = picks || '—';
-  document.getElementById('model-record').textContent  = picks ? `${wins}W – ${losses}L` : '—';
-
-  const roiEl = document.getElementById('model-roi');
-  if (roi != null) {
-    roiEl.textContent  = `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%`;
-    roiEl.style.color  = roi >= 0 ? 'var(--teal)' : 'var(--red)';
-  } else {
-    roiEl.textContent = '—';
-    roiEl.style.color = 'var(--muted)';
-  }
-
-  const evEl = document.getElementById('model-avg-ev');
-  evEl.textContent = avgEv != null ? `${(avgEv).toFixed(1)}%` : '—';
-
-  const clvEl = document.getElementById('model-avg-clv');
-  if (avgClv != null) {
-    clvEl.textContent = `${avgClv >= 0 ? '+' : ''}${avgClv.toFixed(4)}`;
-    clvEl.style.color = avgClv >= 0 ? 'var(--teal)' : 'var(--red)';
-  } else {
-    clvEl.textContent = '—';
-    clvEl.style.color = 'var(--muted)';
-  }
-
-  const lastEl = document.getElementById('model-last-updated');
-  lastEl.textContent = sc.last_updated ? `Updated: ${sc.last_updated}` : '—';
-
-  // Tab panels
-  document.getElementById('tab-content-sport').innerHTML =
-    renderBreakdownTable(sc.by_sport, ['Sport', 'ev']);
-  document.getElementById('tab-content-bettype').innerHTML =
-    renderBreakdownTable(sc.by_bet_type, ['Bet Type']);
-  document.getElementById('tab-content-book').innerHTML =
-    renderBreakdownTable(sc.by_book, ['Book']);
-  document.getElementById('tab-content-recent').innerHTML =
-    renderRecentForm(sc.recent_picks);
-
-  // Show/hide section if no data at all
-  if (!picks && !sc.by_sport) {
-    document.getElementById('model-scorecard-section').style.opacity = '0.5';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// DEMO DATA — used when JSON files aren't present yet
-// Replace with real data by running SureBet.R with JSON exports
-// ═══════════════════════════════════════════════════════════
-
-function getDemoSummary() {
-  return {
-    starting_bankroll: 1000,
-    current_bankroll: 908.42,
-    today_risk: 83.75,
-    last_run: '2026-03-14 16:53',
-    record_by_sport: {
-      'NBA':   { wins: 8,  losses: 14, roi: -0.12 },
-      'NCAAB': { wins: 24, losses: 48, roi: -0.08 },
-      'NHL':   { wins: 9,  losses: 18, roi: -0.04 },
-      'Soccer':{ wins: 0,  losses: 0,  roi: null   },
-      'Tennis':{ wins: 0,  losses: 0,  roi: null   },
+    // Last run timestamp
+    if (sc.last_updated) {
+      const ts = new Date(sc.last_updated).toLocaleString('en-US', {
+        month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName:'short'
+      });
+      document.getElementById('footer-last-run').textContent = ts;
     }
-  };
+
+    // Process Score dial
+    const score = overall.process_quality_score ?? sc.process_quality_score ?? null;
+    if (score != null) drawDial(Math.round(score), 'process-dial');
+    else drawDial(0, 'process-dial');
+
+    // Variance badge
+    const vs = overall.variance_status || sc.variance_status;
+    document.getElementById('variance-badge-wrap').innerHTML = varianceBadge(vs || '');
+    lucide.createIcons();
+
+    // KPI strip
+    const roi = overall.model_roi ?? null;
+    const kpiRoi = document.getElementById('kpi-roi');
+    kpiRoi.textContent = fmtPct(roi);
+    kpiRoi.style.color = roi == null ? 'var(--teal)' : roi >= 0 ? 'var(--green)' : 'var(--red)';
+
+    document.getElementById('kpi-record').textContent =
+      fmtRecord(overall.wins, overall.losses, overall.pushes);
+
+    const avgEv = overall.avg_ev ?? null;
+    document.getElementById('kpi-avg-ev').textContent = fmtPct(avgEv);
+
+    // Entry Alpha = beat_close_pct
+    const bcp = skill.beat_close_pct ?? overall.beat_close_pct ?? null;
+    document.getElementById('kpi-entry-alpha').textContent =
+      bcp != null ? fmtPct(bcp * 100) : '—';
+
+    // Attribution values
+    const pca = skill.price_capture_alpha ?? overall.price_capture_alpha ?? null;
+    const sel = skill.selection_alpha      ?? overall.selection_alpha      ?? null;
+    const vrn = skill.outcome_variance     ?? overall.outcome_variance     ?? null;
+
+    document.getElementById('attr-pca').textContent = pca != null ? fmtPct(pca * 100) : '—';
+    document.getElementById('attr-sel').textContent = sel != null ? fmtPct(sel * 100) : '—';
+    document.getElementById('attr-var').textContent = vrn != null ? fmtPct(vrn * 100) : '—';
+
+    // Attribution bar
+    if (pca != null && sel != null && vrn != null) {
+      const total = Math.abs(pca) + Math.abs(sel) + Math.abs(vrn) || 1;
+      document.getElementById('attr-bar').innerHTML =
+        `<div class="attribution-segment-pca"   style="width:${(Math.abs(pca)/total*100).toFixed(1)}%;"></div>
+         <div class="attribution-segment-sel"   style="width:${(Math.abs(sel)/total*100).toFixed(1)}%;"></div>
+         <div class="attribution-segment-chance" style="width:${(Math.abs(vrn)/total*100).toFixed(1)}%;"></div>`;
+      document.getElementById('attr-bar').style.display   = 'flex';
+      document.getElementById('attr-legend').style.display = 'flex';
+    }
+
+    // Sample integrity
+    const settled = skill.total_settled ?? overall.picks ?? null;
+    if (settled != null) renderIntegrity(settled);
+
+    // Equity curve
+    if (sc.equity_curve && sc.equity_curve.length) {
+      allEquity = sc.equity_curve;
+      filterEquity(7);
+      document.getElementById('current-bankroll').textContent =
+        fmt$(sc.equity_curve[sc.equity_curve.length - 1].bankroll ?? null);
+    } else {
+      document.getElementById('equity-wrap').style.display = 'none';
+      document.getElementById('equity-empty').style.display = 'flex';
+    }
+
+    // Sport breakdown
+    renderSportBars(sc.by_sport);
+    renderBetTypeTable(sc.by_bet_type);
+
+    // Recent picks
+    renderRecentPicks(sc.recent_picks || []);
+  })
+  .catch(() => {
+    drawDial(0, 'process-dial');
+    document.getElementById('equity-wrap').style.display  = 'none';
+    document.getElementById('equity-empty').style.display = 'flex';
+    document.getElementById('record-tbody').innerHTML =
+      `<tr><td colspan="10" style="text-align:center;padding:var(--space-6);color:var(--dim);font-family:var(--font-mono);font-size:12px;">Unable to load scorecard data.</td></tr>`;
+  });
+
+// ── Load summary.json — tournaments nav + bankroll fallback ──
+fetch(DATA_BASE + 'summary.json')
+  .then(r => r.json())
+  .then(s => {
+    if (s.tournaments_active) {
+      const t = '<a href="/tournaments.html">TOURNAMENTS</a>';
+      const od = document.querySelector('.nav-links a[href*="odds"]');
+      if (od) od.insertAdjacentHTML('afterend', t);
+      const om = document.querySelector('.nav-mobile a[href*="odds"]');
+      if (om) om.insertAdjacentHTML('afterend', t);
+    }
+    // Bankroll from summary if equity_curve not present
+    if (s.current_bankroll) {
+      const el = document.getElementById('current-bankroll');
+      if (el.textContent === '—') el.textContent = fmt$(s.current_bankroll);
+    }
+    if (s.last_run) {
+      const fl = document.getElementById('footer-last-run');
+      if (fl.textContent === '—') fl.textContent = s.last_run;
+    }
+  })
+  .catch(() => {});
+
+// ── Subscriber path visibility ──
+if (IS_SUBSCRIBER) {
+  document.getElementById('sub-path-masked').style.display = 'none';
+  document.getElementById('sub-path-chart').style.display  = 'block';
 }
-
-function getDemoPaperLog() {
-  return [
-    { date: '2026-03-13', ending_bankroll: 908.42, cumulative_roi: -0.0916, wins: 46, losses: 89 }
-  ];
-}
-
-function getDemoPicks() {
-  return [
-    { Sport:'NBA',   Date:'3/14', 'Time (ET)':'7:30 PM', Home:'Boston Celtics',   Away:'Washington Wizards',  'Bet Type':'ML',     Pick:'Washington Wizards', Odds:13.0,   Book:'DraftKings',   EV:1.750, Kelly:0.00099, 'Risk $':0.90 },
-    { Sport:'NCAAB', Date:'3/14', 'Time (ET)':'6:00 PM', Home:'Florida Gators',   Away:'Vanderbilt Commodores','Bet Type':'SPREAD', Pick:'Vanderbilt +7.5',   Odds:1.91,   Book:'DraftKings',   EV:0.210, Kelly:0.00365, 'Risk $':3.31 },
-    { Sport:'NHL',   Date:'3/14', 'Time (ET)':'7:00 PM', Home:'Toronto Maple Leafs',Away:'Ottawa Senators',   'Bet Type':'ML',     Pick:'Toronto Maple Leafs',Odds:3.25,   Book:'FanDuel',      EV:0.415, Kelly:0.00128, 'Risk $':1.16 },
-    { Sport:'NCAAB', Date:'3/15', 'Time (ET)':'TBD',     Home:'Duke Blue Devils', Away:'Virginia Cavaliers',  'Bet Type':'SPREAD', Pick:'Virginia +7.5',      Odds:1.89,   Book:'DraftKings',   EV:0.200, Kelly:0.00375, 'Risk $':3.40 },
-    { Sport:'ATP - Indian Wells', Date:'3/14', 'Time (ET)':'TBD', Home:'Carlos Alcaraz', Away:'Daniil Medvedev', 'Bet Type':'ML', Pick:'Daniil Medvedev', Odds:5.0, Book:'DraftKings', EV:1.310, Kelly:0.00818, 'Risk $':7.42 },
-    { Sport:'SOCCER-EPL', Date:'3/14', 'Time (ET)':'3:30 PM', Home:'West Ham United', Away:'Manchester City', 'Bet Type':'ML', Pick:'West Ham United', Odds:6.0, Book:'FanDuel', EV:0.476, Kelly:0.00234, 'Risk $':2.12 },
-  ];
-}
-
-// ── Mobile menu toggle ────────────────────────────────────
-document.getElementById('hamburger').addEventListener('click', () => {
-  document.getElementById('mobile-menu').classList.toggle('open');
-});
-document.getElementById('mobile-menu').querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
-});
-
-// ── Boot ──────────────────────────────────────────────────
-init().then(() => {
-  // picks table removed — lives in daily-card.html
-});
 </script>
-<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:2rem;">
-  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.55rem;letter-spacing:-0.02em;color:#8e9ab5;">Arc<span style="color:#c9a84c">Vest</span></div>
-  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
-    <a href="/" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Home</a>
-    <a href="/scorecard.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;">Scorecard</a>
-    <a href="/daily-card.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Daily Card</a>
-    <a href="/odds.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Odds</a>
-    <a href="/tournaments.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">Tournaments</a>
-    <a href="/edgevault.html" style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;">EdgeVault</a>
-  </div>
-  <div style="width:100%;display:flex;gap:1.5rem;padding-bottom:0.75rem;">
-    <a href="/about.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">About</a>
-    <a href="/privacy.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Privacy Policy</a>
-    <a href="/terms.html" style="font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;opacity:0.7;">Terms of Service</a>
-  </div>
-  <div style="width:100%;font-size:0.68rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;line-height:1.5;">
-    For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io
-  </div>
-</footer>
+
+<script src="/arcvest-components.js"></script>
 </body>
 </html>
