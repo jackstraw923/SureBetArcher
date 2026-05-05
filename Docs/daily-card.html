@@ -375,6 +375,55 @@
       }
     }
   </style>
+  <style>
+    /* ── Odds format toggle ── */
+    .odds-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+    .odds-toggle-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .toggle-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+    }
+    .toggle-btn.active {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+    }
+    /* Filter bar: space between sport pills and odds toggle */
+    #sport-filter-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-2);
+    }
+    .filter-bar-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
 
@@ -455,9 +504,16 @@
 
     <!-- Sport filter bar -->
     <div class="filter-bar" id="sport-filter-bar" style="margin-bottom:var(--space-4);">
-      <span class="filter-label">SPORT:</span>
-      <button class="filter-pill active" data-sport="ALL">ALL</button>
-      <!-- Additional sport pills injected by JS -->
+      <div class="filter-bar-left">
+        <span class="filter-label">SPORT:</span>
+        <button class="filter-pill active" data-sport="ALL">ALL</button>
+        <!-- Additional sport pills injected by JS -->
+      </div>
+      <div class="odds-toggle">
+        <span class="odds-toggle-label">ODDS</span>
+        <button class="toggle-btn active" id="btn-american" onclick="setOddsFormat('american')">AMERICAN</button>
+        <button class="toggle-btn" id="btn-decimal" onclick="setOddsFormat('decimal')">DECIMAL</button>
+      </div>
     </div>
 
     <!-- Open position alert (shown when any pick has open_position = true) -->
@@ -574,10 +630,12 @@ lucide.createIcons();
   });
   const ham = document.getElementById('nav-hamburger');
   const mob = document.getElementById('nav-mobile');
-  ham.addEventListener('click', () => {
-    const open = mob.classList.toggle('open');
-    ham.setAttribute('aria-expanded', open);
-  });
+  if (ham && mob) {
+    ham.addEventListener('click', () => {
+      const open = mob.classList.toggle('open');
+      ham.setAttribute('aria-expanded', open);
+    });
+  }
 })();
 
 // ── Drawer toggle ──
@@ -590,6 +648,17 @@ document.querySelectorAll('.drawer-trigger').forEach(t => {
     this.setAttribute('aria-expanded', open);
   });
 });
+
+// ── Odds format state ──
+let showDecimal = false;
+
+function setOddsFormat(fmt) {
+  showDecimal = (fmt === 'decimal');
+  document.getElementById('btn-american').classList.toggle('active', !showDecimal);
+  document.getElementById('btn-decimal').classList.toggle('active',  showDecimal);
+  // Re-render picks with new format
+  if (typeof renderAllPicks === 'function') renderAllPicks();
+}
 
 // ── Helpers ──
 function fmt$(v)    { return v != null ? '$' + parseFloat(v).toFixed(2) : '—'; }
@@ -612,7 +681,12 @@ function fmtWinProb(v) {
 }
 function fmtOdds(v) {
   if (v == null) return '—';
-  return parseFloat(v).toFixed(2);
+  const d = parseFloat(v);
+  if (isNaN(d) || d <= 1) return '—';
+  if (showDecimal) return d.toFixed(2);
+  // Convert decimal to American
+  if (d >= 2.0) return '+' + Math.round((d - 1) * 100);
+  return String(Math.round(-100 / (d - 1)));
 }
 function fmtKelly(v) {
   if (v == null) return '—';
@@ -1004,6 +1078,12 @@ function renderPositions(picks) {
 }
 
 // ── Load daily_picks.json ──
+let _cachedPicks = [];   // module-scope cache for odds format re-render
+
+function renderAllPicks() {
+  if (_cachedPicks.length) renderPositions(_cachedPicks);
+}
+
 fetch(DATA_BASE + 'daily_picks.json')
   .then(r => r.json())
   .then(data => {
@@ -1012,6 +1092,8 @@ fetch(DATA_BASE + 'daily_picks.json')
     const picks = Array.isArray(data)
       ? data.filter(p => (p.status || '').toUpperCase() === 'ACTIVE' || p.status == null)
       : (data.picks || []).filter(p => (p.status || '').toUpperCase() === 'ACTIVE' || p.status == null);
+
+    _cachedPicks = picks;  // cache for toggle re-renders
 
     const generatedAt = data.generated_at || null;
     const bankrollAtRun = data.bankroll_at_run || null;

@@ -1,14 +1,51 @@
-# netlify.toml — ArcVest / Mountain Engineering
-# Build configuration and deployment rules
-#
-# IGNORE RULE: Skip Netlify build when only Docs/data/ JSON files changed.
-# Morning engine runs push JSON data files (market.json, daily_picks.json, etc.)
-# multiple times per day. These do not require a UI rebuild — the HTML pages
-# fetch JSON client-side at runtime via raw GitHub URLs.
-# Only HTML/CSS/JS changes to the UI layer should trigger a deployment.
+# ArcVest — Netlify build configuration
+# Mountain Engineering · Mountain Capital, LLC
 
 [build]
-  ignore = "git diff --quiet HEAD^ HEAD -- . ':(exclude)Docs/data/'"
+  # HTML files live in Docs/ — serve from there
+  publish = "Docs"
 
-# Future: add [context.deploy-preview] and [context.branch-deploy] rules
-# when dev branch strategy is implemented before subscriber launch.
+# ── Ignored files — do not trigger a rebuild ─────────────────────────────────
+# The engine (SureBetAim.R) pushes JSON data files to Docs/data/ every morning.
+# These are pure data updates — no HTML rebuild needed. Without this rule,
+# every morning Aim run consumes a full Netlify build credit unnecessarily.
+#
+# HTML, CSS, JS, and manifest changes still trigger rebuilds normally.
+[build.environment]
+  NETLIFY_PLUGIN_IGNORE_ENABLED = "true"
+
+[context.production]
+  ignore = """
+    git diff --quiet HEAD^ HEAD -- 'Docs/data/'
+  """
+
+# ── Redirect rules ────────────────────────────────────────────────────────────
+# Clean URLs: /scorecard → /scorecard.html etc.
+# Uncomment when ready — requires testing to confirm no nav conflicts.
+# [[redirects]]
+#   from = "/:page"
+#   to   = "/:page.html"
+#   status = 200
+
+# ── Cache headers — long cache for data files, short for HTML ────────────────
+# Data files update daily; aggressive caching would serve stale JSON.
+# HTML files change infrequently; moderate caching is fine.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=60"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=300"
+
+[[headers]]
+  for = "/arcvest.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/arcvest-components.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

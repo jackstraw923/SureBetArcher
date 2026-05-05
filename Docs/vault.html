@@ -629,11 +629,6 @@
       </p>
     </div>
 
-    <!-- Fanatics affiliate disclosure — FTC required, covers all affiliate links on this page -->
-    <p style="font-size:0.65rem;color:var(--muted);letter-spacing:0.05em;margin-bottom:var(--space-3);text-transform:uppercase;">
-      ArcVest participates in the Fanatics affiliate program and may earn a commission on qualifying purchases at no cost to you.
-    </p>
-
     <!-- Fanatics Fan Gear — affiliate placement (top) -->
     <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
        target="_blank" rel="noopener noreferrer sponsored"
@@ -877,6 +872,11 @@
           letter-spacing:0.1em;color:var(--teal);white-space:nowrap;text-transform:uppercase;">SHOP MLB →</div>
       </div>
     </a>
+
+    <!-- FTC affiliate disclosure — below all affiliate placements on this page -->
+    <p style="font-size:0.58rem;color:var(--dim);letter-spacing:0.04em;opacity:0.55;margin-top:calc(var(--space-2) * -1);margin-bottom:var(--space-5);">
+      Affiliate disclosure: ArcVest participates in the Fanatics affiliate program and may earn a commission on qualifying purchases at no cost to you.
+    </p>
 
 
     <!-- ═══════════════════════════════════════
@@ -1450,7 +1450,8 @@ function convertFromProb() {
 }
 ['oc-american','oc-decimal','oc-prob'].forEach((id, i) => {
   const fns = [convertFromAmerican, convertFromDecimal, convertFromProb];
-  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fns[i](); });
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') fns[i](); });
 });
 
 // ── No-Vig Calculator ──
@@ -1478,8 +1479,8 @@ function calcNoVig3() {
   document.getElementById('nv3-away').textContent = (iA / tot * 100).toFixed(2) + '%';
   document.getElementById('nv-result-3way').classList.add('show');
 }
-['nv-a','nv-b'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig2(); }));
-['nv-h','nv-d','nv-aw'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig3(); }));
+['nv-a','nv-b'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig2(); }); });
+['nv-h','nv-d','nv-aw'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') calcNoVig3(); }); });
 
 // ── Kelly Sizer ──
 function calcKelly() {
@@ -1503,7 +1504,7 @@ function calcKelly() {
   document.getElementById('ks-ev').style.color = ev >= 0 ? 'var(--green)' : 'var(--red)';
   document.getElementById('ks-result').classList.add('show');
 }
-['ks-prob','ks-odds','ks-bankroll'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcKelly(); }));
+['ks-prob','ks-odds','ks-bankroll'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') calcKelly(); }); });
 
 // ── Hedge Calculator ──
 function calcHedge() {
@@ -1531,7 +1532,7 @@ function calcHedge() {
   floorEl.className = 'tool-result-val ' + (floor >= 0 ? 'green' : 'red');
   document.getElementById('hg-result').classList.add('show');
 }
-['hg-stake','hg-orig-odds','hg-hedge-odds'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') calcHedge(); }));
+['hg-stake','hg-orig-odds','hg-hedge-odds'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') calcHedge(); }); });
 
 // ── Tournaments nav + footer ──
 fetch(DATA_BASE + 'summary.json')
@@ -1547,16 +1548,16 @@ fetch(DATA_BASE + 'summary.json')
   })
   .catch(() => {});
 
-// Footer offset when sidebar is hidden on mobile
+// Footer offset — sidebar is 260px wide on desktop, full-width on mobile
 function adjustFooter() {
-  // Footer margin adjusted after component injection
-  window.addEventListener('arcvest:ready', function() {
-    const footer = document.querySelector('.footer');
-    if (footer) footer.style.marginLeft = window.innerWidth <= 900 ? '0' : '260px';
-  });
+  const footer = document.querySelector('.footer');
+  if (footer) footer.style.marginLeft = window.innerWidth <= 900 ? '0' : '260px';
 }
-adjustFooter();
+// Apply after component injection AND on resize
+window.addEventListener('arcvest:ready', adjustFooter);
 window.addEventListener('resize', adjustFooter);
+// Fallback: also try after a short delay in case arcvest:ready already fired
+setTimeout(adjustFooter, 500);
 </script>
 
 <script src="/arcvest-components.js"></script>
