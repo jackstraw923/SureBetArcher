@@ -1309,10 +1309,12 @@ lucide.createIcons();
   });
   const ham = document.getElementById('nav-hamburger');
   const mob = document.getElementById('nav-mobile');
-  ham.addEventListener('click', () => {
-    const open = mob.classList.toggle('open');
-    ham.setAttribute('aria-expanded', open);
-  });
+  if (ham && mob) {
+    ham.addEventListener('click', () => {
+      const open = mob.classList.toggle('open');
+      ham.setAttribute('aria-expanded', open);
+    });
+  }
 })();
 
 // ── Sidebar: panel switching ──

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miami Open 2026 — ArcVest Model Probabilities</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#080b12; --bg2:#0e1220; --bg3:#141929;
+      --border:#1a2238; --gold:#f0b429; --gold2:#e07b00;
+      --text:#eceef4; --muted:#6b7794; --green:#10b981;
+      --atp:#3b82f6; --wta:#ec4899; --cha:#f59e0b;
+      --font-head:'Bebas Neue',sans-serif;
+      --font-mono:'DM Mono',monospace;
+      --font-body:'Outfit',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(8,11,18,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(26,34,56,0.6);}
+    .nav-logo{display:flex;align-items:center;gap:0.6rem;text-decoration:none;}
+    .nav-logo svg{width:24px;height:24px;}
+    .nav-logo span{font-family:var(--font-head);font-size:1.5rem;color:var(--text);letter-spacing:0.03em;}
+    .nav-logo span em{color:var(--gold);font-style:normal;}
+    .nav-links{display:flex;gap:2rem;align-items:center;}
+    .nav-links a{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--text);}
+
+    /* ── HERO ── */
+    .hero{padding:6.5rem 2.5rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(240,180,41,0.07) 0%,transparent 70%);pointer-events:none;}
+    .eyebrow{font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem;}
+    .hero h1{font-family:var(--font-head);font-size:clamp(2.8rem,6vw,5rem);letter-spacing:0.04em;line-height:1;margin-bottom:0.5rem;}
+    .hero h1 span{color:var(--gold);}
+    .hero-meta{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem;}
+    .hero-meta-item{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .hero-meta-item strong{color:var(--text);display:block;font-size:0.78rem;}
+
+    /* ── TOUR TABS ── */
+    .tour-tabs{display:flex;justify-content:center;gap:0.5rem;padding:1.5rem 2.5rem 0;}
+    .tab-btn{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 1.5rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.2s;}
+    .tab-btn:hover{border-color:var(--muted);color:var(--text);}
+    .tab-btn.active-atp{background:rgba(59,130,246,0.12);border-color:var(--atp);color:var(--atp);}
+    .tab-btn.active-wta{background:rgba(236,72,153,0.12);border-color:var(--wta);color:var(--wta);}
+    .tab-btn.active-cha{background:rgba(245,158,11,0.12);border-color:var(--cha);color:var(--cha);}
+
+    /* ── MAIN CONTENT ── */
+    .content{max-width:1100px;margin:0 auto;padding:2rem 2.5rem 5rem;}
+    .tour-section{display:none;}
+    .tour-section.visible{display:block;}
+
+    /* ── SECTION HEADER ── */
+    .section-hdr{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+    .section-hdr h2{font-family:var(--font-head);font-size:2rem;letter-spacing:0.05em;}
+    .section-hdr h2.atp{color:var(--atp);}
+    .section-hdr h2.wta{color:var(--wta);}
+    .section-hdr h2.cha{color:var(--cha);}
+    .section-hdr .sub{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .sim-note{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.06em;color:var(--muted);margin-bottom:1.5rem;}
+    .sim-note strong{color:var(--gold);}
+
+    /* ── PROBABILITY TABLE ── */
+    .prob-table-wrap{overflow-x:auto;margin-bottom:2.5rem;}
+    table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    thead th{font-family:var(--font-mono);font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:0.6rem 0.75rem;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;}
+    thead th.num{text-align:right;}
+    tbody tr{border-bottom:1px solid rgba(26,34,56,0.5);transition:background 0.15s;}
+    tbody tr:hover{background:rgba(240,180,41,0.03);}
+    td{padding:0.55rem 0.75rem;color:var(--muted);}
+    td.player-name{color:var(--text);font-weight:500;}
+    td.seed-col{font-family:var(--font-mono);font-size:0.7rem;color:var(--muted);text-align:center;width:36px;}
+    td.num{text-align:right;font-family:var(--font-mono);font-size:0.75rem;}
+    .prob-bar-cell{width:120px;padding-right:1rem;}
+    .prob-bar{height:4px;border-radius:2px;background:var(--border);overflow:hidden;}
+    .prob-bar-fill{height:100%;border-radius:2px;transition:width 0.6s ease;}
+    .bar-atp{background:var(--atp);}
+    .bar-wta{background:var(--wta);}
+    .bar-cha{background:var(--cha);}
+    .rank-1{background:rgba(240,180,41,0.05);}
+    .rank-2{background:rgba(240,180,41,0.03);}
+    .rank-3{background:rgba(240,180,41,0.02);}
+    .pct-high{color:var(--gold)!important;font-weight:600;}
+    .pct-med{color:var(--text)!important;}
+
+    /* ── BRACKET GRID ── */
+    .bracket-label{font-family:var(--font-head);font-size:1.2rem;letter-spacing:0.08em;color:var(--muted);margin:2rem 0 1rem;}
+    .half-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);padding:0.4rem 0.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;display:inline-block;margin-bottom:1rem;}
+    .bracket-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:1rem;}
+    .bracket-row{display:grid;grid-template-columns:28px 1fr 60px 60px 60px 60px;gap:0.5rem;align-items:center;padding:0.35rem 0;border-bottom:1px solid rgba(26,34,56,0.3);}
+    .bracket-row:last-child{border-bottom:none;}
+    .br-pos{font-family:var(--font-mono);font-size:0.58rem;color:var(--border);text-align:right;}
+    .br-seed{font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);background:var(--bg3);border-radius:2px;padding:0.1rem 0.25rem;text-align:center;min-width:18px;display:inline-block;}
+    .br-player{font-size:0.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .br-player.qualifier{color:var(--muted);font-style:italic;}
+    .br-player.bye{color:var(--border);}
+    .br-pct{font-family:var(--font-mono);font-size:0.68rem;text-align:center;}
+    .br-win{color:var(--gold);}
+    .br-sf{color:var(--text);}
+    .br-q{color:var(--muted);}
+    .br-next{color:var(--green);}
+    .bracket-row-hdr{display:grid;grid-template-columns:28px 1fr 60px 60px 60px 60px;gap:0.5rem;padding:0 0 0.5rem 0;margin-bottom:0.25rem;border-bottom:1px solid var(--border);}
+    .bracket-row-hdr span{font-family:var(--font-mono);font-size:0.58rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-align:center;}
+    .bracket-row-hdr span:nth-child(2){text-align:left;}
+
+    /* ── CHALLENGER INFO CARD ── */
+    .cha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:2rem;}
+    .cha-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.25rem;border-left:3px solid var(--cha);}
+    .cha-card-title{font-family:var(--font-head);font-size:1.2rem;letter-spacing:0.05em;color:var(--text);margin-bottom:0.25rem;}
+    .cha-card-meta{font-family:var(--font-mono);font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;}
+    .cha-card-surface{display:inline-flex;align-items:center;gap:0.3rem;font-family:var(--font-mono);font-size:0.6rem;padding:0.15rem 0.5rem;border-radius:3px;border:1px solid var(--border);color:var(--muted);}
+    .surface-h{border-color:rgba(59,130,246,0.4);color:rgba(59,130,246,0.8);}
+    .surface-c{border-color:rgba(245,158,11,0.4);color:rgba(245,158,11,0.8);}
+
+    footer{background:var(--bg2);border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+    .footer-links{display:flex;gap:1.5rem;}
+    .footer-links a{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+    .footer-links a:hover{color:var(--text);}
+    .footer-disc{width:100%;font-size:0.65rem;color:var(--muted);font-family:var(--font-mono);border-top:1px solid var(--border);padding-top:1rem;}
+
+    @media(max-width:768px){
+      .bracket-row{grid-template-columns:20px 1fr 48px 48px 48px 48px;font-size:0.72rem;}
+      .content{padding:1.5rem 1rem 4rem;}
+      .hero{padding:5.5rem 1.5rem 2rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="#f0b429" stroke-width="1.5"/><path d="M7 13 L13 6.5 L19 13 L13 19.5 Z" fill="#f0b429" opacity="0.9"/><circle cx="13" cy="13" r="2.5" fill="#080b12"/></svg>
+    <span>Arc<em>Vest</em></span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/bracket.html">March Madness</a>
+    <a href="/bracket_tennis.html" class="active">Tennis</a>
+    <a href="/library.html">Learn</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">ArcVest Model · Monte Carlo Simulation</div>
+  <h1>Miami Open<br><span>2026</span></h1>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><strong>March 17–29</strong>Miami Gardens, FL</div>
+    <div class="hero-meta-item"><strong>Hard Rock Stadium</strong>Hardcourt (Laykold)</div>
+    <div class="hero-meta-item"><strong>ATP & WTA 1000</strong>Sunshine Double</div>
+    <div class="hero-meta-item"><strong>50,000 Simulations</strong>Sackmann Elo Method</div>
+  </div>
+</div>
+
+<div class="tour-tabs">
+  <button class="tab-btn active-atp" onclick="showTour('atp')">ATP Men's</button>
+  <button class="tab-btn" onclick="showTour('wta')">WTA Women's</button>
+  <button class="tab-btn" onclick="showTour('challenger')">Challengers</button>
+</div>
+
+<div class="content">
+
+  <!-- ══════════════ ATP ══════════════ -->
+  <div id="tour-atp" class="tour-section visible">
+    <div class="section-hdr">
+      <h2 class="atp">ATP Men's Singles</h2>
+      <span class="sub">Miami Open · 128 draw · 50k sims · hardcourt Elo</span>
+    </div>
+    <div class="sim-note">
+      Championship probabilities based on 50,000 Monte Carlo simulations using surface-specific Elo ratings.
+      <strong>Win%</strong> = P(championship) &nbsp;·&nbsp; <strong>Final%</strong> = P(reaching final) &nbsp;·&nbsp;
+      <strong>SF%</strong> = P(reaching semis) &nbsp;·&nbsp; <strong>Next%</strong> = P(winning next match)
+    </div>
+
+    <div class="prob-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Seed</th>
+            <th>Player</th>
+            <th class="num">Win%</th>
+            <th class="num">Final%</th>
+            <th class="num">SF%</th>
+            <th class="num">Next%</th>
+            <th>Model</th>
+            <th class="num">Elo</th>
+          </tr>
+        </thead>
+        <tbody id="atp-table-body">
+          <!-- Populated by JS from sim data -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bracket-label">Draw — Top Half</div>
+    <div class="half-label">Alcaraz Half · Positions 1–64</div>
+    <div class="bracket-section">
+      <div class="bracket-row-hdr">
+        <span>#</span><span>Player</span><span>Win%</span><span>Final%</span><span>SF%</span><span>Next%</span>
+      </div>
+      <div id="atp-top-bracket"></div>
+    </div>
+
+    <div class="half-label">Sinner Half · Positions 65–128</div>
+    <div class="bracket-section">
+      <div class="bracket-row-hdr">
+        <span>#</span><span>Player</span><span>Win%</span><span>Final%</span><span>SF%</span><span>Next%</span>
+      </div>
+      <div id="atp-bot-bracket"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ WTA ══════════════ -->
+  <div id="tour-wta" class="tour-section">
+    <div class="section-hdr">
+      <h2 class="wta">WTA Women's Singles</h2>
+      <span class="sub">Miami Open · 128 draw · 50k sims · hardcourt Elo</span>
+    </div>
+    <div class="sim-note">
+      Championship probabilities based on 50,000 Monte Carlo simulations using surface-specific Elo ratings.
+      <strong>Win%</strong> = P(championship) &nbsp;·&nbsp; <strong>Final%</strong> = P(reaching final) &nbsp;·&nbsp;
+      <strong>SF%</strong> = P(reaching semis) &nbsp;·&nbsp; <strong>Next%</strong> = P(winning next match)
+    </div>
+
+    <div class="prob-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Seed</th>
+            <th>Player</th>
+            <th class="num">Win%</th>
+            <th class="num">Final%</th>
+            <th class="num">SF%</th>
+            <th class="num">Next%</th>
+            <th>Model</th>
+            <th class="num">Elo</th>
+          </tr>
+        </thead>
+        <tbody id="wta-table-body"></tbody>
+      </table>
+    </div>
+
+    <div class="bracket-label">Draw — Top Half</div>
+    <div class="half-label">Sabalenka Half · Positions 1–64</div>
+    <div class="bracket-section">
+      <div class="bracket-row-hdr">
+        <span>#</span><span>Player</span><span>Win%</span><span>Final%</span><span>SF%</span><span>Next%</span>
+      </div>
+      <div id="wta-top-bracket"></div>
+    </div>
+
+    <div class="half-label">Swiatek Half · Positions 65–128</div>
+    <div class="bracket-section">
+      <div class="bracket-row-hdr">
+        <span>#</span><span>Player</span><span>Win%</span><span>Final%</span><span>SF%</span><span>Next%</span>
+      </div>
+      <div id="wta-bot-bracket"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CHALLENGER ══════════════ -->
+  <div id="tour-challenger" class="tour-section">
+    <div class="section-hdr">
+      <h2 class="cha">ATP Challenger Tournaments</h2>
+      <span class="sub">Active this week · Model probabilities</span>
+    </div>
+    <div class="sim-note">
+      Challenger probabilities cross-referenced with Tennis Abstract E(W%) and ArcVest Elo model.
+      <strong>Only markets with ≥5% EV edge</strong> appear in daily picks.
+    </div>
+
+    <div class="cha-grid">
+      <div class="cha-card">
+        <div class="cha-card-title">Cuernavaca (Morelos)</div>
+        <div class="cha-card-meta">ATP Challenger · March 17–23 · Cuernavaca, Mexico</div>
+        <div class="cha-card-surface surface-h">🎾 Hard Court (Outdoor)</div>
+      </div>
+      <div class="cha-card">
+        <div class="cha-card-title">Asunción</div>
+        <div class="cha-card-meta">ATP Challenger · March 17–23 · Asunción, Paraguay</div>
+        <div class="cha-card-surface surface-c">🎾 Clay (Outdoor)</div>
+      </div>
+      <div class="cha-card">
+        <div class="cha-card-title">Murcia</div>
+        <div class="cha-card-meta">ATP Challenger · March 17–23 · Murcia, Spain</div>
+        <div class="cha-card-surface surface-c">🎾 Clay (Outdoor)</div>
+      </div>
+      <div class="cha-card">
+        <div class="cha-card-title">Zadar</div>
+        <div class="cha-card-meta">ATP Challenger · March 17–23 · Zadar, Croatia</div>
+        <div class="cha-card-surface surface-c">🎾 Clay (Indoor)</div>
+      </div>
+    </div>
+
+    <div class="sim-note" style="margin-top:0.5rem;">
+      Full bracket simulation tables for Challenger events will appear here once daily picks are published.
+      Odds and schedule loaded from TENDATAUPLOAD — updated each round.
+    </div>
+
+    <div class="prob-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">Seed</th>
+            <th>Player</th>
+            <th>Tournament</th>
+            <th class="num">Win%</th>
+            <th class="num">Final%</th>
+            <th class="num">SF%</th>
+            <th class="num">Next%</th>
+            <th class="num">Elo</th>
+          </tr>
+        </thead>
+        <tbody id="cha-table-body">
+          <!-- Populated by JS once Challenger sim runs -->
+          <tr>
+            <td colspan="8" style="text-align:center;color:var(--muted);padding:2rem;font-family:var(--font-mono);font-size:0.72rem;">
+              Challenger bracket simulations load after daily picks run — check back after 9 AM ET
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<footer>
+  <div style="font-family:var(--font-head);font-size:1.1rem;color:var(--muted);">ArcVest</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/bracket.html">March Madness</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/library.html">Learn</a>
+  </div>
+  <div class="footer-disc">For informational and entertainment purposes only. Not financial or betting advice. Past model performance does not guarantee future results. Must be 21+ and in a jurisdiction where sports betting is legal. ArcVest / Mountain Engineering · arcvest.io</div>
+</footer>
+
+<script>
+// ── Tour tab switcher ─────────────────────────────────────────────────────────
+function showTour(tour) {
+  document.querySelectorAll('.tour-section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.className = 'tab-btn';
+  });
+  document.getElementById('tour-' + tour).classList.add('visible');
+  const btn = document.querySelector(`[onclick="showTour('${tour}')"]`);
+  btn.classList.add('active-' + tour);
+}
+
+// ── Sim data ──────────────────────────────────────────────────────────────────
+// This data block is replaced by SureBet.R's write_json() output each run.
+// Format: array of {tour, draw_pos, seed, player, pct_win, pct_final, pct_semi, pct_next, elo}
+// The R script writes bracket_tennis_data.js which is injected here.
+// For initial launch: hardcoded from first sim run.
+
+const SIM_DATA = {
+  atp: [
+    {draw_pos:1, seed:null, player:"Jannik Sinner", pct_win:2.0, pct_final:3.5, pct_semi:6.2, pct_next:58.7, elo:2269},
+    {draw_pos:2, seed:null, player:"Sebastian Ofner", pct_win:0.5, pct_final:1.0, pct_semi:2.1, pct_next:41.3, elo:1651},
+    {draw_pos:3, seed:null, player:"Alex Michelsen", pct_win:0.8, pct_final:1.6, pct_semi:3.2, pct_next:52.0, elo:1808},
+    {draw_pos:4, seed:null, player:"Alexei Popyrin", pct_win:0.6, pct_final:1.2, pct_semi:2.6, pct_next:48.0, elo:1674},
+    {draw_pos:5, seed:null, player:"Matteo Berrettini", pct_win:0.8, pct_final:1.6, pct_semi:3.1, pct_next:48.7, elo:1797},
+    {draw_pos:6, seed:null, player:"Jakub Mensik", pct_win:1.0, pct_final:2.0, pct_semi:3.7, pct_next:51.3, elo:1895},
+    {draw_pos:7, seed:null, player:"Frances Tiafoe", pct_win:0.9, pct_final:1.8, pct_semi:3.5, pct_next:52.0, elo:1846},
+    {draw_pos:8, seed:null, player:"Lorenzo Sonego", pct_win:0.7, pct_final:1.4, pct_semi:2.8, pct_next:48.0, elo:1718},
+    {draw_pos:9, seed:null, player:"Ignacio Buse", pct_win:0.6, pct_final:1.3, pct_semi:2.7, pct_next:54.7, elo:1613},
+    {draw_pos:10, seed:null, player:"Andrea Pellegrino", pct_win:0.2, pct_final:0.6, pct_semi:1.5, pct_next:45.3, elo:1364},
+    {draw_pos:11, seed:null, player:"Luca Nardi", pct_win:0.5, pct_final:1.1, pct_semi:2.3, pct_next:44.2, elo:1590},
+    {draw_pos:12, seed:null, player:"Arthur Fils", pct_win:1.3, pct_final:2.5, pct_semi:4.8, pct_next:55.8, elo:1963},
+    {draw_pos:13, seed:null, player:"Andrey Rublev", pct_win:1.0, pct_final:2.0, pct_semi:3.8, pct_next:53.2, elo:1842},
+    {draw_pos:14, seed:null, player:"Dalibor Svrcina", pct_win:0.6, pct_final:1.3, pct_semi:2.7, pct_next:46.8, elo:1642},
+    {draw_pos:15, seed:null, player:"Miomir Kecmanovic", pct_win:0.7, pct_final:1.5, pct_semi:2.8, pct_next:51.7, elo:1685},
+    {draw_pos:16, seed:null, player:"Cristian Garin", pct_win:0.5, pct_final:1.2, pct_semi:2.4, pct_next:48.3, elo:1580},
+    {draw_pos:17, seed:null, player:"Juan Manuel Cerundolo", pct_win:0.6, pct_final:1.2, pct_semi:2.5, pct_next:46.3, elo:1610},
+    {draw_pos:18, seed:null, player:"Alejandro Davidovich Fokina", pct_win:1.0, pct_final:2.0, pct_semi:3.8, pct_next:53.7, elo:1838},
+    {draw_pos:19, seed:null, player:"Brandon Nakashima", pct_win:0.9, pct_final:1.8, pct_semi:3.4, pct_next:51.5, elo:1773},
+    {draw_pos:20, seed:null, player:"Roberto Bautista Agut", pct_win:0.7, pct_final:1.4, pct_semi:2.9, pct_next:48.5, elo:1684},
+    {draw_pos:21, seed:null, player:"Francesco Maestrelli", pct_win:0.5, pct_final:1.1, pct_semi:2.4, pct_next:49.9, elo:1566},
+    {draw_pos:22, seed:null, player:"Nikoloz Basilashvili", pct_win:0.5, pct_final:1.2, pct_semi:2.5, pct_next:50.1, elo:1590},
+    {draw_pos:23, seed:null, player:"Daniel Merida Aguilar", pct_win:0.6, pct_final:1.3, pct_semi:2.8, pct_next:46.4, elo:1692},
+    {draw_pos:24, seed:null, player:"Ben Shelton", pct_win:1.2, pct_final:2.2, pct_semi:4.2, pct_next:53.6, elo:1929},
+    {draw_pos:25, seed:null, player:"Felix Auger Aliassime", pct_win:1.2, pct_final:2.2, pct_semi:4.3, pct_next:52.2, elo:1946},
+    {draw_pos:26, seed:null, player:"Denis Shapovalov", pct_win:0.8, pct_final:1.6, pct_semi:3.1, pct_next:47.8, elo:1793},
+    {draw_pos:27, seed:null, player:"Mariano Navone", pct_win:0.6, pct_final:1.2, pct_semi:2.6, pct_next:48.7, elo:1668},
+    {draw_pos:28, seed:null, player:"Hamad Medjedovic", pct_win:0.8, pct_final:1.6, pct_semi:3.1, pct_next:51.3, elo:1734},
+    {draw_pos:29, seed:null, player:"Valentin Royer", pct_win:0.6, pct_final:1.2, pct_semi:2.3, pct_next:45.4, elo:1603},
+    {draw_pos:30, seed:null, player:"Joao Fonseca", pct_win:1.2, pct_final:2.3, pct_semi:4.3, pct_next:54.6, elo:1916},
+    {draw_pos:31, seed:null, player:"Tomas Martin Etcheverry", pct_win:0.9, pct_final:1.8, pct_semi:3.5, pct_next:53.8, elo:1792},
+    {draw_pos:32, seed:null, player:"Roman Andres Burruchaga", pct_win:0.4, pct_final:1.0, pct_semi:2.2, pct_next:46.2, elo:1566},
+    {draw_pos:33, seed:null, player:"Mattia Bellucci", pct_win:0.6, pct_final:1.3, pct_semi:2.7, pct_next:49.2, elo:1656},
+    {draw_pos:34, seed:null, player:"Marcos Giron", pct_win:0.7, pct_final:1.5, pct_semi:3.0, pct_next:50.8, elo:1736},
+    {draw_pos:35, seed:null, player:"Marin Cilic", pct_win:0.8, pct_final:1.5, pct_semi:3.1, pct_next:48.9, elo:1768},
+    {draw_pos:36, seed:null, player:"Valentin Vacherot", pct_win:1.0, pct_final:2.0, pct_semi:3.8, pct_next:51.1, elo:1852},
+    {draw_pos:37, seed:null, player:"Flavio Cobolli", pct_win:0.8, pct_final:1.7, pct_semi:3.4, pct_next:51.1, elo:1806},
+    {draw_pos:38, seed:null, player:"Zizou Bergs", pct_win:0.8, pct_final:1.6, pct_semi:3.1, pct_next:48.9, elo:1754},
+    {draw_pos:39, seed:null, player:"Terence Atmane", pct_win:0.7, pct_final:1.4, pct_semi:3.0, pct_next:51.3, elo:1695},
+    {draw_pos:40, seed:null, player:"Thiago Agustin Tirante", pct_win:0.6, pct_final:1.2, pct_semi:2.4, pct_next:48.7, elo:1617},
+    {draw_pos:41, seed:null, player:"Gianluca Cadenasso", pct_win:0.3, pct_final:0.7, pct_semi:1.6, pct_next:42.7, elo:1390},
+    {draw_pos:42, seed:null, player:"Cameron Norrie", pct_win:1.0, pct_final:2.0, pct_semi:3.9, pct_next:57.3, elo:1812},
+    {draw_pos:43, seed:null, player:"Corentin Moutet", pct_win:0.7, pct_final:1.5, pct_semi:3.2, pct_next:49.7, elo:1759},
+    {draw_pos:44, seed:null, player:"Ethan Quinn", pct_win:0.9, pct_final:1.8, pct_semi:3.5, pct_next:50.3, elo:1772},
+    {draw_pos:45, seed:null, player:"Pablo Llamas Ruiz", pct_win:0.5, pct_final:1.0, pct_semi:2.2, pct_next:46.4, elo:1599},
+    {draw_pos:46, seed:null, player:"Stefanos Tsitsipas", pct_win:0.9, pct_final:1.8, pct_semi:3.5, pct_next:53.6, elo:1816},
+    {draw_pos:47, seed:null, player:"Tomas Machac", pct_win:0.9, pct_final:1.7, pct_semi:3.3, pct_next:47.9, elo:1821},
+    {draw_pos:48, seed:null, player:"Daniil Medvedev", pct_win:1.3, pct_final:2.4, pct_semi:4.5, pct_next:52.1, elo:1974},
+    {draw_pos:49, seed:null, player:"Lorenzo Musetti", pct_win:1.1, pct_final:2.2, pct_semi:4.2, pct_next:55.1, elo:1903},
+    {draw_pos:50, seed:null, player:"Jacob Fearnley", pct_win:0.6, pct_final:1.1, pct_semi:2.4, pct_next:44.9, elo:1578},
+    {draw_pos:51, seed:null, player:"Giovanni Mpetshi Perricard", pct_win:0.6, pct_final:1.3, pct_semi:2.7, pct_next:49.1, elo:1662},
+    {draw_pos:52, seed:null, player:"Pablo Carreno Busta", pct_win:0.7, pct_final:1.5, pct_semi:3.0, pct_next:50.9, elo:1723},
+    {draw_pos:53, seed:null, player:"Alejandro Tabilo", pct_win:0.8, pct_final:1.6, pct_semi:3.1, pct_next:48.6, elo:1764},
+    {draw_pos:54, seed:null, player:"Francisco Cerundolo", pct_win:1.0, pct_final:2.0, pct_semi:3.7, pct_next:51.4, elo:1869},
+    {draw_pos:55, seed:null, player:"Casper Ruud", pct_win:0.9, pct_final:1.8, pct_semi:3.7, pct_next:52.9, elo:1866},
+    {draw_pos:56, seed:null, player:"Zachary Svajda", pct_win:0.6, pct_final:1.3, pct_semi:2.6, pct_next:47.1, elo:1690},
+    {draw_pos:57, seed:null, player:"Jan Lennard Struff", pct_win:0.6, pct_final:1.2, pct_semi:2.6, pct_next:46.1, elo:1636},
+    {draw_pos:58, seed:null, player:"Jiri Lehecka", pct_win:1.1, pct_final:2.1, pct_semi:4.1, pct_next:53.9, elo:1899},
+    {draw_pos:59, seed:null, player:"Karen Khachanov", pct_win:0.8, pct_final:1.6, pct_semi:3.3, pct_next:52.1, elo:1785},
+    {draw_pos:60, seed:null, player:"Alexander Shevchenko", pct_win:0.6, pct_final:1.2, pct_semi:2.6, pct_next:47.9, elo:1651},
+    {draw_pos:61, seed:null, player:"Botic Van De Zandschulp", pct_win:0.8, pct_final:1.5, pct_semi:3.1, pct_next:51.8, elo:1722},
+    {draw_pos:62, seed:null, player:"Aleksandar Kovacevic", pct_win:0.6, pct_final:1.1, pct_semi:2.4, pct_next:48.2, elo:1602},
+    {draw_pos:63, seed:null, player:"Ugo Humbert", pct_win:0.9, pct_final:1.9, pct_semi:3.5, pct_next:52.6, elo:1837},
+    {draw_pos:64, seed:null, player:"Vit Kopriva", pct_win:0.6, pct_final:1.3, pct_semi:2.6, pct_next:47.4, elo:1671},
+    {draw_pos:65, seed:null, player:"Marton Fucsovics", pct_win:1.4, pct_final:2.8, pct_semi:2.8, pct_next:49.6, elo:1727},
+    {draw_pos:66, seed:null, player:"Dino Prizmic", pct_win:1.3, pct_final:2.8, pct_semi:2.8, pct_next:50.4, elo:1724},
+    {draw_pos:67, seed:null, player:"Novak Djokovic", pct_win:2.4, pct_final:4.2, pct_semi:4.2, pct_next:51.2, elo:2032},
+    {draw_pos:68, seed:null, player:"Alex De Minaur", pct_win:2.0, pct_final:3.8, pct_semi:3.8, pct_next:48.8, elo:1947},
+    {draw_pos:69, seed:null, player:"Matteo Arnaldi", pct_win:1.3, pct_final:2.8, pct_semi:2.8, pct_next:49.9, elo:1684},
+    {draw_pos:70, seed:null, player:"Nuno Borges", pct_win:1.2, pct_final:2.6, pct_semi:2.6, pct_next:50.1, elo:1691},
+    {draw_pos:71, seed:null, player:"Rafael Jodar", pct_win:1.8, pct_final:3.6, pct_semi:3.6, pct_next:49.5, elo:1863},
+    {draw_pos:72, seed:null, player:"Learner Tien", pct_win:2.0, pct_final:3.7, pct_semi:3.7, pct_next:50.5, elo:1885},
+    {draw_pos:73, seed:null, player:"Damir Dzumhur", pct_win:1.1, pct_final:2.3, pct_semi:2.3, pct_next:48.4, elo:1600},
+    {draw_pos:74, seed:null, player:"Sebastian Baez", pct_win:1.4, pct_final:2.8, pct_semi:2.8, pct_next:51.6, elo:1702},
+    {draw_pos:75, seed:null, player:"Alexander Bublik", pct_win:1.9, pct_final:3.6, pct_semi:3.6, pct_next:50.0, elo:1855},
+    {draw_pos:76, seed:null, player:"Tommy Paul", pct_win:1.9, pct_final:3.7, pct_semi:3.7, pct_next:50.0, elo:1871},
+    {draw_pos:77, seed:null, player:"Aleksandar Vukic", pct_win:1.0, pct_final:2.3, pct_semi:2.3, pct_next:47.7, elo:1583},
+    {draw_pos:78, seed:null, player:"Yannick Hanfmann", pct_win:1.5, pct_final:3.1, pct_semi:3.1, pct_next:52.3, elo:1724},
+    {draw_pos:79, seed:null, player:"Luciano Darderi", pct_win:1.2, pct_final:2.6, pct_semi:2.6, pct_next:48.0, elo:1650},
+    {draw_pos:80, seed:null, player:"Tallon Griekspoor", pct_win:1.8, pct_final:3.5, pct_semi:3.5, pct_next:52.0, elo:1793},
+    {draw_pos:81, seed:null, player:"Federico Cina", pct_win:4.3, pct_final:9.3, pct_semi:9.3, pct_next:45.6, elo:1526},
+    {draw_pos:82, seed:null, player:"Alexander Blockx", pct_win:6.8, pct_final:13.5, pct_semi:13.5, pct_next:54.4, elo:1786},
+    {draw_pos:83, seed:null, player:"Daniel Altmaier", pct_win:5.0, pct_final:10.5, pct_semi:10.5, pct_next:44.1, elo:1627},
+    {draw_pos:84, seed:null, player:"Alexander Zverev", pct_win:8.8, pct_final:16.5, pct_semi:16.5, pct_next:55.9, elo:2035},
+    {draw_pos:85, seed:null, player:"Bye_85", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.3, elo:1},
+    {draw_pos:86, seed:null, player:"Bye_86", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:49.7, elo:1},
+    {draw_pos:87, seed:null, player:"Bye_87", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.0, elo:1},
+    {draw_pos:88, seed:null, player:"Bye_88", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.0, elo:1},
+    {draw_pos:89, seed:null, player:"Bye_89", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.1, elo:1},
+    {draw_pos:90, seed:null, player:"Bye_90", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:49.9, elo:1},
+    {draw_pos:91, seed:null, player:"Bye_91", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:49.7, elo:1},
+    {draw_pos:92, seed:null, player:"Bye_92", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.3, elo:1},
+    {draw_pos:93, seed:null, player:"Bye_93", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.1, elo:1},
+    {draw_pos:94, seed:null, player:"Bye_94", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:49.9, elo:1},
+    {draw_pos:95, seed:null, player:"Bye_95", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.0, elo:1},
+    {draw_pos:96, seed:null, player:"Bye_96", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.0, elo:1},
+    {draw_pos:97, seed:null, player:"Bye_97", pct_win:0.0, pct_final:0.0, pct_semi:3.0, pct_next:50.1, elo:1},
+    {draw_pos:98, seed:null, player:"Bye_98", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.9, elo:1},
+    {draw_pos:99, seed:null, player:"Bye_99", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.0, elo:1},
+    {draw_pos:100, seed:null, player:"Bye_100", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:101, seed:null, player:"Bye_101", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.1, elo:1},
+    {draw_pos:102, seed:null, player:"Bye_102", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.9, elo:1},
+    {draw_pos:103, seed:null, player:"Bye_103", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:49.6, elo:1},
+    {draw_pos:104, seed:null, player:"Bye_104", pct_win:0.0, pct_final:0.0, pct_semi:3.0, pct_next:50.4, elo:1},
+    {draw_pos:105, seed:null, player:"Bye_105", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:106, seed:null, player:"Bye_106", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:107, seed:null, player:"Bye_107", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:49.9, elo:1},
+    {draw_pos:108, seed:null, player:"Bye_108", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.1, elo:1},
+    {draw_pos:109, seed:null, player:"Bye_109", pct_win:0.0, pct_final:0.0, pct_semi:3.0, pct_next:50.4, elo:1},
+    {draw_pos:110, seed:null, player:"Bye_110", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.6, elo:1},
+    {draw_pos:111, seed:null, player:"Bye_111", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.1, elo:1},
+    {draw_pos:112, seed:null, player:"Bye_112", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.9, elo:1},
+    {draw_pos:113, seed:null, player:"Bye_113", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:114, seed:null, player:"Bye_114", pct_win:0.0, pct_final:0.0, pct_semi:3.0, pct_next:50.0, elo:1},
+    {draw_pos:115, seed:null, player:"Bye_115", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.6, elo:1},
+    {draw_pos:116, seed:null, player:"Bye_116", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.4, elo:1},
+    {draw_pos:117, seed:null, player:"Bye_117", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.8, elo:1},
+    {draw_pos:118, seed:null, player:"Bye_118", pct_win:0.0, pct_final:0.0, pct_semi:3.3, pct_next:50.2, elo:1},
+    {draw_pos:119, seed:null, player:"Bye_119", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.3, elo:1},
+    {draw_pos:120, seed:null, player:"Bye_120", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:49.7, elo:1},
+    {draw_pos:121, seed:null, player:"Bye_121", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.4, elo:1},
+    {draw_pos:122, seed:null, player:"Bye_122", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.6, elo:1},
+    {draw_pos:123, seed:null, player:"Bye_123", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:124, seed:null, player:"Bye_124", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.0, elo:1},
+    {draw_pos:125, seed:null, player:"Bye_125", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:49.9, elo:1},
+    {draw_pos:126, seed:null, player:"Bye_126", pct_win:0.0, pct_final:0.0, pct_semi:3.1, pct_next:50.1, elo:1},
+    {draw_pos:127, seed:null, player:"Bye_127", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.0, elo:1},
+    {draw_pos:128, seed:null, player:"Bye_128", pct_win:0.0, pct_final:0.0, pct_semi:3.2, pct_next:50.0, elo:1}
+  ],
+  wta: [
+    {draw_pos:1, seed:null, player:"Aryna Sabalenka", pct_win:3.0, pct_final:5.4, pct_semi:9.7, pct_next:55.2, elo:2218},
+    {draw_pos:2, seed:null, player:"Barbora Krejcikova", pct_win:1.4, pct_final:2.8, pct_semi:5.7, pct_next:44.8, elo:1811},
+    {draw_pos:3, seed:null, player:"Tatjana Maria", pct_win:0.8, pct_final:1.9, pct_semi:4.2, pct_next:44.7, elo:1566},
+    {draw_pos:4, seed:null, player:"Sorana Cirstea", pct_win:1.9, pct_final:3.6, pct_semi:7.0, pct_next:55.3, elo:1903},
+    {draw_pos:5, seed:null, player:"Clara Tauson", pct_win:1.5, pct_final:3.2, pct_semi:6.4, pct_next:53.9, elo:1798},
+    {draw_pos:6, seed:null, player:"Oleksandra Oliynykova", pct_win:0.9, pct_final:1.9, pct_semi:4.1, pct_next:46.1, elo:1555},
+    {draw_pos:7, seed:null, player:"Anastasia Zakharova", pct_win:1.2, pct_final:2.5, pct_semi:5.2, pct_next:46.8, elo:1703},
+    {draw_pos:8, seed:null, player:"Linda Noskova", pct_win:2.0, pct_final:3.8, pct_semi:7.2, pct_next:53.2, elo:1909},
+    {draw_pos:9, seed:null, player:"Belinda Bencic", pct_win:1.9, pct_final:3.8, pct_semi:7.3, pct_next:54.0, elo:1953},
+    {draw_pos:10, seed:null, player:"Bianca Andreescu", pct_win:1.1, pct_final:2.4, pct_semi:5.0, pct_next:46.0, elo:1698},
+    {draw_pos:11, seed:null, player:"Katerina Siniakova", pct_win:1.4, pct_final:2.9, pct_semi:5.8, pct_next:49.8, elo:1812},
+    {draw_pos:12, seed:null, player:"Anna Kalinskaya", pct_win:1.5, pct_final:3.0, pct_semi:6.1, pct_next:50.2, elo:1856},
+    {draw_pos:13, seed:null, player:"Qinwen Zheng", pct_win:1.6, pct_final:3.1, pct_semi:6.1, pct_next:51.1, elo:1860},
+    {draw_pos:14, seed:null, player:"Jelena Ostapenko", pct_win:1.3, pct_final:2.7, pct_semi:5.5, pct_next:48.9, elo:1782},
+    {draw_pos:15, seed:null, player:"Amanda Anisimova", pct_win:2.0, pct_final:3.8, pct_semi:7.3, pct_next:49.9, elo:1994},
+    {draw_pos:16, seed:null, player:"Coco Gauff", pct_win:2.1, pct_final:4.0, pct_semi:7.5, pct_next:50.1, elo:2041},
+    {draw_pos:17, seed:null, player:"Tereza Valentova", pct_win:1.6, pct_final:3.3, pct_semi:6.8, pct_next:53.5, elo:1816},
+    {draw_pos:18, seed:null, player:"Solana Sierra", pct_win:1.0, pct_final:2.2, pct_semi:4.8, pct_next:46.5, elo:1613},
+    {draw_pos:19, seed:null, player:"Anhelina Kalinina", pct_win:1.4, pct_final:2.9, pct_semi:5.9, pct_next:49.3, elo:1748},
+    {draw_pos:20, seed:null, player:"Marie Bouzkova", pct_win:1.5, pct_final:3.0, pct_semi:6.2, pct_next:50.7, elo:1778},
+    {draw_pos:21, seed:null, player:"Taylor Townsend", pct_win:1.5, pct_final:3.0, pct_semi:6.2, pct_next:50.2, elo:1796},
+    {draw_pos:22, seed:null, player:"Mccartney Kessler", pct_win:1.5, pct_final:3.0, pct_semi:6.1, pct_next:49.8, elo:1801},
+    {draw_pos:23, seed:null, player:"Iva Jovic", pct_win:1.5, pct_final:3.1, pct_semi:6.3, pct_next:48.8, elo:1823},
+    {draw_pos:24, seed:null, player:"Jasmine Paolini", pct_win:1.7, pct_final:3.6, pct_semi:7.2, pct_next:51.2, elo:1888},
+    {draw_pos:25, seed:null, player:"Leolia Jeanjean", pct_win:1.0, pct_final:2.2, pct_semi:4.8, pct_next:45.3, elo:1589},
+    {draw_pos:26, seed:null, player:"Elise Mertens", pct_win:1.9, pct_final:3.7, pct_semi:7.4, pct_next:54.7, elo:1855},
+    {draw_pos:27, seed:null, player:"Maya Joint", pct_win:1.4, pct_final:2.9, pct_semi:5.9, pct_next:50.4, elo:1712},
+    {draw_pos:28, seed:null, player:"Viktorija Golubic", pct_win:1.3, pct_final:2.7, pct_semi:5.6, pct_next:49.6, elo:1693},
+    {draw_pos:29, seed:null, player:"Mirra Andreeva", pct_win:1.9, pct_final:3.8, pct_semi:7.5, pct_next:48.6, elo:1981},
+    {draw_pos:30, seed:null, player:"Jessica Pegula", pct_win:2.4, pct_final:4.6, pct_semi:8.5, pct_next:51.4, elo:2061},
+    {draw_pos:31, seed:null, player:"Zeynep Sonmez", pct_win:1.2, pct_final:2.7, pct_semi:5.6, pct_next:50.5, elo:1709},
+    {draw_pos:32, seed:null, player:"Rebeka Masarova", pct_win:1.1, pct_final:2.4, pct_semi:5.2, pct_next:49.5, elo:1656},
+    {draw_pos:33, seed:null, player:"Leylah Fernandez", pct_win:1.5, pct_final:3.2, pct_semi:6.4, pct_next:51.0, elo:1819},
+    {draw_pos:34, seed:null, player:"Liudmila Samsonova", pct_win:1.3, pct_final:2.8, pct_semi:5.8, pct_next:49.0, elo:1743},
+    {draw_pos:35, seed:null, player:"Ann Li", pct_win:1.4, pct_final:2.8, pct_semi:5.8, pct_next:49.5, elo:1746},
+    {draw_pos:36, seed:null, player:"Anastasia Potapova", pct_win:1.5, pct_final:3.0, pct_semi:6.2, pct_next:50.5, elo:1789},
+    {draw_pos:37, seed:null, player:"Karolina Muchova", pct_win:2.2, pct_final:4.2, pct_semi:8.0, pct_next:52.2, elo:2045},
+    {draw_pos:38, seed:null, player:"Naomi Osaka", pct_win:1.6, pct_final:3.3, pct_semi:6.7, pct_next:47.8, elo:1902},
+    {draw_pos:39, seed:null, player:"Eva Lys", pct_win:1.4, pct_final:2.7, pct_semi:5.8, pct_next:49.8, elo:1776},
+    {draw_pos:40, seed:null, player:"Talia Gibson", pct_win:1.4, pct_final:2.9, pct_semi:5.9, pct_next:50.2, elo:1788},
+    {draw_pos:41, seed:null, player:"Diana Shnaider", pct_win:1.6, pct_final:3.2, pct_semi:6.5, pct_next:51.4, elo:1829},
+    {draw_pos:42, seed:null, player:"Emma Navarro", pct_win:1.3, pct_final:2.7, pct_semi:5.8, pct_next:48.6, elo:1723},
+    {draw_pos:43, seed:null, player:"Elisabetta Cocciaretto", pct_win:1.5, pct_final:3.1, pct_semi:6.4, pct_next:51.3, elo:1781},
+    {draw_pos:44, seed:null, player:"Caty Mcnally", pct_win:1.3, pct_final:2.7, pct_semi:5.7, pct_next:48.7, elo:1723},
+    {draw_pos:45, seed:null, player:"Iga Swiatek", pct_win:2.3, pct_final:4.4, pct_semi:8.7, pct_next:50.6, elo:2024},
+    {draw_pos:46, seed:null, player:"Elina Svitolina", pct_win:2.2, pct_final:4.2, pct_semi:8.2, pct_next:49.4, elo:1976},
+    {draw_pos:47, seed:null, player:"Noemi Basiletti", pct_win:0.3, pct_final:0.7, pct_semi:2.2, pct_next:41.4, elo:1179},
+    {draw_pos:48, seed:null, player:"Simona Waltert", pct_win:1.3, pct_final:2.6, pct_semi:5.8, pct_next:58.6, elo:1612},
+    {draw_pos:49, seed:null, player:"Hailey Baptiste", pct_win:1.5, pct_final:2.9, pct_semi:5.8, pct_next:47.9, elo:1782},
+    {draw_pos:50, seed:null, player:"Madison Keys", pct_win:1.8, pct_final:3.6, pct_semi:7.0, pct_next:52.1, elo:1907},
+    {draw_pos:51, seed:null, player:"Peyton Stearns", pct_win:1.5, pct_final:3.0, pct_semi:6.0, pct_next:54.2, elo:1752},
+    {draw_pos:52, seed:null, player:"Tyra Caterina Grant", pct_win:0.8, pct_final:1.7, pct_semi:3.7, pct_next:45.8, elo:1505},
+    {draw_pos:53, seed:null, player:"Victoria Mboko", pct_win:2.2, pct_final:4.2, pct_semi:8.1, pct_next:53.2, elo:2026},
+    {draw_pos:54, seed:null, player:"Ekaterina Alexandrova", pct_win:1.4, pct_final:2.8, pct_semi:5.8, pct_next:46.8, elo:1808},
+    {draw_pos:55, seed:null, player:"Laura Siegemund", pct_win:1.2, pct_final:2.5, pct_semi:5.1, pct_next:48.7, elo:1713},
+    {draw_pos:56, seed:null, player:"Karolina Pliskova", pct_win:1.5, pct_final:3.0, pct_semi:6.0, pct_next:51.3, elo:1798},
+    {draw_pos:57, seed:null, player:"Jaqueline Cristian", pct_win:1.4, pct_final:2.9, pct_semi:5.7, pct_next:51.1, elo:1801},
+    {draw_pos:58, seed:null, player:"Xin Yu Wang", pct_win:1.2, pct_final:2.5, pct_semi:5.1, pct_next:48.9, elo:1722},
+    {draw_pos:59, seed:null, player:"Alexandra Eala", pct_win:1.4, pct_final:2.9, pct_semi:5.8, pct_next:49.8, elo:1804},
+    {draw_pos:60, seed:null, player:"Maria Sakkari", pct_win:1.4, pct_final:2.9, pct_semi:5.7, pct_next:50.2, elo:1807},
+    {draw_pos:61, seed:null, player:"Elena Rybakina", pct_win:8.9, pct_final:16.3, pct_semi:30.1, pct_next:100.0, elo:2139},
+    {draw_pos:62, seed:null, player:"Bye_62", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:0.0, elo:1},
+    {draw_pos:63, seed:null, player:"Bye_63", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:50.1, elo:1},
+    {draw_pos:64, seed:null, player:"Bye_64", pct_win:0.0, pct_final:0.0, pct_semi:0.0, pct_next:49.9, elo:1}
+  ]
+};
+
+// ── Render probability table ──────────────────────────────────────────────────
+function renderTable(tbodyId, data, tourClass) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const sorted = [...data].sort((a, b) => b.pct_win - a.pct_win).slice(0, 24);
+  const maxWin = sorted[0]?.pct_win || 1;
+  tbody.innerHTML = sorted.map((p, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    const winClass  = p.pct_win >= 10 ? 'pct-high' : p.pct_win >= 3 ? 'pct-med' : '';
+    const barW      = Math.round((p.pct_win / maxWin) * 100);
+    const seedDisp  = p.seed ? `<span class="br-seed">${p.seed}</span>` : `<span class="br-seed" style="color:var(--border)">—</span>`;
+    return `<tr class="${rankClass}">
+      <td class="seed-col">${seedDisp}</td>
+      <td class="player-name">${p.player}</td>
+      <td class="num ${winClass}">${p.pct_win.toFixed(1)}%</td>
+      <td class="num">${p.pct_final.toFixed(1)}%</td>
+      <td class="num">${p.pct_semi.toFixed(1)}%</td>
+      <td class="num" style="color:var(--green)">${p.pct_next < 100 ? p.pct_next.toFixed(0)+'%' : '—'}</td>
+      <td class="prob-bar-cell"><div class="prob-bar"><div class="prob-bar-fill bar-${tourClass}" style="width:${barW}%"></div></div></td>
+      <td class="num" style="color:var(--muted)">${Math.round(p.elo)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Render bracket rows ───────────────────────────────────────────────────────
+function renderBracket(containerId, data, startPos, endPos, tourClass) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const lookup = {};
+  data.forEach(p => { lookup[p.draw_pos] = p; });
+
+  let html = '';
+  for (let pos = startPos; pos <= endPos; pos++) {
+    const p = lookup[pos];
+    if (!p) continue;
+    const seedTxt  = p.seed ? p.seed : (p.player.startsWith('Q') ? 'Q' : '');
+    const isQ      = !p.seed && p.player.includes('Qualifier');
+    const nextTxt  = p.pct_next < 100 ? p.pct_next.toFixed(0) + '%' : '—';
+    html += `<div class="bracket-row">
+      <span class="br-pos">${pos}</span>
+      <span class="br-player ${isQ ? 'qualifier' : ''}">${p.seed ? `<span class="br-seed">${p.seed}</span> ` : ''}${p.player}</span>
+      <span class="br-pct br-win">${p.pct_win.toFixed(1)}%</span>
+      <span class="br-pct br-sf">${p.pct_final.toFixed(1)}%</span>
+      <span class="br-pct br-q">${p.pct_semi.toFixed(1)}%</span>
+      <span class="br-pct br-next">${nextTxt}</span>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderTable('atp-table-body', SIM_DATA.atp, 'atp');
+  renderTable('wta-table-body', SIM_DATA.wta, 'wta');
+  renderBracket('atp-top-bracket', SIM_DATA.atp, 1,  64, 'atp');
+  renderBracket('atp-bot-bracket', SIM_DATA.atp, 65, 128, 'atp');
+  renderBracket('wta-top-bracket', SIM_DATA.wta, 1,  64, 'wta');
+  renderBracket('wta-bot-bracket', SIM_DATA.wta, 65, 128, 'wta');
+});
+</script>
+</body>
+</html>

@@ -2,34 +2,22 @@
 # Mountain Engineering · Mountain Capital, LLC
 
 [build]
-  # HTML files live in Docs/ — serve from there
   publish = "Docs"
 
-# ── Ignored files — do not trigger a rebuild ─────────────────────────────────
-# The engine (SureBetAim.R) pushes JSON data files to Docs/data/ every morning.
-# These are pure data updates — no HTML rebuild needed. Without this rule,
-# every morning Aim run consumes a full Netlify build credit unnecessarily.
+# ── Skip build only when ALL changes are inside Docs/data/ ───────────────────
+# The ignore script exits 0 (skip) only when git diff finds zero changes
+# outside Docs/data/. If any HTML/CSS/JS changed alongside data files,
+# the build fires normally.
 #
-# HTML, CSS, JS, and manifest changes still trigger rebuilds normally.
-[build.environment]
-  NETLIFY_PLUGIN_IGNORE_ENABLED = "true"
-
+# Previous version used --quiet flag which caused all deploys to be
+# canceled rather than just data-only pushes. Fixed 2026-05-05.
 [context.production]
   ignore = """
-    git diff --quiet HEAD^ HEAD -- 'Docs/data/'
+    changed=$(git diff --name-only HEAD^ HEAD | grep -v '^Docs/data/' | wc -l)
+    [ "$changed" -eq 0 ]
   """
 
-# ── Redirect rules ────────────────────────────────────────────────────────────
-# Clean URLs: /scorecard → /scorecard.html etc.
-# Uncomment when ready — requires testing to confirm no nav conflicts.
-# [[redirects]]
-#   from = "/:page"
-#   to   = "/:page.html"
-#   status = 200
-
-# ── Cache headers — long cache for data files, short for HTML ────────────────
-# Data files update daily; aggressive caching would serve stale JSON.
-# HTML files change infrequently; moderate caching is fine.
+# ── Cache headers ─────────────────────────────────────────────────────────────
 [[headers]]
   for = "/data/*"
   [headers.values]

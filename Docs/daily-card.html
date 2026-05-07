@@ -1021,23 +1021,29 @@ function renderPositions(picks) {
     grouped[s].push(p);
   });
 
-  // Build sport filter pills (unique sports)
+  // Build sport filter pills (unique sports) — only on first render
   const filterBar = document.getElementById('sport-filter-bar');
   const sports = Object.keys(grouped);
-  // Add grouped sport families
   const families = new Set();
   sports.forEach(s => {
     if (s.startsWith('SOCCER')) families.add('SOCCER');
     else if (s.startsWith('ATP') || s.startsWith('WTA') || s.startsWith('CHA')) families.add('TENNIS');
     else families.add(s);
   });
-  families.forEach(f => {
-    const pill = document.createElement('button');
-    pill.className = 'filter-pill';
-    pill.dataset.sport = f;
-    pill.textContent = f;
-    filterBar.appendChild(pill);
-  });
+  // Only inject pills if they haven't been built yet (avoid duplicating on toggle re-render)
+  const existingPills = filterBar.querySelectorAll('.filter-pill[data-sport]:not([data-sport="ALL"])');
+  if (existingPills.length === 0) {
+    families.forEach(f => {
+      const pill = document.createElement('button');
+      pill.className = 'filter-pill';
+      pill.dataset.sport = f;
+      pill.textContent = f;
+      // Insert before the odds toggle div, not at the end of filterBar
+      const toggle = filterBar.querySelector('.odds-toggle');
+      if (toggle) filterBar.insertBefore(pill, toggle);
+      else filterBar.appendChild(pill);
+    });
+  }
 
   // Render cards
   let html = '';
