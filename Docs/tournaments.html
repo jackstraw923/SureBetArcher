@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
   <title>ArcVest — Tournaments</title>
   <meta name="description" content="Live bracket simulation data for active NBA and NHL playoffs and ATP/WTA tournaments. Championship probability, round survival rates, and quadrant analysis from 50,000 simulations.">
   <link rel="stylesheet" href="arcvest.css">
@@ -495,22 +499,9 @@ function renderTournamentSection(id, data) {
   const simCount = data.sim_count || 50000;
   const entries  = data.teams || data.players || data.entries || [];
 
-  // For tennis, check if there's also a pre-rendered bracket_tennis.html link
-  const isTennis = sport.includes('tennis') || sport === 'atp' || sport === 'wta';
-
-  const bracketLink = isTennis
-    ? `<a href="${DATA_BASE.replace('/data/', '/').replace('raw.githubusercontent.com/jackstraw923/SureBetArcher/main/', 'jackstraw923.github.io/SureBetArcher/')}bracket_tennis.html"
-         class="tennis-bracket-link" target="_blank" rel="noopener">
-        <div>
-          <div class="t-card-title">Full Interactive Bracket</div>
-          <p class="t-disclaimer" style="margin-top:var(--space-1);">View the complete draw with round-by-round matchup probabilities in the full bracket visualization.</p>
-        </div>
-        <div class="flex-center gap-2" style="flex-shrink:0;">
-          <span class="badge badge-gold">VIEW BRACKET</span>
-          <i data-lucide="external-link" class="icon-sm icon-gold"></i>
-        </div>
-       </a>`
-    : '';
+  // bracketLink retired — bracket_tennis.html was a pre-architecture orphan.
+  // Tennis bracket data renders inline via bracket_atp.json / bracket_wta.json same as NBA/NHL.
+  const bracketLink = '';
 
   return `
     <div class="tournament-section" id="section-${id}">
@@ -557,18 +548,41 @@ function showTab(id) {
 // ── Known bracket files to attempt ──
 // Order determines tab order. Add new brackets here as sports go in-season.
 const BRACKET_SOURCES = [
-  { id: 'nba',    file: 'bracket_nba.json',    label: 'NBA',    icon: 'circle' },
-  { id: 'nhl',    file: 'bracket_nhl.json',    label: 'NHL',    icon: 'circle' },
-  { id: 'atp',    file: 'bracket_atp.json',    label: 'ATP',    icon: 'circle-dot' },
-  { id: 'wta',    file: 'bracket_wta.json',    label: 'WTA',    icon: 'circle-dot' },
-  { id: 'ncaab',  file: 'bracket_ncaab.json',  label: 'NCAAB',  icon: 'circle' },
-  { id: 'ncaaw',  file: 'bracket_ncaaw.json',  label: 'NCAAW',  icon: 'circle' },
+  { id: 'nba',    file: 'bracket_nba.json',    label: 'NBA',    icon: 'NBA' },
+  { id: 'nhl',    file: 'bracket_nhl.json',    label: 'NHL',    icon: 'NHL' },
+  { id: 'atp',    file: 'bracket_atp.json',    label: 'ATP',    icon: 'ATP' },
+  { id: 'wta',    file: 'bracket_wta.json',    label: 'WTA',    icon: 'WTA' },
+  { id: 'ncaab',  file: 'bracket_ncaab.json',  label: 'NCAAB',  icon: 'NCAAB' },
+  { id: 'ncaaw',  file: 'bracket_ncaaw.json',  label: 'NCAAW',  icon: 'NCAAW' },
 ];
 
 // ── Inline SVG for icons (not in static HTML where lucide can't reach) ──
-function tabIcon(name) {
-  if (name === 'circle-dot') return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="display:inline-block;vertical-align:middle;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>`;
-  return `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="display:inline-block;vertical-align:middle;"><circle cx="12" cy="12" r="10"/></svg>`;
+// ── Sport Icons (Phosphor inline SVG) — matches daily-card.html ──
+function tabIcon(sportCode) {
+  const s = (sportCode || '').toUpperCase();
+  const isTennis = s === 'ATP' || s === 'WTA' || s === 'CHA';
+  const color = s === 'NBA'   ? 'var(--sport-nba,#fde68a)'
+    : s === 'WNBA'  ? 'var(--sport-wnba,#86efac)'
+    : s === 'NCAAB' ? 'var(--sport-ncaab,#7dd3fc)'
+    : s === 'NCAAW' ? 'var(--sport-ncaaw,#ff6b6b)'
+    : s === 'ATP'   ? 'var(--sport-atp,#fde68a)'
+    : s === 'WTA'   ? 'var(--sport-wta,#86efac)'
+    : s === 'CHA'   ? 'var(--sport-cha,#7dd3fc)'
+    : 'currentColor';
+
+  const paths = {
+    basketball: `<path d="M128,32a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,32ZM48.09,136H80.18a112.09,112.09,0,0,0,13.34,47.86A80.28,80.28,0,0,1,48.09,136Zm0-16A80.28,80.28,0,0,1,93.52,72.14,112.09,112.09,0,0,0,80.18,120Zm96.65,47.86A80.29,80.29,0,0,1,207.91,136H175.82A112.09,112.09,0,0,0,162.43,183.86ZM128,192a95.64,95.64,0,0,1-11.51-.71A95.56,95.56,0,0,0,144,120h-32a95.56,95.56,0,0,0,27.51,71.29A95.64,95.64,0,0,1,128,192Zm11.51-.71A95.56,95.56,0,0,0,112,120H96a95.64,95.64,0,0,0,11.51,71.29A80.28,80.28,0,0,0,139.51,191.29ZM207.91,120H175.82a112.09,112.09,0,0,0-13.34-47.86A80.28,80.28,0,0,1,207.91,120Z"/>`,
+    hockey:     `<path d="M232,64H24A16,16,0,0,0,8,80v96a16,16,0,0,0,16,16H232a16,16,0,0,0,16-16V80A16,16,0,0,0,232,64Zm0,112H24V80H232ZM72,128a12,12,0,1,1-12-12A12,12,0,0,1,72,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,116,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,160,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,204,128Z"/>`,
+    tennis:     `<path d="M176.49,55.43A96,96,0,1,0,200.57,79.51,95.41,95.41,0,0,0,176.49,55.43Zm-16.4,28.18a80.4,80.4,0,0,1,12.81,28.33L116.08,55.12A80.4,80.4,0,0,1,160.09,83.61ZM95.91,172.39A80.4,80.4,0,0,1,83.1,144.06l56.82,56.82A80.4,80.4,0,0,1,95.91,172.39ZM71.49,128c0-1.23,0-2.44.1-3.65l60,60c-1.2.07-2.42.1-3.65.1a80,80,0,0,1-56.4-23.4A79.48,79.48,0,0,1,71.49,128ZM184.4,131.55l-59.9-59.9c1.2-.07,2.42-.1,3.65-.1A80,80,0,0,1,184.4,131.55Z"/>`,
+    baseball:   `<path d="M128,32a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,32Zm0,16a79.55,79.55,0,0,1,28.57,5.3L136,84.69A40.29,40.29,0,0,0,128,84a39.6,39.6,0,0,0-8,.82L99.43,53.3A79.55,79.55,0,0,1,128,48ZM88,128a40,40,0,1,1,40,40A40,40,0,0,1,88,128ZM53.3,99.43l31.39,31.38a40.06,40.06,0,0,0,.83,8A40.27,40.27,0,0,0,84.69,147L53.3,156.57A79.87,79.87,0,0,1,53.3,99.43Zm149.4,57.14L171.31,125.19a40.27,40.27,0,0,0-.82-8.24,40.06,40.06,0,0,0-.83-8l31.39-31.38a79.87,79.87,0,0,1,0,57.14Zm-46.27,46.27-20.59-20.59A39.93,39.93,0,0,0,152,171.44a40.27,40.27,0,0,0-.82-8.24l31.09-9.57A79.64,79.64,0,0,1,156.43,202.84ZM99.57,202.84A79.64,79.64,0,0,1,73.73,153.63l31.09,9.57A40.27,40.27,0,0,0,104,171.44a39.93,39.93,0,0,0,16.63,10.41Z"/>`
+  };
+
+  const key = isTennis ? 'tennis'
+    : (s === 'NBA' || s === 'WNBA' || s === 'NCAAB' || s === 'NCAAW') ? 'basketball'
+    : s === 'NHL' ? 'hockey'
+    : 'baseball';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="14" height="14" style="display:inline-block;vertical-align:middle;fill:${color};flex-shrink:0;">${paths[key]}</svg>`;
 }
 
 // ── Main load ──

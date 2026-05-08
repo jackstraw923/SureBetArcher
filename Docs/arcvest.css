@@ -100,6 +100,22 @@
   --z-nav:     100;
   --z-modal:   200;
   --z-toast:   300;
+
+  /* ── Sport Color Tokens ── */
+  /* Single source of truth for all sport icon and label colors site-wide. */
+  /* currentColor sports inherit active/inactive state from parent element. */
+  --sport-mlb:    currentColor;   /* MLB — neutral, label carries identity */
+  --sport-nba:    #fde68a;        /* NBA — yellow */
+  --sport-wnba:   #86efac;        /* WNBA — green */
+  --sport-ncaab:  #7dd3fc;        /* NCAAB — light blue */
+  --sport-ncaaw:  #ff6b6b;        /* NCAAW — light red */
+  --sport-nhl:    currentColor;   /* NHL — neutral */
+  --sport-soccer: currentColor;   /* Soccer — neutral */
+  --sport-atp:    #fde68a;        /* ATP — yellow (pro men's tennis) */
+  --sport-wta:    #86efac;        /* WTA — green (pro women's tennis) */
+  --sport-cha:    #7dd3fc;        /* CHA — light blue (Challenger) */
+  --sport-nfl:    currentColor;   /* NFL — neutral */
+  --sport-ncaaf:  #7dd3fc;        /* NCAAF — light blue */
 }
 
 /* ============================================================
@@ -829,6 +845,13 @@ button {
 [data-lucide] {
   display: inline-block;
   vertical-align: middle;
+}
+
+/* Phosphor sport icon SVGs — rendered as direct <svg> elements with icon-* class */
+svg.icon-sm, svg.icon-md, svg.icon-lg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 /* ============================================================

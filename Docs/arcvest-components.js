@@ -178,7 +178,7 @@
     .then(function (r) { return r.json(); })
     .then(function (s) {
       injectTournamentsLink(s.tournaments_active);
-      setFooterLastRun(s.last_run);
+      setFooterLastRun(s.last_run || s.last_settled);  // fallback: last_settled alias
     })
     .catch(function () { /* silent fail — UI degrades gracefully */ });
 

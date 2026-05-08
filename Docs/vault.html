@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
   <title>ArcVest — EdgeVault</title>
   <meta name="description" content="EdgeVault by ArcVest — research articles and free tools for quantitative sports market analysis. No-vig calculator, odds converter, Kelly sizer, hedge calculator, and deep-dive methodology pieces.">
   <link rel="stylesheet" href="arcvest.css">
@@ -544,6 +548,22 @@
       .tool-row { flex-direction: column; }
       .soon-grid { grid-template-columns: 1fr; }
     }
+
+    /* VAULT-NAV-1: Collapsible sidebar section toggles */
+    .vault-section-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: var(--space-2) var(--space-3);
+      background: none; border: none; border-radius: var(--radius-sm);
+      font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em;
+      color: var(--dim); cursor: pointer; text-align: left;
+      transition: color var(--transition-fast);
+      margin-top: var(--space-2);
+    }
+    .vault-section-toggle:hover { color: var(--muted); }
+    .vault-section-toggle.open { color: var(--gold); }
+    .vault-section-chevron { font-size: 10px; }
+    .vault-section-body { overflow: hidden; transition: max-height 0.25s ease; max-height: 400px; }
+    .vault-section-body.collapsed { max-height: 0; }
   </style>
 </head>
 <body>
@@ -572,40 +592,62 @@
       </div>
     </div>
 
-    <!-- Tools -->
-    <div class="vault-section-label">TOOLS</div>
-    <button class="vault-item active" data-panel="novig">No-Vig Calculator</button>
-    <button class="vault-item" data-panel="odds-converter">Odds Converter</button>
-    <button class="vault-item" data-panel="kelly">Kelly Sizer</button>
-    <button class="vault-item" data-panel="hedge">Hedge Calculator</button>
+    <!-- VAULT-NAV-1: Collapsible sidebar sections — auto-expands active section on load -->
 
-    <!-- Methodology — Plex articles (new) -->
-    <div class="vault-section-label">METHODOLOGY</div>
-    <button class="vault-item" data-panel="article-alpha-ledger">The Synthetic Alpha Ledger <span class="vault-item-badge new">NEW</span></button>
-    <button class="vault-item" data-panel="article-variance-shadow">The Variance Shadow <span class="vault-item-badge new">NEW</span></button>
-    <button class="vault-item" data-panel="article-allocation-guide">The Sovereign Allocation Guide <span class="vault-item-badge new">NEW</span></button>
+    <!-- Tools -->
+    <button class="vault-section-toggle open" data-section="tools" onclick="toggleVaultSection('tools')">
+      TOOLS <span class="vault-section-chevron">▾</span>
+    </button>
+    <div class="vault-section-body" id="vault-section-tools">
+      <button class="vault-item active" data-panel="novig">No-Vig Calculator</button>
+      <button class="vault-item" data-panel="odds-converter">Odds Converter</button>
+      <button class="vault-item" data-panel="kelly">Kelly Sizer</button>
+      <button class="vault-item" data-panel="hedge">Hedge Calculator</button>
+    </div>
+
+    <!-- Methodology -->
+    <button class="vault-section-toggle" data-section="methodology" onclick="toggleVaultSection('methodology')">
+      METHODOLOGY <span class="vault-section-chevron">▸</span>
+    </button>
+    <div class="vault-section-body collapsed" id="vault-section-methodology">
+      <button class="vault-item" data-panel="article-alpha-ledger">The Synthetic Alpha Ledger <span class="vault-item-badge new">NEW</span></button>
+      <button class="vault-item" data-panel="article-variance-shadow">The Variance Shadow <span class="vault-item-badge new">NEW</span></button>
+      <button class="vault-item" data-panel="article-allocation-guide">The Sovereign Allocation Guide <span class="vault-item-badge new">NEW</span></button>
+    </div>
 
     <!-- Playoff Strategy -->
-    <div class="vault-section-label">PLAYOFF STRATEGY</div>
-    <button class="vault-item" data-panel="article-bounded-overlay">The Bounded Overlay <span class="vault-item-badge playoff">Playoff</span></button>
-    <button class="vault-item" data-panel="article-path-to-cup">The Path to the Cup <span class="vault-item-badge playoff">Playoff</span></button>
+    <button class="vault-section-toggle" data-section="playoff" onclick="toggleVaultSection('playoff')">
+      PLAYOFF STRATEGY <span class="vault-section-chevron">▸</span>
+    </button>
+    <div class="vault-section-body collapsed" id="vault-section-playoff">
+      <button class="vault-item" data-panel="article-bounded-overlay">The Bounded Overlay <span class="vault-item-badge playoff">Playoff</span></button>
+      <button class="vault-item" data-panel="article-path-to-cup">The Path to the Cup <span class="vault-item-badge playoff">Playoff</span></button>
+    </div>
 
     <!-- Foundations -->
-    <div class="vault-section-label">FOUNDATIONS</div>
-    <button class="vault-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
-    <button class="vault-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
+    <button class="vault-section-toggle" data-section="foundations" onclick="toggleVaultSection('foundations')">
+      FOUNDATIONS <span class="vault-section-chevron">▸</span>
+    </button>
+    <div class="vault-section-body collapsed" id="vault-section-foundations">
+      <button class="vault-item" data-panel="article-twogates">The Two-Gate EV Filter</button>
+      <button class="vault-item" data-panel="article-odds-formats">American vs. Decimal Odds</button>
+    </div>
 
-    <!-- Coming soon -->
-    <div class="vault-section-label">COMING SOON</div>
-    <div class="vault-section-sublabel">Articles</div>
-    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Why Win Rates Lie <span class="vault-item-badge">Soon</span></button>
-    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Line Shopping Is Free Money <span class="vault-item-badge">Soon</span></button>
-    <button class="vault-item" data-panel="articles" style="opacity:0.5;">Closing Line Value (CLV) <span class="vault-item-badge">Soon</span></button>
-    <div class="vault-section-sublabel">Deep Dives</div>
-    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Kelly Criterion for Sports <span class="vault-item-badge">Soon</span></button>
-    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Pythagorean Expectation <span class="vault-item-badge">Soon</span></button>
-    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Soccer Double Chance <span class="vault-item-badge">Soon</span></button>
-    <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Tennis Elo + Bracket Sim <span class="vault-item-badge">Soon</span></button>
+    <!-- Coming Soon -->
+    <button class="vault-section-toggle" data-section="coming-soon" onclick="toggleVaultSection('coming-soon')">
+      COMING SOON <span class="vault-section-chevron">▸</span>
+    </button>
+    <div class="vault-section-body collapsed" id="vault-section-coming-soon">
+      <div class="vault-section-sublabel">Articles</div>
+      <button class="vault-item" data-panel="articles" style="opacity:0.5;">Why Win Rates Lie <span class="vault-item-badge">Soon</span></button>
+      <button class="vault-item" data-panel="articles" style="opacity:0.5;">Line Shopping Is Free Money <span class="vault-item-badge">Soon</span></button>
+      <button class="vault-item" data-panel="articles" style="opacity:0.5;">Closing Line Value (CLV) <span class="vault-item-badge">Soon</span></button>
+      <div class="vault-section-sublabel">Deep Dives</div>
+      <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Kelly Criterion for Sports <span class="vault-item-badge">Soon</span></button>
+      <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Pythagorean Expectation <span class="vault-item-badge">Soon</span></button>
+      <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Soccer Double Chance <span class="vault-item-badge">Soon</span></button>
+      <button class="vault-item" data-panel="deepdives" style="opacity:0.5;">Tennis Elo + Bracket Sim <span class="vault-item-badge">Soon</span></button>
+    </div>
 
   </aside>
 
@@ -843,40 +885,7 @@
       </div>
     </div>
 
-    <!-- Fanatics Fan Gear — affiliate placement (mid, MLB-themed since season active) -->
-    <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663?u=https%3A%2F%2Fwww.fanatics.com%2FMLB"
-       target="_blank" rel="noopener noreferrer sponsored"
-       style="display:block;text-decoration:none;margin:var(--space-5) 0;"
-       aria-label="Shop officially licensed MLB gear at Fanatics">
-      <div style="
-        position:relative;overflow:hidden;
-        background:linear-gradient(135deg,#0d1218 0%,#0f1a10 100%);
-        border:1px solid rgba(45,212,191,0.18);border-radius:6px;
-        padding:1.1rem 1.6rem;
-        display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
-        transition:border-color 0.2s,box-shadow 0.2s;
-      "
-      onmouseover="this.style.borderColor='rgba(45,212,191,0.4)';this.style.boxShadow='0 0 20px rgba(45,212,191,0.06)'"
-      onmouseout="this.style.borderColor='rgba(45,212,191,0.18)';this.style.boxShadow='none'">
-        <div style="position:relative;z-index:1;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
-            letter-spacing:0.2em;color:var(--teal);margin-bottom:0.3rem;">MLB · 2026 SEASON GEAR</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.25rem;
-            letter-spacing:0.04em;color:var(--text);line-height:1.1;">
-            JERSEYS, CAPS &amp; COLLECTIBLES</div>
-        </div>
-        <div style="flex-shrink:0;
-          background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.3);
-          border-radius:4px;padding:0.5rem 1rem;
-          font-family:'DM Mono',monospace;font-size:0.62rem;
-          letter-spacing:0.1em;color:var(--teal);white-space:nowrap;text-transform:uppercase;">SHOP MLB →</div>
-      </div>
-    </a>
 
-    <!-- FTC affiliate disclosure — below all affiliate placements on this page -->
-    <p style="font-size:0.58rem;color:var(--dim);letter-spacing:0.04em;opacity:0.55;margin-top:calc(var(--space-2) * -1);margin-bottom:var(--space-5);">
-      Affiliate disclosure: ArcVest participates in the Fanatics affiliate program and may earn a commission on qualifying purchases at no cost to you.
-    </p>
 
 
     <!-- ═══════════════════════════════════════
@@ -916,6 +925,32 @@
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">SEE IT IN ACTION</div>
@@ -973,6 +1008,32 @@
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">VARIANCE STATE ON THE SCORECARD</div>
@@ -1031,6 +1092,32 @@
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">TRY THE KELLY SIZER</div>
@@ -1085,6 +1172,32 @@ MAX_RECENT_FORM_SHIFT  = 0.08   # ±8% circuit breaker cap
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">LIVE SIMULATION DATA</div>
@@ -1134,6 +1247,32 @@ correctly as a distant long shot in the futures market.
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">LIVE SIMULATION DATA</div>
@@ -1193,6 +1332,32 @@ A position must have Edge > 0 to pass Gate 2.
         <p class="article-disclaimer">For informational purposes only. Not financial or betting advice. Past model performance does not guarantee future results.</p>
       </div>
 
+
+      <!-- Fanatics affiliate — article bottom placement -->
+      <a href="https://fanatics.93n6tx.net/c/7165760/586570/9663"
+         target="_blank" rel="noopener noreferrer sponsored"
+         style="display:block;text-decoration:none;margin:var(--space-5) 0 var(--space-4);"
+         aria-label="Shop officially licensed fan gear at Fanatics">
+        <div style="
+          background:linear-gradient(135deg,#0d1218 0%,#111822 60%,#0a1520 100%);
+          border:1px solid rgba(201,168,76,0.2);border-radius:6px;
+          padding:0.9rem 1.4rem;
+          display:flex;align-items:center;justify-content:space-between;gap:1rem;
+          transition:border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='rgba(201,168,76,0.45)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,0.2)'">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:0.58rem;
+              letter-spacing:0.2em;color:var(--gold);margin-bottom:0.3rem;">FAN GEAR · OFFICIALLY LICENSED</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:var(--muted);">
+              NFL, MLB, NBA, NHL &amp; more — officially licensed gear at Fanatics.</div>
+          </div>
+          <div style="flex-shrink:0;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);
+            border-radius:4px;padding:0.4rem 0.9rem;font-family:'DM Mono',monospace;
+            font-size:0.6rem;letter-spacing:0.1em;color:var(--gold);white-space:nowrap;">SHOP →</div>
+        </div>
+      </a>
       <div class="vault-crosslink">
         <div>
           <div class="t-eyebrow" style="margin-bottom:var(--space-2);">TRY IT YOURSELF</div>

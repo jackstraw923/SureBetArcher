@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
   <title>ArcVest — Daily Card</title>
   <meta name="description" content="Today's model-qualified positions. Sealed at the morning run. Sized by fractional Kelly. Every position tracked publicly from day one.">
   <link rel="stylesheet" href="arcvest.css">
@@ -619,6 +623,44 @@ const DATA_BASE = 'https://raw.githubusercontent.com/jackstraw923/SureBetArcher/
 // For now: false = public view (masked), true = subscriber view (full).
 const IS_SUBSCRIBER = false;
 
+// ── Sport Icons (Phosphor inline SVG) ──
+// Single source for all sport icon SVG paths. Uses CSS sport color tokens.
+// cls = Tailwind-style size class passed through to wrapper span.
+function sportIcon(sport, cls) {
+  const s = (sport || '').toUpperCase();
+  const isTennis = s.startsWith('ATP') || s.startsWith('WTA') || s.startsWith('CHA');
+  const isSoccer = s.startsWith('SOCCER');
+  const color = isTennis
+    ? (s.startsWith('WTA') ? 'var(--sport-wta)' : s.startsWith('CHA') ? 'var(--sport-cha)' : 'var(--sport-atp)')
+    : s === 'NBA'   ? 'var(--sport-nba)'
+    : s === 'WNBA'  ? 'var(--sport-wnba)'
+    : s === 'NCAAB' ? 'var(--sport-ncaab)'
+    : s === 'NCAAW' ? 'var(--sport-ncaaw)'
+    : s === 'NCAAF' ? 'var(--sport-ncaaf)'
+    : 'currentColor';
+
+  // Phosphor icon paths (outline weight, 256px viewBox)
+  const paths = {
+    baseball: `<path d="M128,32a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,32Zm0,16a79.55,79.55,0,0,1,28.57,5.3L136,84.69A40.29,40.29,0,0,0,128,84a39.6,39.6,0,0,0-8,.82L99.43,53.3A79.55,79.55,0,0,1,128,48ZM88,128a40,40,0,1,1,40,40A40,40,0,0,1,88,128ZM53.3,99.43l31.39,31.38a40.06,40.06,0,0,0,.83,8A40.27,40.27,0,0,0,84.69,147L53.3,156.57A79.87,79.87,0,0,1,53.3,99.43Zm149.4,57.14L171.31,125.19a40.27,40.27,0,0,0-.82-8.24,40.06,40.06,0,0,0-.83-8l31.39-31.38a79.87,79.87,0,0,1,0,57.14Zm-46.27,46.27-20.59-20.59A39.93,39.93,0,0,0,152,171.44a40.27,40.27,0,0,0-.82-8.24l31.09-9.57A79.64,79.64,0,0,1,156.43,202.84ZM99.57,202.84A79.64,79.64,0,0,1,73.73,153.63l31.09,9.57A40.27,40.27,0,0,0,104,171.44a39.93,39.93,0,0,0,16.63,10.41Z"/>`,
+    basketball: `<path d="M128,32a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,32ZM48.09,136H80.18a112.09,112.09,0,0,0,13.34,47.86A80.28,80.28,0,0,1,48.09,136Zm0-16A80.28,80.28,0,0,1,93.52,72.14,112.09,112.09,0,0,0,80.18,120Zm96.65,47.86A80.29,80.29,0,0,1,207.91,136H175.82A112.09,112.09,0,0,0,162.43,183.86ZM128,192a95.64,95.64,0,0,1-11.51-.71A95.56,95.56,0,0,0,144,120h-32a95.56,95.56,0,0,0,27.51,71.29A95.64,95.64,0,0,1,128,192Zm11.51-.71A95.56,95.56,0,0,0,112,120H96a95.64,95.64,0,0,0,11.51,71.29A80.28,80.28,0,0,0,139.51,191.29ZM207.91,120H175.82a112.09,112.09,0,0,0-13.34-47.86A80.28,80.28,0,0,1,207.91,120Z"/>`,
+    hockey: `<path d="M232,64H24A16,16,0,0,0,8,80v96a16,16,0,0,0,16,16H232a16,16,0,0,0,16-16V80A16,16,0,0,0,232,64Zm0,112H24V80H232ZM72,128a12,12,0,1,1-12-12A12,12,0,0,1,72,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,116,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,160,128Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,204,128Z"/>`,
+    soccer: `<path d="M128,32a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,32ZM80.64,175.6,68.13,137.08,96,117.08l27.86,20L128,162.84l4.13-25.75L160,117.08l27.87,20L175.36,175.6A80,80,0,0,1,80.64,175.6ZM192,161.73l10.43-32.26A79.81,79.81,0,0,1,207.91,136H196.56ZM128,48a79.55,79.55,0,0,1,30.83,6.17L144,68H112L97.17,54.17A79.55,79.55,0,0,1,128,48ZM86.89,72H112l16,49.23L96,141.08,64.45,118.54ZM48.09,136a79.81,79.81,0,0,1,5.48-6.53L64,161.73,59.44,136Zm0,0"/>`,
+    tennis: `<path d="M176.49,55.43A96,96,0,1,0,200.57,79.51,95.41,95.41,0,0,0,176.49,55.43Zm-16.4,28.18a80.4,80.4,0,0,1,12.81,28.33L116.08,55.12A80.4,80.4,0,0,1,160.09,83.61ZM95.91,172.39A80.4,80.4,0,0,1,83.1,144.06l56.82,56.82A80.4,80.4,0,0,1,95.91,172.39ZM71.49,128c0-1.23,0-2.44.1-3.65l60,60c-1.2.07-2.42.1-3.65.1a80,80,0,0,1-56.4-23.4A79.48,79.48,0,0,1,71.49,128ZM184.4,131.55l-59.9-59.9c1.2-.07,2.42-.1,3.65-.1A80,80,0,0,1,184.4,131.55Z"/>`,
+    football: `<path d="M239.1,33.22a8,8,0,0,0-7.69-2.69C217.92,33.28,173.75,40.4,136,74.83,109.81,98.21,96,129.05,96,160a64.08,64.08,0,0,0,64,64c30.95,0,61.79-13.81,85.17-40C279.6,146.25,222.72,42.08,239.1,33.22ZM222.08,168c-19.55,22.45-46.16,36-70.08,36a47.36,47.36,0,0,1-7.16-.55l84.76-84.76A152.24,152.24,0,0,1,222.08,168ZM119.88,181.26a48.15,48.15,0,0,1-9.69-23.42c-.44-2.85-.7-5.74-.77-8.65l33.87-33.86a48.14,48.14,0,0,1,23.41,9.68ZM148.7,97.88l9.53,9.53-34.66,34.66-9.53-9.53Zm23.38,23.38,9.53,9.53-34.66,34.66-9.53-9.53Zm-46.77-46.77,9.53,9.53-34.66,34.66-9.53-9.53Zm83.54,23.38,9.53,9.53-34.66,34.66-9.53-9.53ZM116.17,80.62,92.6,57.05A152,152,0,0,0,53.57,132.8l37.12,37.13C92.35,147.34,101.37,121.93,116.17,80.62Z"/>`
+  };
+
+  const key = isTennis ? 'tennis'
+    : isSoccer ? 'soccer'
+    : s === 'MLB' || s === 'NCAAB' || s === 'NCAAW' ? 'baseball'
+    : s === 'NBA' || s === 'WNBA' ? 'basketball'
+    : s === 'NHL' ? 'hockey'
+    : s === 'NFL' || s === 'NCAAF' ? 'football'
+    : 'baseball';
+
+  const path = paths[key] || paths.baseball;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="${cls}" style="fill:${color};flex-shrink:0;">${path}</svg>`;
+}
+
 lucide.createIcons();
 
 // ── Nav ──
@@ -834,6 +876,13 @@ function buildPositionCard(p, index) {
         <span class="detail-value c-teal">${ev}</span>
       </div>
     </div>
+    <!-- Qualification badges — shown before the lock so visitor knows why this matters -->
+    <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+      <span class="badge badge-qualified">QUALIFIED</span>
+      <span class="badge badge-type">${betType}</span>
+      ${hasOpen ? `<span class="badge badge-open"><span class="badge-dot"></span> OPEN POSITION</span>` : ''}
+      ${statusNote ? `<span class="badge badge-void">${statusNote}</span>` : ''}
+    </div>
     <!-- Masked private fields -->
     <div class="masked-row">
       <div class="detail-field">
@@ -858,12 +907,6 @@ function buildPositionCard(p, index) {
           UNLOCK — FREE ACCOUNT
         </a>
       </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:var(--space-3);">
-      <span class="badge badge-qualified">QUALIFIED</span>
-      <span class="badge badge-type">${betType}</span>
-      ${hasOpen ? `<span class="badge badge-open"><span class="badge-dot"></span> OPEN POSITION</span>` : ''}
-      ${statusNote ? `<span class="badge badge-void">${statusNote}</span>` : ''}
     </div>`;
 
   // ── Subscriber view ──
@@ -923,7 +966,7 @@ function buildPositionCard(p, index) {
 
         <!-- Sport icon col -->
         <div class="position-sport-icon-col" style="display:flex;align-items:center;justify-content:center;width:36px;">
-          <i data-lucide="circle" class="icon-md icon-muted"></i>
+          ${sportIcon(sport, "icon-md")}
         </div>
 
         <!-- Meta -->
@@ -1033,7 +1076,11 @@ function renderPositions(picks) {
   // Only inject pills if they haven't been built yet (avoid duplicating on toggle re-render)
   const existingPills = filterBar.querySelectorAll('.filter-pill[data-sport]:not([data-sport="ALL"])');
   if (existingPills.length === 0) {
-    families.forEach(f => {
+    // Canonical sport order — always consistent regardless of JSON data order
+    const SPORT_ORDER = ['MLB', 'NBA', 'WNBA', 'NCAAB', 'NCAAW', 'NHL', 'SOCCER', 'TENNIS', 'NFL', 'NCAAF'];
+    const sortedFamilies = SPORT_ORDER.filter(f => families.has(f))
+      .concat([...families].filter(f => !SPORT_ORDER.includes(f)).sort());
+    sortedFamilies.forEach(f => {
       const pill = document.createElement('button');
       pill.className = 'filter-pill';
       pill.dataset.sport = f;
@@ -1055,7 +1102,7 @@ function renderPositions(picks) {
     html += `
       <div class="sport-section-header" data-sport-header="${sport}">
         <div class="sport-section-icon">
-          <i data-lucide="circle" class="icon-lg icon-text"></i>
+          ${sportIcon(sport, "icon-lg")}
         </div>
         <span class="sport-section-title">${sportLabel(sport)}</span>
         <span class="sport-section-meta">${sportPicks.length} POSITION${sportPicks.length !== 1 ? 'S' : ''}</span>
@@ -1136,13 +1183,25 @@ fetch(DATA_BASE + 'daily_picks.json')
         month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
       });
 
-      // Card date heading
+      // Card date heading — validate before new Date() to prevent INVALID DATE
       const cardDate = picks.length > 0 ? (picks[0].Date || picks[0].date) : null;
       if (cardDate) {
-        document.getElementById('card-date-heading').textContent =
-          new Date(cardDate + 'T12:00:00').toLocaleDateString('en-US', {
-            weekday: 'long', month: 'long', day: 'numeric'
-          }).toUpperCase();
+        const d = new Date(cardDate + 'T12:00:00');
+        if (!isNaN(d.getTime())) {
+          document.getElementById('card-date-heading').textContent =
+            d.toLocaleDateString('en-US', {
+              weekday: 'long', month: 'long', day: 'numeric'
+            }).toUpperCase();
+        }
+      } else if (generatedAt) {
+        // Fallback: derive date from generated_at if cardDate absent or invalid
+        const d = new Date(generatedAt);
+        if (!isNaN(d.getTime())) {
+          document.getElementById('card-date-heading').textContent =
+            d.toLocaleDateString('en-US', {
+              weekday: 'long', month: 'long', day: 'numeric'
+            }).toUpperCase();
+        }
       }
     }
 
@@ -1162,17 +1221,20 @@ fetch(DATA_BASE + 'daily_picks.json')
     renderPositions(picks);
   })
   .catch(() => {
-    document.getElementById('seal-status-text').textContent = 'ERROR LOADING';
-    document.getElementById('seal-status-chip').className = 'seal-status collecting';
-    document.getElementById('positions-list').innerHTML = `
-      <div class="card">
-        <div class="empty-state">
-          <i data-lucide="wifi-off" style="width:28px;height:28px;color:var(--border-light);"></i>
-          <div class="empty-state-title">UNABLE TO LOAD CARD</div>
-          <div class="empty-state-message">Could not reach the data source. Try refreshing.</div>
-        </div>
-      </div>`;
-    lucide.createIcons();
+    // Only show error state if summary bar hasn't already populated (i.e. no cached data)
+    if (!_cachedPicks.length) {
+      document.getElementById('seal-status-text').textContent = 'ERROR LOADING';
+      document.getElementById('seal-status-chip').className = 'seal-status collecting';
+      document.getElementById('positions-list').innerHTML = `
+        <div class="card">
+          <div class="empty-state">
+            <i data-lucide="wifi-off" style="width:28px;height:28px;color:var(--border-light);"></i>
+            <div class="empty-state-title">UNABLE TO LOAD CARD</div>
+            <div class="empty-state-message">Could not reach the data source. Try refreshing.</div>
+          </div>
+        </div>`;
+      lucide.createIcons();
+    }
   });
 
 // ── Load scorecard.json for variance state ──
