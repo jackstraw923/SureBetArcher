@@ -574,10 +574,12 @@ lucide.createIcons();
   });
   const ham = document.getElementById('nav-hamburger');
   const mob = document.getElementById('nav-mobile');
-  ham.addEventListener('click', () => {
-    const open = mob.classList.toggle('open');
-    ham.setAttribute('aria-expanded', open);
-  });
+  if (ham && mob) {
+    ham.addEventListener('click', () => {
+      const open = mob.classList.toggle('open');
+      ham.setAttribute('aria-expanded', open);
+    });
+  }
 })();
 
 // ── Helpers ──
@@ -760,7 +762,8 @@ document.querySelectorAll('[data-window]').forEach(btn => {
 });
 
 // ── Attribution toggle ──
-document.getElementById('attr-toggle').addEventListener('click', function() {
+const _att = document.getElementById('attr-toggle');
+if (_att) _att.addEventListener('click', function() {
   const tray = document.getElementById('attr-tray');
   const icon = this.querySelector('i');
   const showing = tray.style.display !== 'none';

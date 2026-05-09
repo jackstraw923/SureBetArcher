@@ -429,7 +429,7 @@
     .email-capture-title {
       font-family: var(--font-head);
       font-weight: 800;
-      font-size: clamp(28px, 3.5vw, 42px);
+      font-size: clamp(40px, 5vw, 62px);
       color: var(--text);
       margin-bottom: var(--space-3);
     }
@@ -954,10 +954,12 @@ lucide.createIcons();
   });
   const hamburger = document.getElementById('nav-hamburger');
   const mobileMenu = document.getElementById('nav-mobile');
-  hamburger.addEventListener('click', function() {
-    const isOpen = mobileMenu.classList.toggle('open');
-    hamburger.setAttribute('aria-expanded', isOpen);
-  });
+  if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', function() {
+      const isOpen = mobileMenu.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', isOpen);
+    });
+  }
 })();
 
 // ── Process Score Dial ──
@@ -1074,7 +1076,8 @@ document.querySelectorAll('[data-window]').forEach(btn => {
 });
 
 // ── Breakdown toggle ──
-document.getElementById('breakdown-toggle').addEventListener('click', function() {
+const _bdt = document.getElementById('breakdown-toggle');
+if (_bdt) _bdt.addEventListener('click', function() {
   const tray = document.getElementById('attribution-tray');
   const isVisible = tray.style.display !== 'none';
   tray.style.display = isVisible ? 'none' : 'block';

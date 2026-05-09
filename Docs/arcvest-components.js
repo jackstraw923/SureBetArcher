@@ -73,8 +73,9 @@
         ArcVest is a quantitative advisory framework for evaluating sports-market prices and
         portfolio risk. For informational purposes only. Not investment advice. Past model
         performance does not guarantee future results. Must be 21 or older. Only available
-        where permitted by applicable law. ArcVest uses non-intrusive advertising to keep
-        the platform accessible. Pro subscribers are ad-free.
+        where permitted by applicable law. ArcVest may earn a commission from qualifying
+        purchases made through affiliate links on this platform. Affiliate relationships do
+        not influence model outputs or position recommendations. Pro subscribers are ad-free.
       </p>
       <span class="footer-copy">
         Reset 4 baseline: April 23, 2026 &nbsp;·&nbsp; Last run: <span id="footer-last-run">—</span>

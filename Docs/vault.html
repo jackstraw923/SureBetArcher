@@ -1482,6 +1482,36 @@ lucide.createIcons();
   }
 })();
 
+
+// ── VAULT-NAV-1: Collapsible sidebar sections ──
+const PANEL_SECTION_MAP = {
+  'novig': 'tools', 'odds-converter': 'tools', 'kelly': 'tools', 'hedge': 'tools',
+  'article-alpha-ledger': 'methodology', 'article-variance-shadow': 'methodology',
+  'article-allocation-guide': 'methodology',
+  'article-bounded-overlay': 'playoff', 'article-path-to-cup': 'playoff',
+  'article-twogates': 'foundations', 'article-odds-formats': 'foundations',
+  'articles': 'coming-soon', 'deepdives': 'coming-soon'
+};
+
+function toggleVaultSection(section) {
+  const body   = document.getElementById('vault-section-' + section);
+  const toggle = document.querySelector('.vault-section-toggle[data-section="' + section + '"]');
+  if (!body || !toggle) return;
+  const isOpen = !body.classList.contains('collapsed');
+  body.classList.toggle('collapsed', isOpen);
+  toggle.classList.toggle('open', !isOpen);
+  toggle.querySelector('.vault-section-chevron').textContent = isOpen ? '▸' : '▾';
+}
+
+function openVaultSection(section) {
+  const body   = document.getElementById('vault-section-' + section);
+  const toggle = document.querySelector('.vault-section-toggle[data-section="' + section + '"]');
+  if (!body || !toggle) return;
+  body.classList.remove('collapsed');
+  toggle.classList.add('open');
+  toggle.querySelector('.vault-section-chevron').textContent = '▾';
+}
+
 // ── Sidebar: panel switching ──
 const vaultItems = document.querySelectorAll('.vault-item[data-panel]');
 const panels     = document.querySelectorAll('.vault-panel');
@@ -1494,6 +1524,9 @@ function showPanel(id) {
   vaultItems.forEach(i => { if (i.dataset.panel === id) i.classList.add('active'); });
   document.getElementById('vault-sidebar').classList.remove('open');
   window.scrollTo(0, 0);
+  // Auto-expand the sidebar section containing this panel
+  const sec = PANEL_SECTION_MAP[id];
+  if (sec) openVaultSection(sec);
 }
 
 vaultItems.forEach(item => {
