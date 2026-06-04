@@ -393,7 +393,7 @@
     }
 
     /* ── Tennis / Soccer sub-group headers ── */
-    .tour-group { margin-bottom: var(--space-5); }
+    .tour-group { margin-bottom: var(--space-5); display: block; width: 100%; }
 
     .tour-header {
       display: flex;
@@ -817,9 +817,14 @@ function formatEV(val) {
 function formatTime(utcStr) {
   if (!utcStr) return '';
   try {
-    return new Date(utcStr).toLocaleTimeString('en-US', {
+    const d = new Date(utcStr);
+    const date = d.toLocaleDateString('en-US', {
+      month: 'numeric', day: 'numeric', timeZone: 'America/New_York'
+    });
+    const time = d.toLocaleTimeString('en-US', {
       hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/New_York'
-    }) + ' ET';
+    });
+    return `${date}, ${time} ET`;
   } catch { return ''; }
 }
 
@@ -1088,7 +1093,9 @@ function renderTennisSection(games) {
       : ''}
     <span class="sport-section-meta">${gameCount} MATCH${gameCount !== 1 ? 'ES' : ''}</span>
   </div>
-  ${tourOrder.map(renderTourGroup).join('')}
+  <div style="display:block;width:100%;">
+    ${tourOrder.map(renderTourGroup).join('')}
+  </div>
 </section>`;
 }
 

@@ -1133,16 +1133,48 @@ function renderPositions(picks) {
 
 // ── Load daily_picks.json ──
 let _cachedPicks = [];   // module-scope cache for odds format re-render
+let _picksLoaded  = false; // guard against double-render on retry
 
 function renderAllPicks() {
   if (_cachedPicks.length) renderPositions(_cachedPicks);
 }
 
-fetch(DATA_BASE + 'daily_picks.json')
-  .then(r => r.json())
-  .then(data => {
+// Extension-resilient fetch: some Chrome extensions (ad blockers, shopping tools, etc.)
+// intercept fetch promises and close the message channel before resolution, producing
+// "message channel closed" errors that silently abort the render. This wrapper retries
+// once after a short delay when that happens.
+function loadPicksWithRetry(attempt) {
+  attempt = attempt || 1;
+  fetch(DATA_BASE + 'daily_picks.json')
+    .then(r => r.json())
+    .then(data => { processPicks(data); })
+    .catch(err => {
+      if (attempt < 3) {
+        setTimeout(() => loadPicksWithRetry(attempt + 1), 800 * attempt);
+      } else {
+        if (!_picksLoaded) {
+          document.getElementById('seal-status-text').textContent = 'ERROR LOADING';
+          document.getElementById('seal-status-chip').className = 'seal-status collecting';
+          document.getElementById('positions-list').innerHTML = `
+            <div class="card">
+              <div class="empty-state">
+                <i data-lucide="wifi-off" style="width:28px;height:28px;color:var(--border-light);"></i>
+                <div class="empty-state-title">UNABLE TO LOAD CARD</div>
+                <div class="empty-state-message">Could not reach the data source. Try refreshing.</div>
+              </div>
+            </div>`;
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+      }
+    });
+}
 
-    // Handle both array format and {picks:[]} wrapper
+function processPicks(data) {
+  if (_picksLoaded) return; // idempotent — ignore duplicate calls from retry
+  _picksLoaded = true;
+
+
+  // Handle both array format and {picks:[]} wrapper
     const picks = Array.isArray(data)
       ? data.filter(p => (p.status || '').toUpperCase() === 'ACTIVE' || p.status == null)
       : (data.picks || []).filter(p => (p.status || '').toUpperCase() === 'ACTIVE' || p.status == null);
@@ -1226,23 +1258,9 @@ fetch(DATA_BASE + 'daily_picks.json')
     } catch(e) {
       console.error('[ArcVest] renderPositions error:', e);
     }
-  })
-  .catch(() => {
-    // Only show error state if summary bar hasn't already populated (i.e. no cached data)
-    if (!_cachedPicks.length) {
-      document.getElementById('seal-status-text').textContent = 'ERROR LOADING';
-      document.getElementById('seal-status-chip').className = 'seal-status collecting';
-      document.getElementById('positions-list').innerHTML = `
-        <div class="card">
-          <div class="empty-state">
-            <i data-lucide="wifi-off" style="width:28px;height:28px;color:var(--border-light);"></i>
-            <div class="empty-state-title">UNABLE TO LOAD CARD</div>
-            <div class="empty-state-message">Could not reach the data source. Try refreshing.</div>
-          </div>
-        </div>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
-  });
+} // end processPicks
+
+loadPicksWithRetry();
 
 // ── Load scorecard.json for variance state ──
 fetch(DATA_BASE + 'scorecard.json')
