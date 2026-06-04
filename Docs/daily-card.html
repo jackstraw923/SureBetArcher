@@ -412,6 +412,22 @@
       color: var(--bg);
       border-color: var(--gold);
     }
+    /* Filter bar sticky container — matches Odds page controls-bar */
+    .daily-controls-bar {
+      position: sticky;
+      top: var(--nav-height);
+      z-index: var(--z-drawer);
+      background: rgba(10, 12, 16, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--space-4);
+    }
+    .daily-controls-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--page-padding-x);
+    }
     /* Filter bar: space between sport pills and odds toggle */
     #sport-filter-bar {
       display: flex;
@@ -419,6 +435,7 @@
       flex-wrap: wrap;
       justify-content: space-between;
       gap: var(--space-2);
+      padding: var(--space-3) 0;
     }
     .filter-bar-left {
       display: flex;
@@ -506,8 +523,10 @@
 <main>
   <div class="page-container" style="padding-top:var(--space-6);padding-bottom:var(--space-8);">
 
-    <!-- Sport filter bar -->
-    <div class="filter-bar" id="sport-filter-bar" style="margin-bottom:var(--space-4);">
+<!-- ── Sticky filter bar ── -->
+<div class="daily-controls-bar">
+  <div class="daily-controls-inner">
+    <div class="filter-bar" id="sport-filter-bar">
       <div class="filter-bar-left">
         <span class="filter-label">SPORT:</span>
         <button class="filter-pill active" data-sport="ALL">ALL</button>
@@ -519,6 +538,8 @@
         <button class="toggle-btn" id="btn-decimal" onclick="setOddsFormat('decimal')">DECIMAL</button>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Open position alert (shown when any pick has open_position = true) -->
     <div class="open-position-alert" id="open-position-alert" style="display:none;">
@@ -1052,7 +1073,7 @@ function applyFilter(sport) {
   }
   const target = document.getElementById('section-' + sport);
   if (target) {
-    const offset = 80; // clearance for sticky controls bar
+    const offset = 120; // nav height + sticky filter bar height
     const top = target.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: 'smooth' });
   }
@@ -1064,11 +1085,6 @@ document.getElementById('sport-filter-bar').addEventListener('click', function(e
   this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
   pill.classList.add('active');
   applyFilter(pill.dataset.sport);
-  // Reset active pill to ALL after a brief delay (scroll-to doesn't "select" a sport)
-  setTimeout(() => {
-    this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    this.querySelector('.filter-pill[data-sport="ALL"]').classList.add('active');
-  }, 800);
 });
 
 // ── Render positions ──
@@ -1139,7 +1155,7 @@ function renderPositions(picks) {
 
   sortedFamilies.forEach(family => {
     // Family-level anchor div for pill scroll targeting
-    html += `<div id="section-${family}" style="scroll-margin-top:80px;">`;
+    html += `<div id="section-${family}" style="scroll-margin-top:120px;">`;
 
     familyMap[family].forEach(sport => {
       const sportPicks = grouped[sport];
