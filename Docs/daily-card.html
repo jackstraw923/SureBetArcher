@@ -662,7 +662,7 @@ function sportIcon(sport, cls) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="${cls}" style="fill:${color};flex-shrink:0;">${path}</svg>`;
 }
 
-lucide.createIcons();
+if (typeof lucide !== 'undefined') lucide.createIcons();
 
 // ── Nav ──
 (function() {
@@ -1012,7 +1012,7 @@ function togglePositionDetail(trigger, targetId) {
   const isOpen = detail.classList.toggle('open');
   trigger.setAttribute('aria-expanded', isOpen);
   if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-  if (isOpen) lucide.createIcons();
+  if (isOpen && typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // ── Sport filter ──
@@ -1053,7 +1053,7 @@ function renderPositions(picks) {
           </a>
         </div>
       </div>`;
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     return;
   }
 
@@ -1128,7 +1128,7 @@ function renderPositions(picks) {
     alert.style.display = 'flex';
   }
 
-  lucide.createIcons();
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // ── Load daily_picks.json ──
@@ -1217,11 +1217,15 @@ fetch(DATA_BASE + 'daily_picks.json')
       sealEl.className = 'seal-status pending';
       sealText.textContent = 'SEAL PENDING';
     }
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    // Defer renderPositions outside promise microtask queue
-    // Prevents extension-injected promise errors from aborting card render
-    setTimeout(() => renderPositions(picks), 0);
+    // Render positions — wrapped in try/catch so any extension-injected error
+    // surfaces to console rather than silently aborting the card render
+    try {
+      renderPositions(picks);
+    } catch(e) {
+      console.error('[ArcVest] renderPositions error:', e);
+    }
   })
   .catch(() => {
     // Only show error state if summary bar hasn't already populated (i.e. no cached data)
@@ -1236,7 +1240,7 @@ fetch(DATA_BASE + 'daily_picks.json')
             <div class="empty-state-message">Could not reach the data source. Try refreshing.</div>
           </div>
         </div>`;
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   });
 
@@ -1249,7 +1253,7 @@ fetch(DATA_BASE + 'scorecard.json')
       const block = document.getElementById('sum-variance-block');
       document.getElementById('sum-variance-badge').innerHTML = varianceBadge(vs);
       block.style.display = 'flex';
-      lucide.createIcons();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   })
   .catch(() => {});

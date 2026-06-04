@@ -640,12 +640,32 @@ const SVG = {
     </svg>`,
 };
 
-// Sport → SVG icon function
+// Sport → SVG icon function — Phosphor icon paths (regular weight, 256px viewBox)
 function sportIcon(family, size, color) {
-  const tennis  = ['TENNIS'];
-  const soccer  = ['SOCCER'];
-  const fn = (tennis.includes(family) || soccer.includes(family)) ? SVG.circleDot : SVG.circle;
-  return fn(size, color || 'var(--muted)');
+  const col = color || 'var(--muted)';
+  const isTennis = family === 'TENNIS';
+  const isSoccer = family === 'SOCCER';
+
+  const paths = {
+    baseball:   '<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM72.09,195.91c.82-1,1.64-1.93,2.42-2.91A8,8,0,1,0,62,183l-1.34,1.62a87.82,87.82,0,0,1,0-113.24L62,73A8,8,0,1,0,74.51,63c-.78-1-1.6-2-2.42-2.91a87.84,87.84,0,0,1,111.82,0c-.82,1-1.64,1.92-2.42,2.91A8,8,0,1,0,194,73l1.34-1.62a87.82,87.82,0,0,1,0,113.24L194,183a8,8,0,1,0-12.48,10c.78,1,1.6,1.95,2.42,2.91a87.84,87.84,0,0,1-111.82,0Zm23.8-50.59a104.5,104.5,0,0,1-4.48,17.35,8,8,0,0,1-15.09-5.34,87.1,87.1,0,0,0,3.79-14.65,8,8,0,1,1,15.78,2.64Zm0-34.64a8,8,0,0,1-6.57,9.21A8.52,8.52,0,0,1,88,120a8,8,0,0,1-7.88-6.68,87.1,87.1,0,0,0-3.79-14.65,8,8,0,0,1,15.09-5.34A104.5,104.5,0,0,1,95.89,110.68Zm78.91,56.86a8,8,0,0,1-10.21-4.87,104.5,104.5,0,0,1-4.48-17.35,8,8,0,1,1,15.78-2.64,87.1,87.1,0,0,0,3.79,14.65A8,8,0,0,1,174.8,167.54Zm-14.69-56.86a104.5,104.5,0,0,1,4.48-17.35,8,8,0,0,1,15.09,5.34,87.1,87.1,0,0,0-3.79,14.65A8,8,0,0,1,168,120a8.52,8.52,0,0,1-1.33-.11A8,8,0,0,1,160.11,110.68Z"/>',
+    basketball: '<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM60,72.17A87.2,87.2,0,0,1,79.63,120H40.37A87.54,87.54,0,0,1,60,72.17ZM136,120V40.37a87.59,87.59,0,0,1,48.68,20.37A103.06,103.06,0,0,0,160.3,120Zm-16,0H95.7A103.06,103.06,0,0,0,71.32,60.74,87.59,87.59,0,0,1,120,40.37ZM79.63,136A87.2,87.2,0,0,1,60,183.83,87.54,87.54,0,0,1,40.37,136Zm16.07,0H120v79.63a87.59,87.59,0,0,1-48.68-20.37A103.09,103.09,0,0,0,95.7,136Zm40.3,0h24.3a103.09,103.09,0,0,0,24.38,59.26A87.59,87.59,0,0,1,136,215.63Zm40.37,0h39.26A87.54,87.54,0,0,1,196,183.83,87.2,87.2,0,0,1,176.37,136Zm0-16A87.2,87.2,0,0,1,196,72.17,87.54,87.54,0,0,1,215.63,120Z"/>',
+    hockey:     '<path d="M224,152H130.9L38.1,42.82A8,8,0,0,0,25.9,53.18L159.51,210.36A16,16,0,0,0,171.7,216H224a16,16,0,0,0,16-16V168A16,16,0,0,0,224,152Zm-79.5,16H192v32H171.7ZM224,200H208V168h16ZM112.18,179.55a8,8,0,0,0-11.27.91L84.3,200H64V168H85.2a8,8,0,0,0,0-16H32a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16H84.3a16,16,0,0,0,12.19-5.64l16.61-19.53A8,8,0,0,0,112.18,179.55ZM32,168H48v32H32Zm117.9-45.18,68-80a8,8,0,0,1,12.2,10.36l-68,80a8,8,0,1,1-12.2-10.36Z"/>',
+    soccer:     '<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm76.52,147.42H170.9l-9.26-12.76,12.63-36.78,15-4.89,26.24,20.13A87.38,87.38,0,0,1,204.52,171.42Zm-164-34.3L66.71,117l15,4.89,12.63,36.78L85.1,171.42H51.48A87.38,87.38,0,0,1,40.47,137.12Zm10-50.64,5.51,18.6L40.71,116.77A87.33,87.33,0,0,1,50.43,86.48ZM109,152,97.54,118.65,128,97.71l30.46,20.94L147,152Zm91.07-46.92,5.51-18.6a87.33,87.33,0,0,1,9.72,30.29Zm-6.2-35.38-9.51,32.08-15.07,4.89L136,83.79V68.21l29.09-20A88.58,88.58,0,0,1,193.86,69.7ZM146.07,41.87,128,54.29,109.93,41.87a88.24,88.24,0,0,1,36.14,0ZM90.91,48.21l29.09,20V83.79L86.72,106.67l-15.07-4.89L62.14,69.7A88.58,88.58,0,0,1,90.91,48.21ZM63.15,187.42H83.52l7.17,20.27A88.4,88.4,0,0,1,63.15,187.42ZM110,214.13,98.12,180.71,107.35,168h41.3l9.23,12.71-11.83,33.42a88,88,0,0,1-36.1,0Zm55.36-6.44,7.17-20.27h20.37A88.4,88.4,0,0,1,165.31,207.69Z"/>',
+    tennis:     '<path d="M201.57,54.46a104,104,0,1,0,0,147.08A103.4,103.4,0,0,0,201.57,54.46ZM65.75,65.77a87.63,87.63,0,0,1,53.66-25.31A87.31,87.31,0,0,1,94,94.06a87.42,87.42,0,0,1-53.62,25.35A87.58,87.58,0,0,1,65.75,65.77ZM40.33,135.48a103.29,103.29,0,0,0,65-30.11,103.24,103.24,0,0,0,30.13-65,87.78,87.78,0,0,1,80.18,80.14,104,104,0,0,0-95.16,95.1,87.78,87.78,0,0,1-80.18-80.14Zm149.92,54.75a87.69,87.69,0,0,1-53.66,25.31,88,88,0,0,1,79-78.95A87.58,87.58,0,0,1,190.25,190.23Z"/>',
+    football:   '<path d="M229.06,53.89a32.92,32.92,0,0,0-26.95-26.95c-32.37-5.49-93.39-8-138.27,36.9s-42.39,105.9-36.9,138.27a32.92,32.92,0,0,0,27,26.95A206.58,206.58,0,0,0,88.27,232c32.09,0,72.05-8,103.89-39.84C237.05,147.28,234.55,86.26,229.06,53.89Zm-61.61-14a192,192,0,0,1,32,2.8A16.94,16.94,0,0,1,213.3,56.56,188.59,188.59,0,0,1,216,92.78L163.21,40C164.61,39.92,166,39.9,167.45,39.9ZM56.56,213.3A16.94,16.94,0,0,1,42.7,199.44,188.59,188.59,0,0,1,40,163.22L92.78,216A187.79,187.79,0,0,1,56.56,213.3Zm124.3-32.44c-11.61,11.6-33.27,27.73-67.37,33.27L41.87,142.51c5.54-34.1,21.67-55.76,33.27-67.37S108.4,47.4,142.5,41.86l71.63,71.63C208.59,147.59,192.46,169.25,180.86,180.86Zm-15.22-90.5a8,8,0,0,1,0,11.31L151.3,116l6.34,6.34a8,8,0,1,1-11.31,11.3L140,127.31,127.31,140l6.34,6.34a8,8,0,1,1-11.3,11.31L116,151.3l-14.34,14.34a8,8,0,1,1-11.31-11.31L104.7,140l-6.34-6.34a8,8,0,0,1,11.31-11.3l6.34,6.34L128.69,116l-6.34-6.34a8,8,0,0,1,11.3-11.31L140,104.7l14.34-14.34A8,8,0,0,1,165.64,90.36Z"/>'
+  };
+
+  const key = isTennis ? 'tennis'
+    : isSoccer ? 'soccer'
+    : family === 'MLB' || family === 'NCAAB' || family === 'NCAAW' ? 'baseball'
+    : family === 'NBA' || family === 'WNBA' ? 'basketball'
+    : family === 'NHL' ? 'hockey'
+    : family === 'NFL' || family === 'NCAAF' ? 'football'
+    : 'baseball';
+
+  const path = paths[key] || paths.baseball;
+  const px = typeof size === 'number' ? size : 24;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="${px}" height="${px}" style="fill:${col};flex-shrink:0;display:inline-block;vertical-align:middle;">${path}</svg>`;
 }
 
 // ── Nav: active state + hamburger + tournaments ──
@@ -1062,9 +1082,7 @@ function renderTennisSection(games) {
 <section class="sport-section" id="section-tennis" style="margin-bottom:var(--space-7);scroll-margin-top:120px;">
   <div class="sport-section-header">
     <div class="sport-section-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-      ${SVG.circleDot(24, 'var(--text)')}
-    </div>
-    <span class="sport-section-title">TENNIS</span>
+      ${sportIcon('TENNIS', 24, 'var(--text)')}
     ${passCount > 0
       ? `<span style="display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:3px var(--space-2);border-radius:100px;background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2);margin-left:var(--space-3);">${passCount} QUALIFIED</span>`
       : ''}
@@ -1090,7 +1108,7 @@ function renderSoccerSection(games) {
 <section class="sport-section" id="section-soccer" style="margin-bottom:var(--space-7);scroll-margin-top:120px;">
   <div class="sport-section-header">
     <div class="sport-section-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-      ${SVG.circleDot(24, 'var(--text)')}
+      ${sportIcon('SOCCER', 24, 'var(--text)')}
     </div>
     <span class="sport-section-title">SOCCER</span>
     ${passCount > 0
@@ -1120,7 +1138,7 @@ function renderSportSection(family, games) {
 <section class="sport-section" id="section-${family.toLowerCase()}" style="margin-bottom:var(--space-7);scroll-margin-top:120px;">
   <div class="sport-section-header">
     <div class="sport-section-icon" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
-      ${SVG.circle(24, 'var(--text)')}
+      ${sportIcon(family, 24, 'var(--text)')}
     </div>
     <span class="sport-section-title">${cfg.display}</span>
     ${passCount > 0
@@ -1137,7 +1155,7 @@ function buildSportPills(familyOrder) {
   const container = document.getElementById('sport-pills');
   container.innerHTML = familyOrder.map(f => {
     const cfg  = sportCfg(f);
-    const icon = (f === 'TENNIS' || f === 'SOCCER') ? SVG.circleDot(12, 'currentColor') : SVG.circle(12, 'currentColor');
+    const icon = sportIcon(f, 12, 'currentColor');
     return `<a class="sport-pill-anchor" href="#section-${f.toLowerCase()}">${icon} ${cfg.display}</a>`;
   }).join('');
 }
