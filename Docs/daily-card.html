@@ -698,7 +698,11 @@ function sportIcon(sport, cls) {
     : 'baseball';
 
   const path = paths[key] || paths.baseball;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="${cls}" style="fill:${color};flex-shrink:0;">${path}</svg>`;
+  // If cls is a number, treat it as explicit pixel size
+  const isPixelSize = typeof cls === 'number';
+  const sizeAttr = isPixelSize ? `width="${cls}" height="${cls}"` : '';
+  const classAttr = isPixelSize ? '' : `class="${cls}"`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" ${sizeAttr} ${classAttr} style="fill:${color};flex-shrink:0;display:inline-block;vertical-align:middle;">${path}</svg>`;
 }
 
 if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -1172,7 +1176,7 @@ function renderPositions(picks) {
     pillContainer.appendChild(allPill);
 
     sortedFamilies.forEach(f => {
-      const icon = sportIcon(f, 12, 'currentColor');
+      const icon = sportIcon(f, 14);
       const label = f === 'TENNIS' ? 'TENNIS'
         : f === 'SOCCER' ? 'SOCCER'
         : f;
@@ -1207,7 +1211,11 @@ function renderPositions(picks) {
           hasAnyOpen = true;
           openCount++;
         }
-        html += buildPositionCard(p, `${sport}-${i}`);
+        try {
+          html += buildPositionCard(p, `${sport}-${i}`);
+        } catch(cardErr) {
+          console.error('[ArcVest] buildPositionCard error for pick', i, cardErr);
+        }
       });
     });
 
@@ -1347,13 +1355,8 @@ function processPicks(data) {
     }
     if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    // Render positions — wrapped in try/catch so any extension-injected error
-    // surfaces to console rather than silently aborting the card render
-    try {
-      renderPositions(picks);
-    } catch(e) {
-      console.error('[ArcVest] renderPositions error:', e);
-    }
+    // Render positions
+    renderPositions(picks);
 } // end processPicks
 
 loadPicksWithRetry();
