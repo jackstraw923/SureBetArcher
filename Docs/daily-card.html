@@ -1361,6 +1361,18 @@ function processPicks(data) {
 
 loadPicksWithRetry();
 
+// Some Chrome extensions (ad blockers, shopping tools) inject listeners that close
+// the message channel mid-flight, producing an unhandled promise rejection at the
+// window level that our fetch .catch() never sees. If picks haven't loaded yet,
+// schedule a retry.
+window.addEventListener('unhandledrejection', function(event) {
+  const msg = event.reason && (event.reason.message || String(event.reason));
+  if (!_picksLoaded && msg && msg.includes('message channel closed')) {
+    event.preventDefault(); // suppress console error
+    setTimeout(() => { if (!_picksLoaded) loadPicksWithRetry(); }, 600);
+  }
+});
+
 // ── Load scorecard.json for variance state ──
 fetch(DATA_BASE + 'scorecard.json')
   .then(r => r.json())
