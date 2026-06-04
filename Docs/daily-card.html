@@ -735,16 +735,31 @@ function fmtKelly(v) {
   if (v == null) return '—';
   return (parseFloat(v) * 100).toFixed(1) + '%';
 }
-function fmtTime(raw) {
+function fmtTime(raw, dateStr) {
   if (!raw) return '—';
-  // Already formatted ET string from daily_picks
-  if (typeof raw === 'string' && !raw.includes('T')) return raw;
-  // ISO datetime — convert to ET display
-  try {
-    return new Date(raw).toLocaleTimeString('en-US', {
-      hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York'
-    }) + ' ET';
-  } catch { return raw; }
+  let timeOut;
+  // Already formatted ET string from daily_picks (e.g. "8:30 AM")
+  if (typeof raw === 'string' && !raw.includes('T')) {
+    timeOut = raw;
+  } else {
+    // ISO datetime — convert to ET display
+    try {
+      timeOut = new Date(raw).toLocaleTimeString('en-US', {
+        hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York'
+      }) + ' ET';
+    } catch { return raw; }
+  }
+  // Prepend M/D date if available (format: "06/05/2026" or "2026-06-05")
+  if (dateStr) {
+    try {
+      const d = new Date(dateStr.includes('/') ? dateStr : dateStr + 'T12:00:00');
+      if (!isNaN(d.getTime())) {
+        const md = d.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
+        return `${md}, ${timeOut}`;
+      }
+    } catch {}
+  }
+  return timeOut;
 }
 function fmtDate(raw) {
   if (!raw) return '';
@@ -762,7 +777,20 @@ function sportLabel(s) {
     'ATP':'ATP','WTA':'WTA'
   };
   if (m[s]) return m[s];
-  if (s && s.startsWith('CHA')) return 'ATP CH';
+  if (s && s.startsWith('CHA')) {
+    // "CHA - Birmingham" → "ATP CH · Birmingham"
+    const parts = s.split(' - ');
+    return parts.length > 1 ? `ATP CH · ${parts.slice(1).join(' - ')}` : 'ATP CH';
+  }
+  if (s && s.startsWith('ATP')) {
+    // "ATP - French Open" → "ATP · French Open"
+    const parts = s.split(' - ');
+    return parts.length > 1 ? `ATP · ${parts.slice(1).join(' - ')}` : 'ATP';
+  }
+  if (s && s.startsWith('WTA')) {
+    const parts = s.split(' - ');
+    return parts.length > 1 ? `WTA · ${parts.slice(1).join(' - ')}` : 'WTA';
+  }
   return s || '—';
 }
 
@@ -835,7 +863,8 @@ function buildPositionCard(p, index) {
   const home     = p.Home  || p.home  || '';
   const matchup  = away && home ? `${away} @ ${home}` : (away || home || '—');
   const betType  = p['Bet Type'] || p.bet_type || '—';
-  const time     = fmtTime(p['Time (ET)'] || p.commence_time || p.time);
+  const rawDate  = p.Date || p.date || '';
+  const time     = fmtTime(p['Time (ET)'] || p.commence_time || p.time, rawDate);
   const ev       = fmtEV(p.EV || p.model_ev);
   const hasOpen  = p.open_position === true || p.open_position === 'TRUE';
   const statusNote = p.status === '910' ? '910' : null;
@@ -1017,13 +1046,16 @@ function togglePositionDetail(trigger, targetId) {
 
 // ── Sport filter ──
 function applyFilter(sport) {
-  document.querySelectorAll('.position-card').forEach(card => {
-    const s = card.dataset.sport || '';
-    const show = sport === 'ALL' || s === sport
-              || (sport === 'TENNIS' && (s.startsWith('ATP') || s.startsWith('WTA') || s.startsWith('CHA')))
-              || (sport === 'SOCCER' && s.startsWith('SOCCER'));
-    card.style.display = show ? '' : 'none';
-  });
+  if (sport === 'ALL') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  const target = document.getElementById('section-' + sport);
+  if (target) {
+    const offset = 80; // clearance for sticky controls bar
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
 }
 
 document.getElementById('sport-filter-bar').addEventListener('click', function(e) {
@@ -1032,6 +1064,11 @@ document.getElementById('sport-filter-bar').addEventListener('click', function(e
   this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
   pill.classList.add('active');
   applyFilter(pill.dataset.sport);
+  // Reset active pill to ALL after a brief delay (scroll-to doesn't "select" a sport)
+  setTimeout(() => {
+    this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    this.querySelector('.filter-pill[data-sport="ALL"]').classList.add('active');
+  }, 800);
 });
 
 // ── Render positions ──
@@ -1065,42 +1102,49 @@ function renderPositions(picks) {
     grouped[s].push(p);
   });
 
-  // Build sport filter pills (unique sports) — only on first render
-  const filterBar = document.getElementById('sport-filter-bar');
-  const sports = Object.keys(grouped);
-  const families = new Set();
-  sports.forEach(s => {
-    if (s.startsWith('SOCCER')) families.add('SOCCER');
-    else if (s.startsWith('ATP') || s.startsWith('WTA') || s.startsWith('CHA')) families.add('TENNIS');
-    else families.add(s);
+  // Render cards — group by family first for scroll anchor IDs
+  let html = '';
+  let hasAnyOpen = false;
+  let openCount = 0;
+
+  // Build family → [sport] mapping in canonical order
+  const SPORT_ORDER = ['MLB', 'NBA', 'WNBA', 'NCAAB', 'NCAAW', 'NHL', 'NFL', 'NCAAF', 'SOCCER', 'TENNIS'];
+  const familyMap = {};
+  Object.keys(grouped).forEach(sport => {
+    let fam;
+    if (sport.startsWith('SOCCER')) fam = 'SOCCER';
+    else if (sport.startsWith('ATP') || sport.startsWith('WTA') || sport.startsWith('CHA')) fam = 'TENNIS';
+    else fam = sport;
+    if (!familyMap[fam]) familyMap[fam] = [];
+    familyMap[fam].push(sport);
   });
-  // Only inject pills if they haven't been built yet (avoid duplicating on toggle re-render)
+  const sortedFamilies = SPORT_ORDER.filter(f => familyMap[f])
+    .concat(Object.keys(familyMap).filter(f => !SPORT_ORDER.includes(f)).sort());
+
+  // Inject pills on first render only (idempotent on toggle re-render)
+  const filterBar = document.getElementById('sport-filter-bar');
   const existingPills = filterBar.querySelectorAll('.filter-pill[data-sport]:not([data-sport="ALL"])');
   if (existingPills.length === 0) {
-    // Canonical sport order — always consistent regardless of JSON data order
-    const SPORT_ORDER = ['MLB', 'NBA', 'WNBA', 'NCAAB', 'NCAAW', 'NHL', 'NFL', 'NCAAF', 'SOCCER', 'TENNIS'];
-    const sortedFamilies = SPORT_ORDER.filter(f => families.has(f))
-      .concat([...families].filter(f => !SPORT_ORDER.includes(f)).sort());
     sortedFamilies.forEach(f => {
       const pill = document.createElement('button');
       pill.className = 'filter-pill';
       pill.dataset.sport = f;
       pill.textContent = f;
-      // Insert before the odds toggle div, not at the end of filterBar
       const toggle = filterBar.querySelector('.odds-toggle');
       if (toggle) filterBar.insertBefore(pill, toggle);
       else filterBar.appendChild(pill);
     });
   }
 
-  // Render cards
-  let html = '';
-  let hasAnyOpen = false;
-  let openCount = 0;
 
-  Object.entries(grouped).forEach(([sport, sportPicks]) => {
-    // Sport section header
-    html += `
+  sortedFamilies.forEach(family => {
+    // Family-level anchor div for pill scroll targeting
+    html += `<div id="section-${family}" style="scroll-margin-top:80px;">`;
+
+    familyMap[family].forEach(sport => {
+      const sportPicks = grouped[sport];
+      // Sport section header
+      html += `
       <div class="sport-section-header" data-sport-header="${sport}">
         <div class="sport-section-icon">
           ${sportIcon(sport, "icon-lg")}
@@ -1109,13 +1153,16 @@ function renderPositions(picks) {
         <span class="sport-section-meta">${sportPicks.length} POSITION${sportPicks.length !== 1 ? 'S' : ''}</span>
       </div>`;
 
-    sportPicks.forEach((p, i) => {
-      if (p.open_position === true || p.open_position === 'TRUE') {
-        hasAnyOpen = true;
-        openCount++;
-      }
-      html += buildPositionCard(p, `${sport}-${i}`);
+      sportPicks.forEach((p, i) => {
+        if (p.open_position === true || p.open_position === 'TRUE') {
+          hasAnyOpen = true;
+          openCount++;
+        }
+        html += buildPositionCard(p, `${sport}-${i}`);
+      });
     });
+
+    html += `</div>`; // close family anchor div
   });
 
   list.innerHTML = html;
