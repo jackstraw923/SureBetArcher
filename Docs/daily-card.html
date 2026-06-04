@@ -421,28 +421,50 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      margin-bottom: var(--space-4);
     }
     .daily-controls-inner {
       max-width: var(--max-width);
       margin: 0 auto;
-      padding: 0 var(--page-padding-x);
-    }
-    /* Filter bar: space between sport pills and odds toggle */
-    #sport-filter-bar {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
       justify-content: space-between;
-      gap: var(--space-2);
-      padding: var(--space-3) 0;
+      padding: var(--space-3) var(--page-padding-x);
+      gap: var(--space-4);
+      flex-wrap: wrap;
     }
-    .filter-bar-left {
+    /* Sport pills — identical to Odds page sport-pill-anchor */
+    #sport-pills-dc {
       display: flex;
       align-items: center;
+      gap: var(--space-1);
       flex-wrap: wrap;
-      gap: var(--space-2);
-      flex: 1;
+    }
+    #sport-pills-dc .sport-pill-anchor {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    #sport-pills-dc .sport-pill-anchor:hover {
+      border-color: var(--border-light);
+      color: var(--text);
+    }
+    #sport-pills-dc .sport-pill-anchor.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.08);
     }
   </style>
 </head>
@@ -526,17 +548,13 @@
 <!-- ── Sticky filter bar ── -->
 <div class="daily-controls-bar">
   <div class="daily-controls-inner">
-    <div class="filter-bar" id="sport-filter-bar">
-      <div class="filter-bar-left">
-        <span class="filter-label">SPORT:</span>
-        <button class="filter-pill active" data-sport="ALL">ALL</button>
-        <!-- Additional sport pills injected by JS -->
-      </div>
-      <div class="odds-toggle">
-        <span class="odds-toggle-label">ODDS</span>
-        <button class="toggle-btn active" id="btn-american" onclick="setOddsFormat('american')">AMERICAN</button>
-        <button class="toggle-btn" id="btn-decimal" onclick="setOddsFormat('decimal')">DECIMAL</button>
-      </div>
+    <div id="sport-pills-dc">
+      <!-- Populated by JS after data loads -->
+    </div>
+    <div class="odds-toggle">
+      <span class="odds-toggle-label">ODDS</span>
+      <button class="toggle-btn active" id="btn-american" onclick="setOddsFormat('american')">AMERICAN</button>
+      <button class="toggle-btn" id="btn-decimal" onclick="setOddsFormat('decimal')">DECIMAL</button>
     </div>
   </div>
 </div>
@@ -799,9 +817,9 @@ function sportLabel(s) {
   };
   if (m[s]) return m[s];
   if (s && s.startsWith('CHA')) {
-    // "CHA - Birmingham" → "ATP CH · Birmingham"
+    // "CHA - Birmingham" → "CHA · Birmingham"
     const parts = s.split(' - ');
-    return parts.length > 1 ? `ATP CH · ${parts.slice(1).join(' - ')}` : 'ATP CH';
+    return parts.length > 1 ? `CHA · ${parts.slice(1).join(' - ')}` : 'CHA';
   }
   if (s && s.startsWith('ATP')) {
     // "ATP - French Open" → "ATP · French Open"
@@ -1069,20 +1087,24 @@ function togglePositionDetail(trigger, targetId) {
 function applyFilter(sport) {
   if (sport === 'ALL') {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Reset all pills to inactive, set ALL active
+    document.querySelectorAll('#sport-pills-dc .sport-pill-anchor').forEach(p => p.classList.remove('active'));
+    const allPill = document.querySelector('#sport-pills-dc .sport-pill-anchor[data-sport="ALL"]');
+    if (allPill) allPill.classList.add('active');
     return;
   }
   const target = document.getElementById('section-' + sport);
   if (target) {
-    const offset = 120; // nav height + sticky filter bar height
+    const offset = 120;
     const top = target.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: 'smooth' });
   }
 }
 
-document.getElementById('sport-filter-bar').addEventListener('click', function(e) {
-  const pill = e.target.closest('.filter-pill');
+document.getElementById('sport-pills-dc').addEventListener('click', function(e) {
+  const pill = e.target.closest('.sport-pill-anchor');
   if (!pill) return;
-  this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  this.querySelectorAll('.sport-pill-anchor').forEach(p => p.classList.remove('active'));
   pill.classList.add('active');
   applyFilter(pill.dataset.sport);
 });
@@ -1138,17 +1160,28 @@ function renderPositions(picks) {
     .concat(Object.keys(familyMap).filter(f => !SPORT_ORDER.includes(f)).sort());
 
   // Inject pills on first render only (idempotent on toggle re-render)
-  const filterBar = document.getElementById('sport-filter-bar');
-  const existingPills = filterBar.querySelectorAll('.filter-pill[data-sport]:not([data-sport="ALL"])');
+  const pillContainer = document.getElementById('sport-pills-dc');
+  const existingPills = pillContainer.querySelectorAll('.sport-pill-anchor[data-sport]');
   if (existingPills.length === 0) {
+    // ALL pill — scrolls to top
+    const allPill = document.createElement('a');
+    allPill.className = 'sport-pill-anchor active';
+    allPill.dataset.sport = 'ALL';
+    allPill.textContent = 'ALL';
+    allPill.href = 'javascript:void(0)';
+    pillContainer.appendChild(allPill);
+
     sortedFamilies.forEach(f => {
-      const pill = document.createElement('button');
-      pill.className = 'filter-pill';
-      pill.dataset.sport = f;
-      pill.textContent = f;
-      const toggle = filterBar.querySelector('.odds-toggle');
-      if (toggle) filterBar.insertBefore(pill, toggle);
-      else filterBar.appendChild(pill);
+      const icon = sportIcon(f, 12, 'currentColor');
+      const label = f === 'TENNIS' ? 'TENNIS'
+        : f === 'SOCCER' ? 'SOCCER'
+        : f;
+      const a = document.createElement('a');
+      a.className = 'sport-pill-anchor';
+      a.dataset.sport = f;
+      a.href = 'javascript:void(0)';
+      a.innerHTML = `${icon} ${label}`;
+      pillContainer.appendChild(a);
     });
   }
 
